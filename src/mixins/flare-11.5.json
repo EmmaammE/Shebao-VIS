@@ -1,0 +1,291 @@
+{
+ "name": "flare",
+ "children": [
+  {
+   "name": "Dresses",
+   "children": [
+
+    
+    {
+      "name": "Occasion",
+      "children": [
+        {"name": "Wedding Dress", "value":2042},
+        {"name": "Hanbok (Korean Dress)", "value": 1992}
+      ]
+    },
+    {
+      "name": "Formal",
+      "children": [
+        {"name": "Floor Length Black Gown", "value": 4958}
+      ]
+    },
+    {"name": "Pencil Dress", "value": 449},
+    {"name": "Fitted Sleveless Dress", "value": 2020},
+    {"name": "Maxi Dress (Black)", "value": 6712},
+    {"name": "Maxi Dress (Tan)", "value": 3621},
+    {"name": "Fitted Racing Stripe Dress", "value": 2222},
+    {"name": "Scalloped Dress", "value": 6006}
+   ]
+  },
+  {
+   "name": "One Pieces",
+   "children": [
+    
+    {"name": "Overalls", "value": 1759},
+    {"name": "Loose Two Piece Jumpsuit", "value": 2165},
+    {"name": "Candice Playsuit", "value": 586},
+    {"name": "Nike Bodysuit", "value": 3322}
+   ]
+  },
+  {
+   "name": "Outerwear",
+   "children": [
+    {
+      "name": "Winter",
+      "children": [
+        {"name": "Super Puff Long Coat", "value": 9433},
+        {"name": "Vintage Mink Fur Coat", "value": 8865},
+        {"name": "Leopard Print Fur Coat", "value": 2954}
+      ]
+    },
+
+    {"name": "Yukata", "value": 8833},
+    {"name": "Blazer", "value": 1732},
+    {"name": "Transparent Organza Crop Hoodie", "value": 4877},
+    {"name": "Nike Crop Jacket", "value": 3623},
+    {"name": "Polyester Jacket", "value": 10066}
+   ]
+  },
+
+  {
+   "name": "Skirts",
+   "children": [
+    {"name": "Polyester Midi Skirt", "value": 1616},
+    {"name": "Tennis Skirt (Blue)", "value": 1027},
+    {"name": "Tennis Skirt (White)", "value": 843}
+   ]
+  },
+  {
+   "name": "Swimwear",
+   "children": [
+    {"name": "Satin Bikini (Neon Green)", "value": 2105},
+    {"name": "Textured Bikini (Neon Pink)", "value": 1316},
+     {"name": "One Piece (Black)", "value": 1316},
+    {"name": "Ribbed Bikini (Neon Green)", "value": 5833}
+   ]
+  },
+  {
+   "name": "Pants",
+   "children": [
+    {
+    "name": "Leggings",
+     "children": [
+      {"name": "3 Stripes Adidas Leggings", "value": 9354},
+      {"name": "Uniqlo Leggings", "value": 9922},
+      {"name": "Nike Leggings", "value": 1233}
+     ]
+    },
+    {
+      "name": "Sweatpants",
+      "children": [
+        {"name": "Plush Sweatpants", "value": 1212},
+        {"name": "Under Armour Sweatpants", "value": 4983},
+        {"name": "Tracksuit Sweatpants", "value": 3975}
+      ]
+    },
+
+    {
+     "name": "Denim",
+     "children": [
+      {"name": "Crop Workwear Jeans", "value": 3165},
+      {"name": "Skinny Jeans", "value": 2815},
+      {"name": "High Waisted Light Wash Jeans", "value": 3366}
+     ]
+    },
+
+    {
+     "name": "Shorts",
+     "children": [
+      {"name": "Nike Running Shorts", "value": 6367},
+      {"name": "Cashmere Ribbed Shorts", "value": 1229},
+      {"name": "Biker Shorts", "value": 2059},
+      {"name": "Cotton Shorts", "value": 6854},
+      {"name": "Towelling Shorts", "value": 2291}
+     ]
+    },
+    {"name": "Cropped Slacks", "value": 8258},
+    {"name": "Cropped Flared Pants", "value": 10001},
+    {"name": "Tech Slim Fit Nike Pants", "value": 8217},
+    {"name": "Satin Slim Pants", "value": 10993}
+    ]
+ },     
+  {
+    "name": "Boots",
+    "children": [
+      {"name": "Diamond Boots", "value": 57732},
+      {"name": "Hand Sewn Chelsea Boots", "value": 2239},
+      {"name": "Renegade Hiking Boots", "value": 11965},
+      {"name": "Thigh High Flat Boots", "value": 84573},
+      {"name": "Classic Short Uggs", "value": 5777},
+      {"name": "Hunter Rain Boots", "value": 2043}
+  ]
+  },
+  {
+    "name": "Heels",
+    "children": [
+      {"name": "Nude Heels", "value": 4462},
+      {"name": "Nude Kitten Heels", "value": 6935},
+      {"name": "J'Adior Slingback Pump", "value": 9978},
+      {"name": "Clear Heeled Sandal", "value": 12349}
+    ]
+  },
+  {
+    "name": "Sandals",
+    "children": [
+      {"name": "Birkenstock Sandals", "value": 56200},
+      {"name": "Japanese Geta Sandals", "value": 56200}
+    ]
+  },  
+  {
+    "name": "Sneakers",
+    "children": [
+      {"name": "Nike Air Zoom Elite", "value": 3801},
+      {"name": "Nike Flyknit Running Shoe", "value": 2865},
+      {"name": "Vans", "value": 11099}
+    ]
+  },
+  {
+    "name": "Bags",
+    "children": [
+      {
+        "name": "Backpacks",
+        "children": [
+          {"name": "Mini Kanken Backpack (Graphite)", "value": 6661},
+          {"name": "Mini Kanken Backpack (Black)", "value": 44421}
+        ]
+      },
+      {
+        "name": "Purses",
+        "children": [
+          {"name": "Prada Saffiano", "value": 3987},
+          {"name": "Coach Turnlock Tote", "value": 77711},
+          {"name": "Coach Wallet Purse", "value": 8326}
+        ]
+      },
+      {
+        "name": "Tote Bags",
+        "children": [
+          {"name": "Sling Tote", "value": 99325},
+          {"name": "Patagonia Tote", "value": 31754}
+      ]
+      },
+      {"name": "Patagonia Hip Pack", "value": 33278}
+    ]
+  },
+  {
+   "name": "Belts",
+   "children": [
+    {"name": "Maje Amanda Belt", "value": 55532}
+  ]
+  },
+  {
+    "name": "Hats",
+    "children": [
+      {"name": "Flight Cap", "value": 8831}
+    ]
+  },
+  {
+    "name": "Jewelry",
+    "children": [
+      {
+        "name": "Earrings",
+        "children": [
+          {"name": "Colorful Floral Hoop Earrings", "value": 3997},
+          {"name": "Gold Diamond Hoop Earrings", "value": 1124},
+          {"name": "Heart Earrings", "value": 77721},
+          {"name": "Simple Diamond Stud Earrings", "value": 1249},
+          {"name": "Glossy Hoop Earrings", "value": 5893},
+          {"name": "Multi-Stud Earrings", "value": 9921}
+        ]
+      },
+      {
+        "name": "Necklaces",
+        "children": [
+          {"name": "Gold Leaf and Pearl Pendant", "value": 2221},
+          {"name": "Rose Gold Cross Necklace", "value": 1097},
+          {"name": "Ain't No Sinner Necklace", "value": 8832},
+          {"name": "Nameplate Necklace", "value": 5552}
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Eyewear",
+    "children": [
+      {
+        "name": "Sunglasses",
+        "children": [
+          {"name": "Indio Sunglasses", "value": 2345},
+          {"name": "Oscar Magnuson Sunglasses", "value": 3948},
+          {"name": "90s Horn Rimmed Sunglasses", "value": 3357}
+        ]
+      },
+      {"name": "Crystal Eyeglasses", "value": 67583}
+    ]
+  },
+  {
+    "name": "Scarves",
+    "children": [
+      {
+        "name": "Accent",
+        "children": [
+          {"name": "Silk Concentric Square Scarf", "value": 3321},
+          {"name": "Wool Water Color Scarf", "value": 21840}
+        ]
+      },
+      {"name": "Winter Scarf", "value": 4457},
+      {"name": "Bandana", "value": 2411}
+    ]
+  },
+  {
+   "name": "Tops",
+   "children": [
+    {
+     "name": "Sweatshirts",
+     "children": [
+      {"name": "Colts Superbowl Sweatshirt", "value": 1302},
+      {"name": "ME. Rose Crewneck", "value": 24593},
+      {"name": "Tracksuit Sweatshirt", "value": 652},
+      {"name": "Bronx Sweater", "value": 6703}
+     ]
+    },
+    {
+     "name": "Turtlenecks",
+     "children": [
+      {"name": "The Slim Turtleneck", "value": 2138},
+      {"name": "Under Armour Turtleneck", "value": 3824},
+      {"name": "High Neck T-Shirt", "value": 8435}
+     ]
+    },
+    {
+     "name": "T-Shirts",
+     "children": [
+      {"name": "Ribbed Tee", "value": 20859},
+      {"name": "Crop Shirt", "value": 4614},
+      {"name": "Super Oversized Pink t-shirt", "value": 3234},
+      {"name": "Super Oversized White t-shirt", "value": 10530}
+     ]
+
+    },
+    {"name": "Towelling Crop Top", "value": 16540},
+    {"name": "Long Sleeve Tee", "value": 7833},
+    {"name": "Graphic Tee", "value": 3398},
+    {"name": "Adidas Short-Sleeve Crop Top", "value": 2389},
+    {"name": "Reyes Teee", "value": 6591},
+    {"name": "Nike Cropped Tee", "value": 2974},
+    {"name": "Cropped Long Sleeve Shirt", "value": 4786},
+    {"name": "Sweater", "value": 9265}
+   ]
+  }
+ ]
+}

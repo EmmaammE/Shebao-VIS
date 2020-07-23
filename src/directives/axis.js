@@ -8,12 +8,15 @@ export function axisDirective(el, binding) {
   const axisMethod = { x: 'axisBottom', y: 'axisLeft' }[axisKey];
   const methodArg = binding.value.scale;
 
-  const { ticks = 11, padding = 3, tickFormat = null } = binding.value;
+  const {
+    ticks = 11, padding = 3, tickFormat = null, inner = 6,
+  } = binding.value;
 
   // 暂时只设置了两个选项，参考：
   // https://github.com/d3/d3/wiki/SVG-%E8%BD%B4#axis
   const axis = d3[axisMethod](methodArg)
     .ticks(ticks)
+    .tickSize(inner)
     .tickPadding(padding)
     .tickFormat(tickFormat);
 

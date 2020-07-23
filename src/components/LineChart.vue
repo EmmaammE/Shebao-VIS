@@ -1,7 +1,10 @@
 <template>
   <div class="line-chart">
-    <svg :width='width' :height='height'
-        v-if ="datum.y !== undefined"
+    <svg
+      v-if ="datum.y"
+      :width='width'
+      :height='height'
+      ref="svg"
     >
       <defs>
         <clipPath id="clip">
@@ -9,23 +12,23 @@
         </clipPath>
       </defs>
 
-      <g :transform='`translate(${margin.left}, ${margin.top})`'
-        clip-path ="url(#clip)"
+      <g class="barchart-axis"
+        :transform='`translate(${margin.left}, ${margin.top})`'
+      >
+        <g v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
+          :transform='`translate(0, ${chartHeight})`' />
+        <g v-axis:y="{scale: chartY}" />
+        <g v-axis:y="{scale: chartY, inner: -chartWidth, tickFormat: ''}"
+          v-if="gridLine" class="grid-line"
+        />
+      </g>
+
+      <g clip-path ="url(#clip)"
+        :transform='`translate(${margin.left}, ${margin.top})`'
       >
         <path
           v-for="kind in Object.keys(datum.y)" :key="kind"
           :d="line(datum.y[kind])" :stroke="color(kind)"
-        />
-      </g>
-
-      <g class="barchart-axis">
-        <g
-          v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
-          :transform='`translate(${margin.left}, ${height-margin.bottom})`'
-        />
-        <g
-          v-axis:y="{scale: chartY}"
-          :transform='`translate(${margin.left}, ${margin.top})`'
         />
       </g>
 
@@ -63,6 +66,12 @@ export default {
     yTicks: Number,
     // 数据
     datum: Object,
+
+    // 是否有格子线
+    gridLine: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
@@ -93,6 +102,7 @@ export default {
       const { chartX, chartY } = this;
       return d3
         .line()
+        .curve(d3.curveCardinal)
         .x((d, i) => chartX(this.datum.x[i]))
         .y((d) => chartY(d));
     },
@@ -101,15 +111,38 @@ export default {
   directives: {
     axis: axisDirective,
   },
+
+  mounted() {
+    const $svg = d3.select(this.$refs.svg);
+    const that = this;
+    $svg.on('mousemove', function mousemoveAction() {
+      that.focusMousemove(d3.mouse(this));
+    });
+  },
+
+  methods: {
+    focusMousemove(mouse) {
+      const xOnMouse = this.chartX.invert(mouse[0] - this.margin.left);
+      const yOnMouse = this.chartY.invert(mouse[1] - this.margin.top);
+
+      // 返回鼠标映射的数值
+      this.$emit('d3-mousemove', [xOnMouse, yOnMouse]);
+    },
+  },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 
-path {
-  fill:none;
-  stroke-width: 1px;
-}
+  path {
+    fill:none;
+    stroke-width: 1px;
+  }
+
+  .grid-line {
+    stroke: #ccc;
+    opacity: 0.2;
+  }
 
 </style>
