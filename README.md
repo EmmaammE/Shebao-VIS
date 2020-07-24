@@ -94,3 +94,15 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### mixins/toggle.js
 
 如tooltip,model 组件可能都需要控制显示和隐藏
+
+# 样式
+
+src/styles/global.scss中定义全局样式
+
+变量名以```she```为前缀
+
+# svg图标
+
+使用**vue-svg-loader**, 可以直接引入svg为组件
+
+https://vue-svg-loader.js.org/

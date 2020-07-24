@@ -10,6 +10,14 @@ const toggle = {
     toggleShow() {
       this.isShowing = !this.isShowing;
     },
+
+    toShow() {
+      this.isShowing = true;
+    },
+
+    toHide() {
+      this.isShowing = false;
+    },
   },
 };
 

@@ -4,7 +4,6 @@
       v-if ="datum.y"
       :width='width'
       :height='height'
-      ref="svg"
     >
       <defs>
         <clipPath id="clip">
@@ -25,10 +24,13 @@
 
       <g clip-path ="url(#clip)"
         :transform='`translate(${margin.left}, ${margin.top})`'
+        ref="paths"
       >
         <path
           v-for="kind in Object.keys(datum.y)" :key="kind"
-          :d="line(datum.y[kind])" :stroke="color(kind)"
+          :id="kind"
+          :d="line(datum.y[kind])"
+          :stroke="color(kind)"
         />
       </g>
 
@@ -113,20 +115,21 @@ export default {
   },
 
   mounted() {
-    const $svg = d3.select(this.$refs.svg);
+    const $paths = d3.select(this.$refs.paths);
     const that = this;
-    $svg.on('mousemove', function mousemoveAction() {
-      that.focusMousemove(d3.mouse(this));
+    $paths.on('mousemove', function mousemoveAction() {
+      const { id } = d3.event.path[0];
+      that.focusMousemove(d3.mouse(this), id);
     });
   },
 
   methods: {
-    focusMousemove(mouse) {
-      const xOnMouse = this.chartX.invert(mouse[0] - this.margin.left);
-      const yOnMouse = this.chartY.invert(mouse[1] - this.margin.top);
-
+    focusMousemove(mouse, id) {
+      const coord = [mouse[0] + this.margin.left, mouse[1] + this.margin.left - 35];
+      const xOnMouse = this.chartX.invert(mouse[0]);
+      const yOnMouse = this.chartY.invert(mouse[1]);
       // 返回鼠标映射的数值
-      this.$emit('d3-mousemove', [xOnMouse, yOnMouse]);
+      this.$emit('d3-mousemove', [xOnMouse, yOnMouse], id, coord);
     },
   },
 };
@@ -134,6 +137,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+  svg {
+    cursor: pointer;
+  }
 
   path {
     fill:none;
