@@ -1,13 +1,21 @@
 <template>
-  <div id="app">
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
-    <router-view/>
-  </div>
+    <component :is="layout" id="app" :links="$route.meta.links">
+    <router-view :layout.sync="layout"/>
+  </component>
 </template>
 
+<script>
+export default {
+  name: 'App',
+  data() {
+    return {
+      layout: 'div',
+    };
+  },
+};
+</script>>
+
+/**为了修改Vuetify中slot的样式，这个组件不设置scoped */
 <style lang="scss">
 #nav {
   padding: 30px;
@@ -20,5 +28,9 @@
       color: #42b983;
     }
   }
+}
+
+.v-input__slot {
+  background: $she-bg;
 }
 </style>

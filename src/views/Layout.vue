@@ -1,6 +1,6 @@
 <template>
   <v-app id="app-container">
-      <header>
+    <header>
       <div class="box">
         <v-row>
           <v-col :cols="3" align-self="center">
@@ -22,15 +22,15 @@
 
       <div class="textarea-container box">
        <v-text-field
-        flat
-        hide-details
-        label="Search"
-        solo
-      >
-        <template v-slot:prepend-inner>
-          <SearchIconIcon />
-        </template>
-      </v-text-field>
+          flat
+          hide-details
+          label="Search"
+          solo
+        >
+          <template v-slot:prepend-inner>
+            <SearchIconIcon />
+          </template>
+        </v-text-field>
       </div>
 
       <div class="box">
@@ -44,13 +44,12 @@
     <div class=" content-container">
       <aside>
         <v-card flat>
-         <div class="icon-nav">
-           <router-link to="/"><HomeIcon /></router-link>
-
-          <router-link to="/monitor"><MonitorIcon /></router-link>
-          <router-link to="/search"><SearchIcon /></router-link>
-          <router-link to="/warning"><WarningIcon /></router-link>
-         </div>
+          <div class="icon-nav">
+            <router-link to="/"><HomeIcon /></router-link>
+            <router-link to="/monitor"><MonitorIcon /></router-link>
+            <router-link to="/search"><SearchIcon /></router-link>
+            <router-link to="/warning"><WarningIcon /></router-link>
+          </div>
         </v-card>
 
         <v-card>
@@ -80,9 +79,10 @@
           </v-list>
         </v-card>
       </aside>
-    <main>
-      <slot name="page-main" />
-    </main>
+
+      <main>
+        <slot/>
+      </main>
     </div>
   </v-app>
 </template>
@@ -92,7 +92,7 @@ import BackIcon from '@/assets/common/back.svg';
 import NextIcon from '@/assets/common/next.svg';
 import SearchIconIcon from '@/assets/common/searchIcon.svg';
 import HomeIcon from '@/assets/common/home.svg';
-import MonitorIcon from '@/assets/common/monitor_on.svg';
+import MonitorIcon from '@/assets/common/monitor.svg';
 import SearchIcon from '@/assets/common/search.svg';
 import WarningIcon from '@/assets/common/warning.svg';
 
@@ -123,15 +123,20 @@ export default {
 };
 </script>
 
-/**为了修改Vuetify中slot的样式，这个组件不设置scoped */
-<style lang="scss">
-  #app-container {
+<style scoped lang="scss">
+  #app {
     background: $she-bg;
     height: 100vh;
     box-sizing: border-box;
 
     .title {
       font-size: 2rem;
+    }
+
+    .router-link-exact-active {
+      path {
+        fill: #4E80D1;
+      }
     }
 
     .box {
@@ -164,10 +169,6 @@ export default {
           max-width: 50%;
           margin: 0 15px;
         }
-      }
-
-      .v-input__slot {
-        background: $she-bg;
       }
     }
 
@@ -202,14 +203,14 @@ export default {
       }
     }
 
-    main {
-      overflow: auto;
-      max-height: calc(100vh - 80px);
-      background: $she-bg;
-      margin: 0 4px;
-   }
   }
 
+  main {
+    overflow: auto;
+    max-height: calc(100vh - 80px);
+    background: $she-bg;
+    margin: 0 4px;
+  }
   // ::-webkit-scrollbar {
   //   width: 1px;
   //   height: 1px;
