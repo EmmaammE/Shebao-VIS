@@ -5233,6 +5233,16 @@ launch-editor@^2.2.1:
     chalk "^2.3.0"
     shell-quote "^1.6.1"
 
+leaflet.markercluster@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.npm.taobao.org/leaflet.markercluster/download/leaflet.markercluster-1.4.1.tgz#b53f2c4f2ca7306ddab1dbb6f1861d5e8aa6c5e5"
+  integrity sha1-tT8sTyynMG3asdu28YYdXoqmxeU=
+
+leaflet@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.npm.taobao.org/leaflet/download/leaflet-1.6.0.tgz#aecbb044b949ec29469eeb31c77a88e2f448f308"
+  integrity sha1-rsuwRLlJ7ClGnusxx3qI4vRI8wg=
+
 leven@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npm.taobao.org/leven/download/leven-3.1.0.tgz#77891de834064cccba82ae7842bb6b14a13ed7f2"
@@ -8495,6 +8505,11 @@ vue-template-es2015-compiler@^1.9.0:
   version "1.9.1"
   resolved "https://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha1-HuO8mhbsv1EYvjNLsV+cRvgvWCU=
+
+vue2-leaflet@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.npm.taobao.org/vue2-leaflet/download/vue2-leaflet-2.5.2.tgz#b89c056fe741c7ce7cb9df5aca90809092e5eb8d"
+  integrity sha1-uJwFb+dBx858ud9aypCAkJLl640=
 
 vue@^2.6.11:
   version "2.6.11"
