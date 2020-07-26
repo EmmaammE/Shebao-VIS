@@ -42,7 +42,8 @@
     </header>
 
     <div class=" content-container">
-      <aside>
+      <transition>
+              <aside v-show="drawer">
         <v-card flat>
           <div class="icon-nav">
             <router-link to="/"><HomeIcon /></router-link>
@@ -79,6 +80,7 @@
           </v-list>
         </v-card>
       </aside>
+      </transition>
 
       <main>
         <slot/>
@@ -111,7 +113,7 @@ export default {
     MonitorIcon,
   },
   data: () => ({
-    drawer: null,
+    drawer: true,
     items: [
       { title: 'Landing', icon: HomeIcon },
       { title: 'Monitor', icon: SearchIcon },
@@ -144,6 +146,7 @@ export default {
       background: #fff;
       margin: 0 $she-padding $she-padding 0;
     }
+
     header {
       display: flex;
 
@@ -153,6 +156,7 @@ export default {
       }
       .v-image {
         margin: 0 0.7rem 0 1.2rem;
+        cursor: pointer;
       }
 
       .v-sheet.v-card {
@@ -185,6 +189,7 @@ export default {
       margin: 2px 0 0 0;
       display: flex;
     }
+
     aside {
       display: flex;
       min-height: 100%;
@@ -211,8 +216,4 @@ export default {
     background: $she-bg;
     margin: 0 4px;
   }
-  // ::-webkit-scrollbar {
-  //   width: 1px;
-  //   height: 1px;
-  // }
 </style>

@@ -33,4 +33,8 @@ export default {
 .v-input__slot {
   background: $she-bg;
 }
+
+body::-webkit-scrollbar {
+  width: 4px;
+}
 </style>
