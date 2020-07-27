@@ -1,27 +1,59 @@
 <template>
-  <v-app id="app-container">
-    <header>
-      <div class="box">
-        <v-row>
-          <v-col :cols="3" align-self="center">
-            <v-img
-              height="48px"
-              contain
-              src="@/assets/common/header.png"
-              @click="drawer = !drawer"
-            ></v-img>
-          </v-col>
+  <v-app class="s-container">
+    <v-navigation-drawer app floating class="s-drawer">
+      <template v-slot:prepend>
+        <v-sheet class="s-header">
+          <v-img
+            height="2rem"
+            contain
+            src="@/assets/common/header.png"
+            @click="drawer = !drawer"
+          ></v-img>
 
-          <v-col :cols="9">
-            <span class="title">
+          <span class="title">
             医保<br/>智能监测预警系统
           </span>
-          </v-col>
-        </v-row>
-      </div>
+        </v-sheet>
+      </template>
 
-      <div class="textarea-container box">
-       <v-text-field
+      <v-divider></v-divider>
+
+      <v-sheet class="s-lists">
+        <div class="icon-lists">
+          <router-link to="/"><HomeIcon /></router-link>
+          <router-link to="/monitor"><MonitorIcon /></router-link>
+          <router-link to="/search"><SearchIcon /></router-link>
+          <router-link to="/warning"><WarningIcon /></router-link>
+        </div>
+        <v-list nav dense>
+          <v-list-group
+            v-for="item in links"
+            :key="item.title"
+            v-model="item.active"
+          >
+            <template v-slot:activator>
+              <v-list-item-content>
+                <v-list-item-title v-text="item.title"></v-list-item-title>
+              </v-list-item-content>
+            </template>
+
+            <v-list-item
+              v-for="subItem in item.items"
+              :key="subItem.title"
+            >
+              <v-list-item-content>
+                <v-list-item-title v-text="subItem.title"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-group>
+        </v-list>
+      </v-sheet>
+    </v-navigation-drawer>
+
+    <v-app-bar app outlined flat class="s-bar">
+      <!-- -->
+      <div class="s-bar-content">
+        <v-text-field
           flat
           hide-details
           label="Search"
@@ -31,61 +63,20 @@
             <SearchIconIcon />
           </template>
         </v-text-field>
-      </div>
-
-      <div class="box">
+        <div></div>
         <div class="tool-btn"><BackIcon/></div>
-      </div>
-      <div class="box">
         <div class="tool-btn"><NextIcon/></div>
       </div>
-    </header>
+    </v-app-bar>
 
-    <div class=" content-container">
-      <transition>
-              <aside v-show="drawer">
-        <v-card flat>
-          <div class="icon-nav">
-            <router-link to="/"><HomeIcon /></router-link>
-            <router-link to="/monitor"><MonitorIcon /></router-link>
-            <router-link to="/search"><SearchIcon /></router-link>
-            <router-link to="/warning"><WarningIcon /></router-link>
-          </div>
-        </v-card>
+    <!-- Sizes your content based upon application components -->
+    <v-main>
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+        <slot></slot>
+      </v-container>
+    </v-main>
 
-        <v-card>
-          <v-list nav>
-            <v-list-group
-              v-for="item in links"
-              :key="item.title"
-              v-model="item.active"
-              :prepend-icon="item.action"
-              no-action
-            >
-              <template v-slot:activator>
-                <v-list-item-content>
-                  <v-list-item-title v-text="item.title"></v-list-item-title>
-                </v-list-item-content>
-              </template>
-
-              <v-list-item
-                v-for="subItem in item.items"
-                :key="subItem.title"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-text="subItem.title"></v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-group>
-          </v-list>
-        </v-card>
-      </aside>
-      </transition>
-
-      <main>
-        <slot/>
-      </main>
-    </div>
   </v-app>
 </template>
 
@@ -115,10 +106,10 @@ export default {
   data: () => ({
     drawer: true,
     items: [
-      { title: 'Landing', icon: HomeIcon },
-      { title: 'Monitor', icon: SearchIcon },
-      { title: 'Search', icon: MonitorIcon },
-      { title: 'Warning', icon: WarningIcon },
+      { title: 'landing', icon: HomeIcon },
+      { title: 'monitor', icon: SearchIcon },
+      { title: 'search', icon: MonitorIcon },
+      { title: 'warning', icon: WarningIcon },
     ],
     mini: true,
   }),
@@ -126,94 +117,88 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  #app {
+  .s-container {
+    display: grid;
     background: $she-bg;
-    height: 100vh;
-    box-sizing: border-box;
 
-    .title {
-      font-size: 2rem;
+    $gap: 4px;
+
+    .v-toolbar {
+      box-shadow: none;
     }
 
-    .router-link-exact-active {
-      path {
-        fill: #4E80D1;
+    .s-drawer {
+      background: $she-bg;
+
+      .s-header {
+        display: flex;
+
+        .v-image {
+          flex: 0 0 30%;
+          align-self: center;
+        }
       }
-    }
 
-    .box {
-      box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.2)!important;
-      background: #fff;
-      margin: 0 $she-padding $she-padding 0;
+      .v-divider {
+        border: 2px solid $she-bg;
+      }
+
+      .s-lists {
+        display: flex;
+        height: 100%;
+
+        .icon-lists {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          border-right: 2px solid $she-bg;
+          box-sizing: border-box;
+
+          svg {
+            margin: 1.2rem;
+            transform: scale(0.8);
+          }
+
+          .router-link-exact-active {
+            path {
+              fill: #4E80D1;
+            }
+          }
+        }
+      }
+
     }
 
     header {
-      display: flex;
+      border-color: #fff;
+      background: #fff!important;
+      margin-left: 4px;
 
-      .v-toolbar__content {
-        padding: 0;
-        margin: 12px 0
-      }
-      .v-image {
-        margin: 0 0.7rem 0 1.2rem;
-        cursor: pointer;
-      }
+     .s-bar-content {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 45% auto 64px 64px;
+     }
 
-      .v-sheet.v-card {
-        margin: 0 $she-padding $she-padding 0;
-      }
+     .v-input {
+       align-items: center;
+     }
 
-      .textarea-container {
-        width: 71vw;
+      .tool-btn {
+        border: 4px solid $she-bg;
+        height: 64px;
+        width: 64px;
+        border-width: 0 2px 0 2px;
         display: flex;
+        justify-content: center;
         align-items: center;
-        background: $she-fg;
-
-        .v-input {
-          max-width: 50%;
-          margin: 0 15px;
-        }
       }
     }
 
-    .tool-btn {
-      width: 5vw;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 95%;
-    }
-
-    .content-container {
+    .container--fluid {
+      padding: 4px;
       height: 100%;
-      margin: 2px 0 0 0;
-      display: flex;
     }
-
-    aside {
-      display: flex;
-      min-height: 100%;
-      flex: 0 0 10%
-    }
-
-    .icon-nav {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 100%;
-
-      svg {
-        margin: 1.2rem;
-        transform: scale(0.8);
-      }
-    }
-
   }
 
-  main {
-    overflow: auto;
-    max-height: calc(100vh - 80px);
-    background: $she-bg;
-    margin: 0 4px;
-  }
 </style>

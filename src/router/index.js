@@ -71,6 +71,26 @@ const routes = [
       ],
     },
   },
+  {
+    path: '/search',
+    name: 'Search',
+    component: () => import('../views/search/Search.vue'),
+    meta: {
+      links: [
+        {
+          action: '1',
+          title: '参保人员汇总',
+          active: true,
+          items: [],
+        },
+        {
+          action: '2',
+          title: '违规行为预警',
+          items: [],
+        },
+      ],
+    },
+  },
 ];
 
 const router = new VueRouter({

@@ -30,11 +30,24 @@ export default {
   }
 }
 
-.v-input__slot {
-  background: $she-bg;
+body {
+  font-size: 62.5%;
 }
 
-body::-webkit-scrollbar {
-  width: 4px;
+header .v-input__slot {
+  background: $she-bg!important;
+}
+
+.v-navigation-drawer__content {
+  overflow: hidden!important;
+}
+
+.v-text-field.v-text-field--solo.v-input--dense > .v-input__control {
+  min-height: 28px!important;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden!important;
 }
 </style>

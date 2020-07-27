@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="61px" viewBox="0 0 60 61" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53 (72520) - https://sketchapp.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="53" height="53" rx="1.62"></rect>
+        <filter x="-10.3%" y="-8.4%" width="120.5%" height="120.5%" filterUnits="objectBoundingBox" id="filter-3">
+            <feMorphology radius="0.4455" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="1" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0.184750782   0 0 0 0 0.332027266   0 0 0 0 0.616423234  0 0 0 0.1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="智能搜索引擎" transform="translate(-408.000000, -341.000000)">
+            <g id="Group" transform="translate(411.000000, 344.000000)">
+                <g id="Group-2">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <g id="Mask-Copy">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-1"></use>
+                        <use stroke="#FEB2DF" stroke-width="0.891" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    </g>
+                </g>
+                <g id="nvxing" transform="translate(10.158333, 6.183333)" fill="#FEB2DF" fill-rule="nonzero">
+                    <path d="M26.5090565,28.2834724 C18.4093919,25.8600687 19.9417784,21.4538927 19.9417785,21.4538927 C25.8523733,22.5554367 29.5737955,20.132033 29.5737955,20.132033 C27.1658083,18.3695763 27.8225259,18.5898921 26.0712563,8.67599598 C24.3199868,-1.23790011 16.439205,0.0839596251 16.439205,0.0839596251 C16.439205,0.0839596251 8.33954034,-1.45818126 6.58823646,8.67599598 C4.83693259,18.8101732 5.49368439,18.3695763 3.08569729,20.1320675 C3.08569729,20.1320675 7.02607098,22.5554367 12.7177143,21.4538927 C12.7177143,21.4538927 14.2501009,25.8600687 6.1504362,28.2834724 C6.1504362,28.2834724 -0.416876179,29.3850164 0.02095837,35.3333333 L32.6385687,35.3333333 C33.2952862,29.1647007 26.5090565,28.2834724 26.5090565,28.2834724 Z" id="Path"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
