@@ -5,13 +5,14 @@
         :active="index === tabActive"
         :data="tabNumber[index]"
         :type="item"
+        @click.native="changeTab(index)"
       />
     </v-card>
 
     <v-card class="s-charts">
       <!-- menu -->
       <div class="text-lg-h6 text-md-h6">
-        <span>{{menuTitle}}</span> |
+        <span>{{submenu}}</span> |
         <span>{{menuSubtitle[tabActive]}}</span>
       </div>
 
@@ -33,19 +34,34 @@
 
         <v-divider></v-divider>
 
-        <!-- 日历图-->
-        <div class="chart-legends text-lg-body-2">
-          <span class="legend">同比</span>
-          <span class="legend">环比</span>
-          <v-select
-            :items="items"
-            v-model="itemSelect2"
-            height= "5"
-            solo
-            dense
-            hide-details
-            flat
-          ></v-select>
+        <div class="calendar-view">
+          <div class="chart-legends text-lg-body-2">
+            <span class="legend">同比</span>
+            <span class="legend">环比</span>
+            <v-select
+              :items="items2"
+              v-model="itemSelect2"
+              height= "5"
+              solo
+              dense
+              hide-details
+              flat
+            ></v-select>
+          </div>
+
+          <!-- 日历图 -->
+          <calendar
+            v-bind="setting"
+            :datum="data2019"
+            :year="years[0]"
+            :month="itemSelect2==='月'"
+          />
+          <calendar
+            v-bind="setting"
+            :datum="data2020"
+            :year="years[1]"
+            :month="itemSelect2==='月'"
+          />
         </div>
       </div>
     </v-card>
@@ -56,6 +72,7 @@
 import LineChart from '@/components/LineChart.vue';
 import layout from '@/mixins/layout';
 import Badge from '@/views/monitor/badge.vue';
+import Calendar from '@/components/Calendar.vue';
 
 const chart1Size = {
   width: 800,
@@ -65,12 +82,25 @@ const chart1Size = {
   },
 };
 
+const setting = {
+  width: 800,
+  height: 130,
+  cellSize: 14,
+  marginLeft: 60,
+  marginTop: 10,
+};
+
 export default {
   name: 'Monitor',
 
   components: {
     Badge,
     // LineChart,
+    Calendar,
+  },
+
+  props: {
+    submenu: String,
   },
 
   data: () => ({
@@ -85,14 +115,25 @@ export default {
     items: ['年', '月', '日'],
     itemSelect: '年',
 
-    // chart2
+    // 日历图
     itemSelect2: '月',
+    items2: ['月', '日'],
+    setting,
+    data2019: [],
+    data2020: [],
+    years: [2019, 2020],
   }),
 
   mixins: [layout],
 
   mounted() {
     // fetch 总医疗的四个值
+  },
+
+  methods: {
+    changeTab(index) {
+      this.tabActive = index;
+    },
   },
 
 };
@@ -121,7 +162,7 @@ export default {
 
       .s-charts-list {
         display: grid;
-        grid-template-rows: 50% 5% 45%;
+        grid-template-rows: auto 1% 30vh;
         width: 100%;
       }
 
@@ -144,6 +185,7 @@ export default {
           border: 1px solid #cfcfcf;
           border-radius: 4px;
           margin-right: 15px;
+          cursor: pointer;
 
           i {
             width: 1rem;
@@ -154,6 +196,10 @@ export default {
           }
         }
       }
+    }
+
+    .caledar-view {
+      display: flex;
     }
   }
 </style>

@@ -27,7 +27,7 @@
         </div>
         <v-list nav dense>
           <v-list-group
-            v-for="item in links"
+            v-for="(item,i) in links"
             :key="item.title"
             v-model="item.active"
           >
@@ -38,11 +38,16 @@
             </template>
 
             <v-list-item
-              v-for="subItem in item.items"
+              v-for="(subItem,j) in item.items"
               :key="subItem.title"
+              @click="changeMenu(i,j)"
             >
               <v-list-item-content>
-                <v-list-item-title v-text="subItem.title"></v-list-item-title>
+                <v-list-item-title
+                  v-text="subItem.title"
+                  :class="subItem.title === submenu ? 'active':''"
+                >
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
@@ -91,8 +96,8 @@ import WarningIcon from '@/assets/common/warning.svg';
 
 export default {
   props: {
-    source: String,
     links: Array,
+    submenu: String,
   },
   components: {
     BackIcon,
@@ -113,6 +118,17 @@ export default {
     ],
     mini: true,
   }),
+
+  methods: {
+    changeMenu(i, j) {
+      // 修改submenu
+      this.$store.commit({
+        type: 'changeMenu',
+        i,
+        j,
+      });
+    },
+  },
 };
 </script>
 
@@ -125,6 +141,10 @@ export default {
 
     .v-toolbar {
       box-shadow: none;
+    }
+
+    .v-list-item__title {
+      cursor: pointer;
     }
 
     .s-drawer {
@@ -141,6 +161,10 @@ export default {
 
       .v-divider {
         border: 2px solid $she-bg;
+      }
+
+      .active {
+        color: #1976d2;
       }
 
       .s-lists {

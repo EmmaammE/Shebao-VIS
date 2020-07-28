@@ -1,6 +1,6 @@
 <template>
-    <component :is="layout" id="app" :links="$route.meta.links">
-    <router-view :layout.sync="layout"/>
+  <component :is="layout" id="app" :links="$route.meta.links" :submenu="submenu">
+    <router-view :layout.sync="layout" :submenu="submenu" />
   </component>
 </template>
 
@@ -11,6 +11,21 @@ export default {
     return {
       layout: 'div',
     };
+  },
+
+  computed: {
+    submenu() {
+      if (this.layout === 'div') {
+        return '';
+      }
+      // 如果不是主页就计算submenu
+      const { submenu } = this.$store.state;
+      const temp = this.$route.meta.links[submenu[0]];
+      if (temp.items.length === 0) {
+        return temp.title;
+      }
+      return temp.items[submenu[1]].title;
+    },
   },
 };
 </script>>
