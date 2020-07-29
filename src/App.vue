@@ -15,16 +15,25 @@ export default {
 
   computed: {
     submenu() {
-      if (this.layout === 'div') {
-        return '';
+      try {
+        if (this.layout === 'div' || !this.$route.meta) {
+          return '';
+        }
+
+        // 如果不是主页就计算submenu
+        const { submenu } = this.$store.state;
+
+        console.log(submenu[0]);
+
+        const temp = this.$route.meta.links[submenu[0]];
+        if (temp.items.length === 0) {
+          return temp.title;
+        }
+        return temp.items[submenu[1]].title;
+      } catch (err) {
+        console.log(err);
       }
-      // 如果不是主页就计算submenu
-      const { submenu } = this.$store.state;
-      const temp = this.$route.meta.links[submenu[0]];
-      if (temp.items.length === 0) {
-        return temp.title;
-      }
-      return temp.items[submenu[1]].title;
+      return '';
     },
   },
 };

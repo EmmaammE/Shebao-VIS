@@ -25,7 +25,10 @@
           <router-link to="/search"><SearchIcon /></router-link>
           <router-link to="/warning"><WarningIcon /></router-link>
         </div>
-        <v-list nav dense>
+        <!-- NOTE v-if 是否是层级导航 -->
+        <v-list nav dense
+          v-if="type"
+        >
           <v-list-group
             v-for="(item,i) in links"
             :key="item.title"
@@ -33,14 +36,14 @@
           >
             <template v-slot:activator>
               <v-list-item-content>
-                <v-list-item-title v-text="item.title"></v-list-item-title>
+                <v-list-item-title v-text="item.title" />
               </v-list-item-content>
             </template>
 
             <v-list-item
               v-for="(subItem,j) in item.items"
               :key="subItem.title"
-              @click="changeMenu(i,j)"
+              v-on:click.stop="changeMenu(i,j)"
             >
               <v-list-item-content>
                 <v-list-item-title
@@ -51,6 +54,24 @@
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
+        </v-list>
+        <!-- NOTE v-else 不是层级导航, 路由控制的布局-->
+        <v-list nav dense
+          v-else
+        >
+          <v-list-item
+            v-for="(item,i) in links"
+            :key="item.title"
+          >
+            <v-list-item-content>
+              <v-list-item-title
+                v-text="item.title"
+                :class="item.title === submenu ? 'active':''"
+                v-on:click.stop="changeMenu(i,0)"
+              >
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-sheet>
     </v-navigation-drawer>
@@ -127,6 +148,15 @@ export default {
         i,
         j,
       });
+    },
+  },
+
+  computed: {
+    type() {
+      if (!this.links) {
+        return false;
+      }
+      return this.links[0].items.length !== 0;
     },
   },
 };
