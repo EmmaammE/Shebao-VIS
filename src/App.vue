@@ -1,6 +1,6 @@
 <template>
-    <component :is="layout" id="app" :links="$route.meta.links">
-    <router-view :layout.sync="layout"/>
+  <component :is="layout" id="app" :links="$route.meta.links" :submenu="submenu">
+    <router-view :layout.sync="layout" :submenu="submenu" />
   </component>
 </template>
 
@@ -12,24 +12,25 @@ export default {
       layout: 'div',
     };
   },
-  created() {
-    this.setHtmlFontSize();
 
-    window.addEventListener('resize', this.setHtmlFontSize);
-  },
-  methods: {
-    setHtmlFontSize() {
-      // const screenRatioByDesign = 16 / 9;
-      // const docEle = document.documentElement;
-      // const screenRatio = docEle.clientWidth / docEle.clientHeight;
-      // const fontSize = ((
-      //   screenRatio > screenRatioByDesign
-      //     ? (screenRatioByDesign / screenRatio)
-      //     : 1
-      // ) * docEle.clientWidth) / 10;
+  computed: {
+    submenu() {
+      try {
+        if (this.layout === 'div' || !this.$route.meta) {
+          return '';
+        }
 
-      // console.log(fontSize);
-      // docEle.style.fontSize = `${fontSize.toFixed(3)}px`;
+        // 如果不是主页就计算submenu
+        const { submenu } = this.$store.state;
+        const temp = this.$route.meta.links[submenu[0]];
+        if (temp.items.length === 0) {
+          return temp.title;
+        }
+        return temp.items[submenu[1]].title;
+      } catch (err) {
+        console.log(err);
+      }
+      return '';
     },
   },
 };
@@ -50,8 +51,20 @@ export default {
   }
 }
 
-.v-input__slot {
-  background: $she-bg;
+body {
+  font-size: 62.5%;
+}
+
+header .v-input__slot {
+  background: $she-bg!important;
+}
+
+.v-navigation-drawer__content {
+  overflow: hidden!important;
+}
+
+.v-text-field.v-text-field--solo.v-input--dense > .v-input__control {
+  min-height: 28px!important;
 }
 
 html {

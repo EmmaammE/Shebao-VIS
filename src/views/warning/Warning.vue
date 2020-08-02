@@ -44,17 +44,18 @@ export default {
 
 <style scoped lang="scss">
   .map-container {
-    width: 77vw;
+    width: 99%;
     margin: 4px;
     background: #fff;
   }
 
   .cards-container {
     position: absolute;
-    top: 120px;
+    top: 35px;
     right: 8%;
     z-index: 1100;
-    width: 60%;
+    width: 100%;
+    padding: 0 10% 0 20%;
     display: flex;
     justify-content: space-around;
 
@@ -78,6 +79,5 @@ export default {
         transform: scale(0.7);
       }
     }
-
   }
 </style>

@@ -21,7 +21,15 @@ export default {
   },
 
   mounted() {
-    const map = L.map('map-id').setView([30.260574, 120.125254], 15);
+    const map = L.map('map-id', {
+      zoomControl: false,
+      maxZoom: 18,
+      minZoom: 5,
+    }).setView([30.260574, 120.125254], 15);
+
+    L.control.zoom({
+      position: 'topright',
+    }).addTo(map);
 
     L.tileLayer(`https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${token}`, {
       maxZoom: 18,
@@ -32,7 +40,6 @@ export default {
       id: style,
       tileSize: 512,
       zoomOffset: -1,
-      en_name: 'zh',
     }).addTo(map);
   },
 
@@ -44,7 +51,7 @@ export default {
 <style lang="scss">
 
 #map-id {
- height: calc(100vh - 104px);
+ height: calc(100vh - 80px);
 };
 
 </style>
