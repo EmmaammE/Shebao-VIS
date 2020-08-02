@@ -12,6 +12,26 @@ export default {
       layout: 'div',
     };
   },
+  created() {
+    this.setHtmlFontSize();
+
+    window.addEventListener('resize', this.setHtmlFontSize);
+  },
+  methods: {
+    setHtmlFontSize() {
+      // const screenRatioByDesign = 16 / 9;
+      // const docEle = document.documentElement;
+      // const screenRatio = docEle.clientWidth / docEle.clientHeight;
+      // const fontSize = ((
+      //   screenRatio > screenRatioByDesign
+      //     ? (screenRatioByDesign / screenRatio)
+      //     : 1
+      // ) * docEle.clientWidth) / 10;
+
+      // console.log(fontSize);
+      // docEle.style.fontSize = `${fontSize.toFixed(3)}px`;
+    },
+  },
 };
 </script>>
 
@@ -34,7 +54,11 @@ export default {
   background: $she-bg;
 }
 
-body::-webkit-scrollbar {
-  width: 4px;
+html {
+  overflow: hidden!important;
 }
+
+  // html::-webkit-scrollbar {
+  //   width: 0px;
+  // }
 </style>
