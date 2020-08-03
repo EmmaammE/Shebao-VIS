@@ -51,7 +51,7 @@ export default {
 <style lang="scss">
 
 #map-id {
- height: calc(100vh - 80px);
+ height: 90vh;
 };
 
 </style>

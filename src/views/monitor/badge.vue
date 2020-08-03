@@ -1,6 +1,6 @@
 <template>
   <v-sheet class="s-badge">
-    <component :is="active?IconOn:Icon" />
+    <component :is="active?IconOn:Icon" class="svg-style" viewBox="0 0 59 59"/>
     <div class="s-info">
       <p class="text-lg-body-1 text-md-body-1">{{type}}</p>
       <p class="text-lg-h5 text-md-h6">{{data}}</p>
@@ -33,10 +33,15 @@ export default {
 <style scoped lang="scss">
   .s-badge {
     display: flex!important;
+    justify-content: center;
+
+    .svg-style {
+      width: 4vw;
+      height: auto;
+    }
 
     svg {
       cursor: pointer;
-      transform: scale(0.93);
     }
 
     .s-info {

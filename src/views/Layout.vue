@@ -168,6 +168,11 @@ export default {
     background: $she-bg;
 
     $gap: 4px;
+    $nav-height: 9vh;
+
+    .v-main {
+      padding: $nav-height 0px 0px 256px;
+    }
 
     .v-toolbar {
       box-shadow: none;
@@ -221,6 +226,15 @@ export default {
         }
       }
 
+    }
+
+    .s-bar {
+      // 设置header的高度
+      min-height: $nav-height;
+    }
+
+    .s-header {
+      min-height: $nav-height;
     }
 
     header {

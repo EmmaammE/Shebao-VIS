@@ -24,6 +24,8 @@
           <v-select
             :items="items"
             v-model="itemSelect"
+            item-text="title"
+            item-value="value"
             height= "5"
             solo
             dense
@@ -41,6 +43,8 @@
             <v-select
               :items="items2"
               v-model="itemSelect2"
+              item-text="title"
+              item-value="value"
               height= "5"
               solo
               dense
@@ -55,12 +59,14 @@
             :datum="data2019"
             :year="years[0]"
             :month="itemSelect2==='月'"
+            :type="itemSelect2"
           />
           <calendar
             v-bind="setting"
             :datum="data2020"
             :year="years[1]"
             :month="itemSelect2==='月'"
+            :type="itemSelect2"
           />
         </div>
       </div>
@@ -86,8 +92,8 @@ const setting = {
   width: 800,
   height: 130,
   cellSize: 14,
-  marginLeft: 60,
-  marginTop: 10,
+  marginLeft: 40,
+  marginTop: 20,
 };
 
 export default {
@@ -112,12 +118,20 @@ export default {
     menuSubtitle: ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '人次人头'],
 
     chart1Size,
-    items: ['年', '月', '日'],
-    itemSelect: '年',
+    items: [
+      { value: 0, title: '月' },
+      { value: 1, title: '周' },
+      { value: 2, title: '日' },
+    ],
+    itemSelect: 0,
 
     // 日历图
-    itemSelect2: '月',
-    items2: ['月', '日'],
+    itemSelect2: 0,
+    items2: [
+      { value: 0, title: '月' },
+      { value: 1, title: '周' },
+      { value: 2, title: '日' },
+    ],
     setting,
     data2019: [],
     data2020: [],
@@ -141,9 +155,9 @@ export default {
 
 <style scoped lang="scss">
   .m-container {
-    display: grid;
-    grid-template-columns: 20% auto;
-    grid-gap: 0.8rem;
+    display: flex;
+    // grid-template-columns: 22% auto;
+    // grid-gap: 0.8rem;
     height: 100%;
     padding: 0.8rem;
     background: $she-bg;
@@ -152,13 +166,19 @@ export default {
       display: flex;
       flex-direction: column;
       justify-content: space-evenly;
-      align-items: center;
+      align-items: flex-start;
+      padding: 0 20px;
+      min-width: max-content;
+      flex-grow: 1;
     }
 
     .s-charts {
       display: flex;
       flex-direction: column;
       padding: 1rem 2rem;
+      // width: 100%;
+      margin-left: 1rem;
+      width: 100%;
 
       .s-charts-list {
         display: grid;
