@@ -1,60 +1,54 @@
 <template>
   <v-app>
-    <v-img src="@/assets/landing/main.png">
-      <div class="topbox">
-        <div class="header">
-          <div class="header-right">
-            <ul>
-              <li>首页</li>
-              <li>基金实时监测 <Icon2/></li>
-              <li>智能搜索引擎 <Icon2/></li>
-              <li>智能风险预警 <Icon2/></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+    <v-img src="@/assets/landing/main.png" />
+    <div class="content">
+      <header>
+        <ul class="text-md-body-1 text-lg-body-1 text-xl-body-1">
+          <li>
+            <router-link to="/">首页 </router-link>
+          </li>
+          <li>
+            <router-link to="/monitor">基金实时监测 <Icon2/></router-link>
+          </li>
+          <li>
+            <router-link to="/search">智能搜索引擎 <Icon2/></router-link>
+          </li>
+          <li>
+            <router-link to="/warning">智能风险预警</router-link>
+          <Icon2/></li>
+        </ul>
+      </header>
+
       <div class="downbox">
-        <div class="content">
-          <div class="content-top">
-            <div class="content-top-img">
-              <img src="../.././assets/landing/首页 icon_1.png"/>
-            </div>
-            <div class="content-top-text">
-              医保智能监测预警系统
-            </div>
-          </div>
-          <div class="content-down">
-            <div class="content-down-box">
-              <Icon4/>
-              <div class="content-down-box-text">
-                基金<br>实时监测
-              </div>
-            </div>
-            <div class="content-down-box">
-              <Icon5/>
-              <div class="content-down-box-text">
-                智能<br>搜索引擎
-              </div>
-            </div>
-            <div class="content-down-box">
-              <Icon6/>
-              <div class="content-down-box-text">
-                智能<br>风险预警
-              </div>
-            </div>
-          </div>
+        <div class="s-title">
+          <v-img max-width="3vw" src="../.././assets/landing/首页 icon_1.png"></v-img>
+          <h2>医保智能监测预警系统</h2>
         </div>
 
-        <div class="right-pic">
-          <img src="../.././assets/landing/首页 图片_3.png"
-          height="469px"/>
+        <div class="content-container">
+          <div class="icon-lists">
+          <div class="box">
+            <Icon4/>
+            <p>基金<br />实时监测</p>
+          </div>
+          <div class="box">
+            <Icon5/>
+            <p>智能<br>搜索引擎</p>
+          </div>
+          <div class="box">
+            <Icon6/>
+            <p>智能<br>风险预警</p>
+          </div>
+
         </div>
-        <div class="right-icon">
-          <Icon2/>
+
+        <div class="s-img">
+          <v-img max-width="40%" src="../.././assets/landing/首页 图片_3.png" />
+        </div>
         </div>
       </div>
+    </div>
 
-    </v-img>
   </v-app>
 </template>
 
@@ -79,107 +73,114 @@ export default {
 </script>
 
 <style scoped lang="scss">
-* {
-  margin: 0;
-  padding: 0
-}
-li {
-    list-style: none;
-}
-.show{
-  background-color: pink;
-}
-.show1{
-  background-color: red;
-}
-.show2{
-  background-color: green;
-}
-.topbox{
-  position: relative;
-  height: 80px;
-}
-.downbox{
-  position: relative;
-}
-.header{
-  width: 2200px;
-  height: 80px;
-  margin: 0 auto;
-  border-width: 0 0 2px 0;
-  border-style:solid;
-  border-color: white;
-}
-.header-right{
-  float: right;
-  height: 20px;
-  margin-top: 30px;
-  padding-right: 100px;
-  line-height: 20px;
-}
-.header li {
-  float: left;
-  height: 20px;
-  margin: 0 40px;
-  font-size: 20px;
-  font-family:STHeitiSC-Medium;
-  color:#ffffff;
-}
-.content{
-  position: relative;
-  float: left;
-  padding-top: 253px;
-  padding-left: 200px;
-}
-.content-top{
-  position: relative;
-  height: 104px;
-  width: 1000px;;
-}
-.content-top-img{
-  float: left;
-  margin-right: 0;
-  height: 104px;
-}
-.content-top-img img{
-  height: 100%;
-}
-.content-top-text{
-  float: left;
-  margin-left: 20px;
-  height: 104px;
-  font-size: 70px;
-  line-height: 104px;
-  font-family:YouSheBiaoTiHei;
-  color:#024abd;
-  letter-spacing:3.7px;
-}
-.content-down{
-  position: relative;
-}
-.content-down-box{
-  float: left;
-  margin: 100px;
-}
-.content-down-box-text{
-  margin-top: 20px;;
-  text-align:center;
-  font-family:STHeitiSC-Light;
-  font-size:40px;
-  color:#ffffff;
-}
-.right-pic{
-  float: left;
-  margin-top: 300px;
-  margin-left: 147px;
-}
-.right-icon{
-  float: left;
-  margin-top: 530px;
-  margin-left: 100px;
-  transform:rotate(270deg) scale(7,7);
-}
-.test{
-  background-color: #fff;
-}
+
+  .v-image__image--cover {
+    position: relative;
+  }
+
+  .content {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    padding: 1% 10%;
+    background: rgba($color: #024ab0, $alpha: 0.2);
+  }
+
+  header {
+    color: #fff;
+    display: flex;
+    border-bottom: 1px solid rgb(236, 222, 222);
+    justify-content: flex-end;
+    padding: 10px 0;
+
+    ul {
+      display: flex;
+      float: right;
+      justify-content: space-between;
+      width: 100%;
+      min-width: fit-content;
+      flex: 0 0 50%;
+    }
+
+    li {
+      list-style: none;
+      display: inline-block;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0 10px;
+
+      a {
+        color: #fff;
+        text-decoration: none;
+      }
+
+      svg {
+        margin: 0 10px;
+      }
+    }
+  }
+
+  .downbox {
+    margin: 15vh 1vw;
+    display: flex;
+    flex-direction: column;
+
+    .s-title {
+      display: flex;
+      align-items: center;
+
+      h2 {
+        margin: 0 10px;
+        font-family:YouSheBiaoTiHei;
+        color:#024abd;
+        letter-spacing:3.7px;
+        text-align:center;
+        font-size: 3rem;
+      }
+    }
+
+    .content-container {
+      display: grid;
+      grid-template-columns: 55% auto;
+
+      .s-img {
+        padding: 1vh 1vw;
+      }
+    }
+
+    .icon-lists {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      align-items: center;
+      padding-top: 3vh;
+
+      .box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        p {
+          font-family:STHeitiSC-Light;
+          font-size:1.5rem;
+          color:#ffffff;
+          letter-spacing:1.87px;
+          text-align:center;
+        }
+      }
+
+      div {
+        svg {
+          transform: scale(0.7);
+        }
+      }
+    }
+  }
+
 </style>
