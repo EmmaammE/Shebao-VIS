@@ -15,11 +15,17 @@
         :transform='`translate(${margin.left}, ${margin.top})`'
       >
         <g v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
-          :transform='`translate(0, ${chartHeight})`' />
-        <g v-axis:y="{scale: chartY}" />
-        <g v-axis:y="{scale: chartY, inner: -chartWidth, tickFormat: ''}"
+          :transform='`translate(0, ${chartHeight})`'
+          />
+        <!-- <g v-axis:x="{scale: chartX}" /> -->
+        <g v-axis:x="{scale: chartX, inner: chartHeight, tickFormat: ''}"
           v-if="gridLine" class="grid-line"
         />
+
+        <g v-axis:y="{scale: chartY}" />
+        <!-- <g v-axis:y="{scale: chartY, inner: -chartWidth, tickFormat: ''}"
+          v-if="gridLine" class="grid-line"
+        /> -->
       </g>
 
       <g clip-path ="url(#clip)"
@@ -144,7 +150,7 @@ export default {
 
   path {
     fill:none;
-    stroke-width: 1px;
+    stroke-width: 3px;
   }
 
   .grid-line {

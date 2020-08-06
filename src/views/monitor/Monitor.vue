@@ -1,17 +1,19 @@
 <template>
-  <v-card>
-    <line-chart-container />
-  </v-card>
+  <div>
+    <v-card>
+      <zhexian />
+    </v-card>
+  </div>
 </template>
 
 <script>
-import LineChartContainer from '@/views/home/LineChartContainer.vue';
+import Zhexian from '@/views/home/Zhexian.vue';
 import layout from '@/mixins/layout';
 
 export default {
   name: 'Monitor',
   components: {
-    LineChartContainer,
+    Zhexian,
   },
   data: () => ({
 

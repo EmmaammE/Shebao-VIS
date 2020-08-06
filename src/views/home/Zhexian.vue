@@ -1,12 +1,12 @@
 <template>
   <div class="container">
     <line-chart
-      v-bind="chart1Size"
+      v-bind="chartSize"
       :datum="datumXY"
-      :scale ="{xDomain: xFocusDomain, xType, yDomain, yType}"
+      :scale ="{xDomain, xType, yDomain, yType}"
       :xTickFormat="timeFormat"
+      @d3-mousemove = "mousemoveAction"
       :gridLine = "true"
-      @d3-mousemove = 'mousemoveAction'
     >
     <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
       <Tooltip v-show="isShowing" v-bind="tipPos"
@@ -14,13 +14,6 @@
         {{tipData.date?tipData.date.getHours()+':'+(tipData.value).toFixed(2):''}}
       </Tooltip>
     </foreignObject>
-    </line-chart>
-    <line-chart v-bind="chart2Size"
-      :datum="datumXY"
-      :scale ="{xDomain: xOverviewDomain, xType, yDomain, yType}"
-      :xTickFormat="timeFormat"
-    >
-      <g ref="brush" class="brush"></g>
     </line-chart>
   </div>
 </template>
@@ -32,72 +25,35 @@ import Tooltip from '@/components/Tooltip.vue';
 import fakeData from '@/mixins/data';
 import toggle from '@/mixins/toggle';
 
-const chart1Size = {
+const chartSize = {
   width: 900,
   height: 350,
   margin: {
     bottom: 50, left: 80, top: 10, right: 20,
   },
 };
-const margin = {
-  bottom: 50, left: 80, top: 10, right: 20,
-};
-const chart2Size = {
-  width: 900,
-  height: 120,
-  margin,
-};
-
-// build brush
-let brush = d3
-  .brushX()
-  .extent([
-    [margin.left, margin.top],
-    [chart2Size.width - margin.right,
-      chart2Size.height - margin.bottom],
-  ]);
-
 export default {
-  name: 'LineChartContainer',
+  name: 'Zhexian',
   components: {
     LineChart,
     Tooltip,
   },
   data() {
     return {
-      chart1Size,
-      chart2Size,
-      // 处理后的数据
-      // datumXY = { x: [x轴的数据], y: {key: []} };
+      chartSize,
       datumXY: { x: [], y: {} },
-      xFocusDomain: [],
-      xOverviewDomain: [],
+      xDomain: [],
       yDomain: [],
       xType: 'scaleTime',
       yType: 'scaleLinear',
-      xContext: d3.scaleTime(),
-
       timeFormat: d3.timeFormat('%H:%M'),
-
-      brush,
       tipData: {},
       tipPos: {},
     };
   },
 
   mounted() {
-    // fetch data
-
-    // hanlde data
     this.updateScales();
-
-    // init brush
-    brush = brush
-      .on('brush end', this.brushed);
-
-    const $brush = d3.select(this.$refs.brush);
-    $brush.call(brush);
-    $brush.call(brush.move, [margin.left, 300]);
   },
 
   mixins: [toggle],
@@ -126,20 +82,9 @@ export default {
 
       this.datumXY = { ...datum };
 
-      this.xOverviewDomain = [datum.x[0], datum.x[23]];
-      this.xFocusDomain = [datum.x[0], datum.x[23]];
+      this.xDomain = [datum.x[0], datum.x[23]];
       this.yDomain = [minV, maxV];
-      this.xContext.domain(this.xFocusDomain)
-        .range([margin.left, chart2Size.width - margin.right]);
-      // console.log(minV, maxV);
     },
-
-    brushed() {
-      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
-      const s = d3.event.selection || this.xContext.range();
-      this.xFocusDomain = s.map(this.xContext.invert, this.xContext);
-    },
-
     mousemoveAction(coord, kind, mouse) {
       // TODO hover事件效果
       if (this.datumXY.y[kind]) {
@@ -149,9 +94,9 @@ export default {
         const d0 = new Date(xValues[nearestDateIndex - 1]);
         const d1 = new Date(xValues[nearestDateIndex]);
         let closestDate;
-        if (d0 <= this.xFocusDomain[0]) {
+        if (d0 <= this.xDomain[0]) {
           closestDate = d1;
-        } else if (d1 >= this.xFocusDomain[1]) {
+        } else if (d1 >= this.xDomain[1]) {
           closestDate = d0;
         } else {
           // decide which date is closest to the mouse
@@ -177,10 +122,11 @@ export default {
     },
   },
 };
+
 </script>
 
 <style lang="scss" scoped>
-  .container svg{
+    .container svg{
     position: relative;
 
     .mask {
