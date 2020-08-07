@@ -15,13 +15,17 @@
       >
         <g v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
           :transform='`translate(0, ${chartHeight})`'
-          />
+          class="xaxis"
+        />
         <!-- <g v-axis:x="{scale: chartX}" /> -->
         <g v-axis:x="{scale: chartX, inner: chartHeight, tickFormat: ''}"
-          v-if="gridLine" class="grid-line"
+          v-if="gridLine"
+          class="grid-line"
         />
 
-        <g v-axis:y="{scale: chartY}" />
+        <g v-axis:y="{scale: chartY}"
+          class="yaxis"
+        />
         <!-- <g v-axis:y="{scale: chartY, inner: -chartWidth, tickFormat: ''}"
           v-if="gridLine" class="grid-line"
         /> -->
@@ -141,20 +145,35 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
 
-  svg {
-    cursor: pointer;
-  }
+  .line-chart {
+    svg {
+      cursor: pointer;
+    }
 
-  path {
-    fill:none;
-    stroke-width: 3px;
-  }
+    path {
+      fill:none;
+      stroke-width: 3px;
+    }
 
-  .grid-line {
-    stroke: #ccc;
-    opacity: 0.2;
+    .grid-line {
+      stroke: #ccc;
+      opacity: 0.2;
+
+      path {
+        display: none;
+      }
+    }
+
+    .xaxis, .yaxis {
+      line {
+        display: none;
+      }
+      path {
+        display: none;
+      }
+    }
   }
 
 </style>
