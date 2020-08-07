@@ -249,14 +249,16 @@ export default {
     },
 
     async getFeeTimeSeries(granularity = 'day') {
-      const data = await fetchFeeTimeSeries({
-        year: 2020,
-        fundType: FUND_TYPE[this.submenu],
-        feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
-        granularity,
-        startDay: this.dateStart,
-        endDay: this.dateEnd,
-      });
+      if (FUND_TYPE[this.submenu]) {
+        const data = await fetchFeeTimeSeries({
+          year: 2020,
+          fundType: FUND_TYPE[this.submenu],
+          feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
+          granularity,
+          startDay: this.dateStart,
+          endDay: this.dateEnd,
+        });
+      }
 
       //  计算同比环比的最值 -》 映射color -> 更新color
     },

@@ -115,4 +115,6 @@ vue.config.js 使用proxy配置了跨域问题（开发环境）
 
 在src/util/http.js中封装请求，在组件中引入
 
+修改prefix切换真实和mock api
+
 https://www.yuque.com/docs/share/8393261b-d974-4a0c-97b4-ee3679ee22b3?#
