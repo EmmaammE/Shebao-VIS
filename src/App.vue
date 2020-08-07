@@ -1,5 +1,8 @@
 <template>
-  <component :is="layout" id="app" :links="$route.meta.links" :submenu="submenu">
+  <component :is="layout" id="app" :links="$route.meta.links"
+    :submenu="submenu"
+    :fundType="$route.params.fundType"
+  >
     <router-view :layout.sync="layout" :submenu="submenu" />
   </component>
 </template>

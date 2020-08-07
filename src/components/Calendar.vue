@@ -2,6 +2,16 @@
   <div class="calendar-container">
     <!-- <svg width='100%' height='100%'> -->
     <svg  height='100%' :viewBox="`0 0 ${width} ${height}`">
+      <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
+        <Tooltip v-show="isShowing" v-bind="tipPos"
+        >
+          <div class="s-tip">
+            <p>{{tipData.date}}</p>
+            <p>{{tipData.number.toFixed(2)}}</p>
+          </div>
+        </Tooltip>
+      </foreignObject>
+
       <text x="5" y="50%">{{year}}</text>
       <g :transform="`translate(${marginLeft}, ${marginTop})`">
         <!-- <text v-for="(day,index) in daysLabel" :key="index"
@@ -18,17 +28,18 @@
               : (type === 1 ? cellLength + 3:cellLength )"
             :x="cellX(d)"
             :y="cellY(d)"
-            fill="#eee"
+            :fill="cellColor(d)"
+            @mousemove="showTooltip(d)"
           >
             <title>{{d}}</title>
           </rect>
           <rect
-            v-show="type!==1"
+            v-show="type===0"
             :key="j+year"
             :x="cellX(data[data.length-7]) + cellLength - 3"
             :y="cellY(data[data.length-7]) - 3"
-            :width="3"
-            :height="3"
+            :width="4"
+            :height="4"
             fill="#fff"
           />
           <text
@@ -44,6 +55,7 @@
 
 <script>
 import * as d3 from 'd3';
+import Tooltip from '@/components/Tooltip.vue';
 
 const format = d3.timeFormat('%Y%m%d');
 /** d: Date */
@@ -54,7 +66,7 @@ const daysLabel = Array.from({ length: 7 }, (d, i) => `星期${'一二三四五�
 export default {
   name: 'Calendar',
   components: {
-
+    Tooltip,
   },
   props: {
     width: Number,
@@ -79,15 +91,8 @@ export default {
       type: Number,
       default: 10,
     },
-    colorSchema: {
-      type: Function,
-      default: d3.scaleLinear().range(['#000', '#002b53']).domain([20000, 30000]),
-    },
-
-    datum: Array,
+    datum: Object,
     year: Number,
-    // 是否按月显示
-    month: Boolean,
     /*
       NOTE 显示的格子的粒度
       月 周 日 （0，1，2）
@@ -100,21 +105,114 @@ export default {
       daysLabel,
       // 方块间的间距
       cellPadding: 1,
+      // 是否显示tooltip
+      isShowing: false,
+      tipData: {
+        date: '',
+        number: 0.0,
+      },
+      tipPos: {
+        left: 0,
+        top: 0,
+      },
     };
   },
 
   computed: {
-    handledDatum() {
-      const arr = [];
-      // 将日期字符串处理为Date对象
-      this.datum.forEach((d) => {
-        arr.push({
-          date: new Date(d.date),
-          value: +d.value,
-        });
-      });
-      return arr;
+    colorSchema() {
+      const { extent } = this.handledDatum;
+      return d3.scaleLinear()
+        .range(['#ff5f43', '#5bd7c2'])
+        .domain([-extent, extent]);
     },
+
+    handledDatum() {
+      const data = {};
+      let minV = Number.MAX_VALUE;
+      let maxV = Number.MIN_VALUE;
+
+      let month = 1; let
+        week = 0;
+      let sum = 0;
+      let tmp = [];
+
+      const datumArr = Object.keys(this.datum);
+
+      switch (this.type) {
+        case 0:
+          // 按月平均
+          datumArr.forEach((key, index) => {
+            if (+key.substr(5, 2) !== month || index === datumArr.length - 1) {
+              if (index === datumArr.length - 1) {
+                tmp.push(key);
+                sum += this.datum[key];
+              }
+
+              const value = sum / tmp.length;
+              tmp.forEach((day) => {
+                data[day] = value;
+              });
+              minV = Math.min(minV, value);
+              maxV = Math.max(maxV, value);
+
+              sum = 0;
+              month += 1;
+              tmp = [];
+            }
+            tmp.push(key);
+            sum += this.datum[key];
+          });
+          break;
+
+        case 1:
+          sum = 0;
+          tmp = [];
+          datumArr.forEach((key, index) => {
+            const d = new Date(key);
+            const currentWeek = d3.utcMonday.count(d3.utcYear(d), d);
+            if (currentWeek !== week || index === datumArr.length - 1) {
+              if (index === datumArr.length - 1) {
+                tmp.push(key);
+                sum += this.datum[key];
+              }
+
+              const value = sum / tmp.length;
+              tmp.forEach((day) => {
+                data[day] = value;
+              });
+              minV = Math.min(minV, value);
+              maxV = Math.max(maxV, value);
+
+              sum = 0;
+              week += 1;
+              tmp = [];
+            }
+            tmp.push(key);
+            sum += this.datum[key];
+          });
+          break;
+
+        case 2:
+          // 按日计算
+          datumArr.forEach((key) => {
+            const value = this.datum[key];
+            data[key] = value;
+            minV = Math.min(minV, value);
+            maxV = Math.max(maxV, value);
+          });
+          break;
+        default:
+      }
+
+      const extent = Math.max(Math.abs(minV), Math.abs(maxV));
+
+      return { data, extent };
+    },
+
+    actualData() {
+      return this.handledDatum.data;
+    },
+
     cellData() {
       // 按年份计算日期
       const cellData = Array.from({ length: 12 }, () => []);
@@ -147,13 +245,47 @@ export default {
       return ((index + 6) % 7) * this.cellSize + this.cellPadding;
     },
 
-    cellWidth(i) {
+    cellColor(d) {
+      const key = d.toISOString().substr(0, 10);
+      if (this.actualData[key]) {
+        if (this.actualData[key] === 0) {
+          return '#fff';
+        }
+        return this.colorSchema(this.actualData[key]);
+      }
+      return '#eee';
+    },
 
+    showTooltip(d) {
+      const key = d.toISOString().substr(0, 10);
+
+      this.tipData = {
+        number: this.actualData[key],
+        date: key,
+      };
+
+      this.tipPos = {
+        left: this.cellX(d),
+        top: this.cellY(d) - 20,
+      };
+
+      this.isShowing = true;
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
+  .s-tip {
+    margin: 0;
+    user-select: none;
 
+    p {
+      margin: 0;
+    }
+  }
+
+  rect {
+    cursor: pointer;
+  }
 </style>

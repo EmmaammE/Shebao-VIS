@@ -48,7 +48,7 @@
               <v-list-item-content>
                 <v-list-item-title
                   v-text="subItem.title"
-                  :class="subItem.title === submenu ? 'active':''"
+                  :class="subItem.title === fundString ? 'active':''"
                 >
                 </v-list-item-title>
               </v-list-item-content>
@@ -114,11 +114,13 @@ import HomeIcon from '@/assets/common/home.svg';
 import MonitorIcon from '@/assets/common/monitor.svg';
 import SearchIcon from '@/assets/common/search.svg';
 import WarningIcon from '@/assets/common/warning.svg';
+import { ROUTE_PARAM, FUND_TYPE } from '@/util/type';
 
 export default {
   props: {
     links: Array,
     submenu: String,
+    fundType: String,
   },
   components: {
     BackIcon,
@@ -148,6 +150,9 @@ export default {
         i,
         j,
       });
+      if (j !== undefined) {
+        this.$router.push(`/monitor/${FUND_TYPE[this.links[i].items[j].title]}`);
+      }
     },
   },
 
@@ -157,6 +162,9 @@ export default {
         return false;
       }
       return this.links[0].items.length !== 0;
+    },
+    fundString() {
+      return ROUTE_PARAM[this.fundType];
     },
   },
 };

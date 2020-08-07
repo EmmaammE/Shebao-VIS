@@ -94,8 +94,14 @@
 
         <div class="calendar-view">
           <div class="chart-legends text-lg-body-2">
-            <span class="legend">同比</span>
-            <span class="legend">环比</span>
+            <span
+              :class="type === 0 ? 'active': ''"
+              @click="type = 0"
+            >同比</span>
+            <span
+              :class="type === 1 ? 'active': ''"
+              @click="type = 1"
+            >环比</span>
             <v-select
               :items="items2"
               v-model="itemSelect2"
@@ -112,18 +118,16 @@
           <!-- 日历图 -->
           <calendar
             v-bind="setting"
-            :datum="data2019"
+            :datum="calendarDatum"
             :year="years[0]"
-            :month="itemSelect2==='月'"
             :type="itemSelect2"
           />
-          <calendar
+          <!-- <calendar
             v-bind="setting"
-            :datum="data2020"
+            :datum="calendarDatum"
             :year="years[1]"
-            :month="itemSelect2==='月'"
             :type="itemSelect2"
-          />
+          /> -->
         </div>
       </div>
     </v-card>
@@ -136,7 +140,7 @@ import layout from '@/mixins/layout';
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
 import { fetchFeeStatistics, fetchFeeTimeSeries } from '@/util/http';
-import FUND_TYPE from '@/util/type';
+import { FUND_TYPE } from '@/util/type';
 
 const chart1Size = {
   width: 800,
@@ -163,6 +167,7 @@ const FEE_TYPE = {
   人次人头: 'person_time_head_count',
 };
 
+const DATA_TYPE = ['chain_ratio', 'year_ratio'];
 export default {
   name: 'Monitor',
 
@@ -175,6 +180,7 @@ export default {
 
   props: {
     submenu: String,
+    fundType: String,
   },
 
   data: () => ({
@@ -182,10 +188,10 @@ export default {
     tabTitle: ['总医疗（元）', '医保列支（元）', '基金支出（元）', '门诊均次（元）', '人次人头（次）'],
     tabNumber: [32678903, 0, 0, 0, 0],
 
-    menuTitle: '公立医院',
+    // menuTitle: '公立医院',
     menuSubtitle: ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '人次人头'],
 
-    dateStart: new Date(2019, 0).toISOString().substr(0, 10),
+    dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
     dateEnd: new Date().toISOString().substr(0, 10),
     menu1: false,
     menu2: false,
@@ -201,17 +207,25 @@ export default {
     // 日历图
     itemSelect2: 0,
     items2: [
-      { value: 0, title: '月' },
-      { value: 1, title: '周' },
-      { value: 2, title: '日' },
+      { value: 0, title: '月', key: 'month' },
+      { value: 1, title: '周', key: 'week' },
+      { value: 2, title: '日', key: 'day' },
     ],
     setting,
-    data2019: [],
-    data2020: [],
     years: [2019, 2020],
+
+    // type为0： 同比， 1：环比
+    type: 0,
+    // 获得的数据原始值
+    datum: {},
   }),
 
   mixins: [layout],
+
+  // beforeRouteUpdate(to, from, next) {
+  //   console.log(to, from);
+  //   next();
+  // },
 
   mounted() {
     // fetch 总医疗的四个值
@@ -219,8 +233,22 @@ export default {
     this.getFeeTimeSeries();
   },
 
+  computed: {
+    calendarDatum() {
+      // 日历图的数据
+      const data = {};
+      Object.keys(this.datum).forEach((key) => {
+        data[key] = this.datum[key][DATA_TYPE[this.type]];
+      });
+      return data;
+    },
+    menuTitle() {
+      return this.fundType;
+    },
+  },
+
   watch: {
-    submenu() {
+    fundType() {
       this.getFeeStatistics();
       this.getFeeTimeSeries();
     },
@@ -263,9 +291,10 @@ export default {
           startDay: this.dateStart,
           endDay: this.dateEnd,
         });
-      }
 
-      //  计算同比环比的最值 -》 映射color -> 更新color
+        // TODO 把日期分开？
+        this.datum = data;
+      }
     },
   },
 
@@ -344,7 +373,7 @@ export default {
           border: 1px solid #cfcfcf;
         }
 
-        .legend {
+        span {
           flex: 0 0 30%;
           display: flex;
           align-items: center;
@@ -362,6 +391,10 @@ export default {
             border-radius: 50%;
             margin: 0 0.5rem 0 0;
           }
+        }
+
+        span.active {
+          color: #1976d2;
         }
       }
     }

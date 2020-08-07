@@ -11,9 +11,13 @@ const routes = [
     component: Landing,
   },
   {
-    path: '/monitor',
+    path: '/monitor', redirect: '/monitor/public',
+  },
+  {
+    path: '/monitor/:fundType',
     name: 'Monitor',
     component: () => import('../views/monitor/Monitor.vue'),
+    props: true,
     meta: {
       links: [
         {
