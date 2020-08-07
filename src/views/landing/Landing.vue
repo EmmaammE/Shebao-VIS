@@ -21,7 +21,7 @@
 
       <div class="downbox">
         <div class="s-title">
-          <v-img max-width="3vw" src="../.././assets/landing/首页 icon_1.png"></v-img>
+          <v-img max-width="45px" src="../.././assets/landing/首页 icon_1.png"></v-img>
           <h2>医保智能监测预警系统</h2>
         </div>
 
@@ -126,13 +126,15 @@ export default {
   }
 
   .downbox {
-    margin: 15vh 1vw;
     display: flex;
     flex-direction: column;
+    height: 90vh;
+    margin: 15% 1vw;
 
     .s-title {
       display: flex;
       align-items: center;
+      margin-left: 2vw;
 
       h2 {
         margin: 0 10px;
