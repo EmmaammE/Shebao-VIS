@@ -1,6 +1,7 @@
 <template>
   <div class="calendar-container">
-    <svg width='100%' height='100%' :viewBox="`0 0 ${width} ${height}`">
+    <!-- <svg width='100%' height='100%'> -->
+    <svg  height='100%' :viewBox="`0 0 ${width} ${height}`">
       <text x="5" y="50%">{{year}}</text>
       <g :transform="`translate(${marginLeft}, ${marginTop})`">
         <!-- <text v-for="(day,index) in daysLabel" :key="index"

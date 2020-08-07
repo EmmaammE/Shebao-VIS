@@ -18,20 +18,24 @@
 
       <div class="s-charts-list">
         <!-- 折线图-->
-        <div class="chart-legends text-lg-body-2">
-          <span class="legend"> <i></i> 2019</span>
-          <span class="legend"> <i></i>2020</span>
-          <v-select
-            :items="items"
-            v-model="itemSelect"
-            item-text="title"
-            item-value="value"
-            height= "5"
-            solo
-            dense
-            hide-details
-            flat
-          ></v-select>
+        <div class="zhexian-c">
+          <div class="chart-legends text-lg-body-2">
+            <span class="legend"> <i></i> 2019</span>
+            <span class="legend"> <i></i>2020</span>
+            <v-select
+              :items="items"
+              v-model="itemSelect"
+              item-text="title"
+              item-value="value"
+              height= "5"
+              solo
+              dense
+              hide-details
+              flat
+            ></v-select>
+          </div>
+          <zhexian />
+
         </div>
 
         <v-divider></v-divider>
@@ -75,7 +79,7 @@
 </template>
 
 <script>
-import LineChart from '@/components/LineChart.vue';
+import Zhexian from '@/views/home/Zhexian.vue';
 import layout from '@/mixins/layout';
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
@@ -90,7 +94,7 @@ const chart1Size = {
 
 const setting = {
   width: 800,
-  height: 130,
+  height: 100,
   cellSize: 14,
   marginLeft: 40,
   marginTop: 20,
@@ -103,6 +107,7 @@ export default {
     Badge,
     // LineChart,
     Calendar,
+    Zhexian,
   },
 
   props: {
@@ -182,8 +187,9 @@ export default {
 
       .s-charts-list {
         display: grid;
-        grid-template-rows: auto 1% 30vh;
+        grid-template-rows: 48% 1% auto;
         width: 100%;
+        height: 70vh;
       }
 
       .chart-legends {
@@ -191,6 +197,11 @@ export default {
         width: 20%;
         align-items: center;
         margin: 20px 0;
+
+        .zhexian-c {
+          display: flex;
+          flex-direction: column;
+        }
 
         .v-input {
           border: 1px solid #cfcfcf;
