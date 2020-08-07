@@ -11,9 +11,61 @@
 
     <v-card class="s-charts">
       <!-- menu -->
-      <div class="text-lg-h6 text-md-h6">
-        <span>{{submenu}}</span> |
-        <span>{{menuSubtitle[tabActive]}}</span>
+      <div class="s-header">
+        <div class="text-lg-h6 text-md-h6">
+          <span>{{submenu}}</span> |
+          <span>{{menuSubtitle[tabActive]}}</span>
+        </div>
+
+        <!-- 时间选择 -->
+        <div class="time-container">
+          <v-menu
+            ref="menu1"
+            v-model="menu1"
+            :close-on-content-click="false"
+            :return-value.sync="dateStart"
+            transition="scale-transition"
+            offset-y
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <input
+                v-model="dateStart"
+                v-bind="attrs"
+                v-on="on"
+                class="date-input"
+              />
+            </template>
+            <v-date-picker v-model="dateStart" no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="menu1 = false">取消</v-btn>
+              <v-btn text color="primary" @click="$refs.menu1.save(dateStart)">保存</v-btn>
+            </v-date-picker>
+          </v-menu>
+          <div>—</div>
+          <v-menu
+            ref="menu2"
+            v-model="menu2"
+            :close-on-content-click="false"
+            :return-value.sync="dateEnd"
+            transition="scale-transition"
+            offset-y
+          >
+            <template v-slot:activator="{ on, attrs }">
+            <input
+                v-model="dateEnd"
+                v-bind="attrs"
+                v-on="on"
+                class="date-input"
+              />
+            </template>
+            <v-date-picker v-model="dateEnd" no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="menu2 = false">取消</v-btn>
+              <v-btn text color="primary" @click="$refs.menu2.save(dateEnd)">保存</v-btn>
+            </v-date-picker>
+          </v-menu>
+        </div>
+        <!-- 时间选择 end-->
       </div>
 
       <div class="s-charts-list">
@@ -83,6 +135,8 @@ import Zhexian from '@/views/home/Zhexian.vue';
 import layout from '@/mixins/layout';
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
+import { fetchFeeStatistics, fetchFeeTimeSeries } from '@/util/http';
+import FUND_TYPE from '@/util/type';
 
 const chart1Size = {
   width: 800,
@@ -98,6 +152,15 @@ const setting = {
   cellSize: 14,
   marginLeft: 40,
   marginTop: 20,
+};
+
+const FEE_TYPE = {
+  总医疗费用: 'total',
+  医保列支费用: 'liezhi',
+  基金支出费用: 'fund',
+  门诊均次费用: 'outpatient_average',
+  住院均次费用: 'inpatient_average',
+  人次人头: 'person_time_head_count',
 };
 
 export default {
@@ -121,6 +184,11 @@ export default {
 
     menuTitle: '公立医院',
     menuSubtitle: ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '人次人头'],
+
+    dateStart: new Date(2019, 0).toISOString().substr(0, 10),
+    dateEnd: new Date().toISOString().substr(0, 10),
+    menu1: false,
+    menu2: false,
 
     chart1Size,
     items: [
@@ -147,11 +215,57 @@ export default {
 
   mounted() {
     // fetch 总医疗的四个值
+    this.getFeeStatistics();
+    this.getFeeTimeSeries();
+  },
+
+  watch: {
+    submenu() {
+      this.getFeeStatistics();
+      this.getFeeTimeSeries();
+    },
+    tabActive() {
+      this.getFeeStatistics();
+    },
   },
 
   methods: {
     changeTab(index) {
       this.tabActive = index;
+    },
+
+    async getFeeStatistics() {
+      if (FUND_TYPE[this.submenu]) {
+        const data = await fetchFeeStatistics({
+          startDay: this.dateStart,
+          endDay: this.dateEnd,
+          fundType: FUND_TYPE[this.submenu],
+        });
+
+        this.tabNumber = [
+          data.total,
+          data.liezhi,
+          data.fund,
+          data.outpatient_average,
+          data.inpatient_average,
+          data.person_time_head_count,
+        ];
+      }
+    },
+
+    async getFeeTimeSeries(granularity = 'day') {
+      if (FUND_TYPE[this.submenu]) {
+        const data = await fetchFeeTimeSeries({
+          year: 2020,
+          fundType: FUND_TYPE[this.submenu],
+          feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
+          granularity,
+          startDay: this.dateStart,
+          endDay: this.dateEnd,
+        });
+      }
+
+      //  计算同比环比的最值 -》 映射color -> 更新color
     },
   },
 
@@ -175,6 +289,29 @@ export default {
       padding: 0 20px;
       min-width: max-content;
       flex-grow: 1;
+    }
+
+    .s-header {
+      display: flex;
+      justify-content: space-between;
+
+      .time-container {
+        display: flex;
+        align-items: center;
+        background: #fcfcfc;
+      }
+
+      .date-input {
+        border: 2px solid #efefef;
+        padding: 2px 5px;
+        color: #7589a2;
+        border-radius: 15px;
+        width: 70px;
+      }
+
+      .date-input:focus {
+        outline: none;
+      }
     }
 
     .s-charts {

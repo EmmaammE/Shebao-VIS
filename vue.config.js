@@ -27,4 +27,29 @@ module.exports = {
       .loader('vue-svg-loader');
   },
 
+  devServer: {
+    open: true,
+    host: 'localhost',
+    port: 8080,
+    https: false,
+    hotOnly: false,
+    proxy: {
+      '/mock': {
+        target: 'http://49.232.152.200:8000/backend/',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/mock': '',
+        },
+      },
+      '/api': {
+        target: 'http://zhoujiehui.tech:8888/backend/',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '',
+        },
+      },
+    },
+  },
 };

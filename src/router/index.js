@@ -22,11 +22,10 @@ const routes = [
           active: true,
           items: [
             { title: '公立医院' },
-            { title: '社区卫生服务中心' },
             { title: '民营医院' },
-            { title: '其他社会办医' },
             { title: '零售药店' },
-            { title: '机构画像' },
+            { title: '社区卫生服务中心' },
+            { title: '其他社会办医' },
           ],
         },
         {

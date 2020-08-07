@@ -77,7 +77,7 @@
         :items-per-page="5"
         class="elevation-1"
       >
-        <template v-slot:item.sex="{ item }">
+        <template v-slot:item="{ item }">
           <div class="custom-avatar">
             <component :is="avatar(item.sex)">
             </component>
