@@ -106,3 +106,13 @@ src/styles/global.scss中定义全局样式
 使用**vue-svg-loader**, 可以直接引入svg为组件
 
 https://vue-svg-loader.js.org/
+
+*如果要修改大小，我发现要写一下viewBox属性*
+
+# 网络访问
+
+vue.config.js 使用proxy配置了跨域问题（开发环境）
+
+在src/util/http.js中封装请求，在组件中引入
+
+https://www.yuque.com/docs/share/8393261b-d974-4a0c-97b4-ee3679ee22b3?#
