@@ -16,6 +16,9 @@ export default {
     Map,
     FilterCard,
   },
+  props: {
+    routeType: String,
+  },
   data() {
     return {
 

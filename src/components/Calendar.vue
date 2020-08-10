@@ -1,17 +1,9 @@
 <template>
   <div class="calendar-container">
     <!-- <svg width='100%' height='100%'> -->
-    <svg  height='100%' :viewBox="`0 0 ${width} ${height}`">
-      <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
-        <Tooltip v-show="isShowing" v-bind="tipPos"
-        >
-          <div class="s-tip">
-            <p>{{tipData.date}}</p>
-            <p>{{tipData.number.toFixed(2)}}</p>
-          </div>
-        </Tooltip>
-      </foreignObject>
-
+    <svg  height='100%' :viewBox="`0 0 ${width} ${height}`"
+      @mouseleave="isShowing=false"
+    >
       <text x="5" y="50%">{{year}}</text>
       <g :transform="`translate(${marginLeft}, ${marginTop})`">
         <!-- <text v-for="(day,index) in daysLabel" :key="index"
@@ -49,6 +41,18 @@
           >{{j+1}}</text>
         </template>
       </g>
+
+      <!-- tooltip -->
+      <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
+        <Tooltip v-show="isShowing" v-bind="tipPos"
+        >
+          <div class="s-tip">
+            <p>{{tipData.date}}</p>
+            <p>{{tipData.number[0].toFixed(2)}}</p>
+            <p>{{tipData.number[1].toFixed(2)}}</p>
+          </div>
+        </Tooltip>
+      </foreignObject>
     </svg>
   </div>
 </template>
@@ -98,6 +102,8 @@ export default {
       月 周 日 （0，1，2）
     */
     type: Number,
+    // 按同比（0）还是环比（1）
+    dataType: Number,
   },
 
   data() {
@@ -109,7 +115,7 @@ export default {
       isShowing: false,
       tipData: {
         date: '',
-        number: 0.0,
+        number: [0, 0],
       },
       tipPos: {
         left: 0,
@@ -121,19 +127,20 @@ export default {
   computed: {
     colorSchema() {
       const { extent } = this.handledDatum;
+      const { dataType } = this;
       return d3.scaleLinear()
         .range(['#ff5f43', '#5bd7c2'])
-        .domain([-extent, extent]);
+        .domain([-extent[dataType], extent[dataType]]);
     },
 
     handledDatum() {
       const data = {};
-      let minV = Number.MAX_VALUE;
-      let maxV = Number.MIN_VALUE;
+      let minV = [Number.MAX_VALUE, Number.MAX_VALUE];
+      let maxV = [Number.MIN_VALUE, Number.MIN_VALUE];
 
       let month = 1; let
         week = 0;
-      let sum = 0;
+      let sum = [0, 0];
       let tmp = [];
 
       const datumArr = Object.keys(this.datum);
@@ -145,27 +152,31 @@ export default {
             if (+key.substr(5, 2) !== month || index === datumArr.length - 1) {
               if (index === datumArr.length - 1) {
                 tmp.push(key);
-                sum += this.datum[key];
+                sum[0] += this.datum[key][0];
+                sum[1] += this.datum[key][1];
               }
 
-              const value = sum / tmp.length;
+              const value = sum.map((d) => d / tmp.length);
               tmp.forEach((day) => {
                 data[day] = value;
               });
-              minV = Math.min(minV, value);
-              maxV = Math.max(maxV, value);
 
-              sum = 0;
+              minV = value.map((d, i) => Math.min(minV[i], d));
+              maxV = value.map((d, i) => Math.max(maxV[i], d));
+
+              sum = [0, 0];
               month += 1;
               tmp = [];
             }
             tmp.push(key);
-            sum += this.datum[key];
+
+            sum[0] += this.datum[key][0];
+            sum[1] += this.datum[key][1];
           });
           break;
 
         case 1:
-          sum = 0;
+          sum = [0, 0];
           tmp = [];
           datumArr.forEach((key, index) => {
             const d = new Date(key);
@@ -173,22 +184,25 @@ export default {
             if (currentWeek !== week || index === datumArr.length - 1) {
               if (index === datumArr.length - 1) {
                 tmp.push(key);
-                sum += this.datum[key];
+                sum[0] += this.datum[key][0];
+                sum[1] += this.datum[key][1];
               }
 
-              const value = sum / tmp.length;
+              const value = sum.map((da) => da / tmp.length);
               tmp.forEach((day) => {
                 data[day] = value;
               });
-              minV = Math.min(minV, value);
-              maxV = Math.max(maxV, value);
 
-              sum = 0;
+              minV = value.map((da, i) => Math.min(minV[i], da));
+              maxV = value.map((da, i) => Math.max(maxV[i], da));
+
+              sum = [0, 0];
               week += 1;
               tmp = [];
             }
             tmp.push(key);
-            sum += this.datum[key];
+            sum[0] += this.datum[key][0];
+            sum[1] += this.datum[key][1];
           });
           break;
 
@@ -197,14 +211,15 @@ export default {
           datumArr.forEach((key) => {
             const value = this.datum[key];
             data[key] = value;
-            minV = Math.min(minV, value);
-            maxV = Math.max(maxV, value);
+            minV = value.map((d, i) => Math.min(minV[i], d));
+            maxV = value.map((d, i) => Math.max(maxV[i], d));
           });
           break;
         default:
       }
 
-      const extent = Math.max(Math.abs(minV), Math.abs(maxV));
+      const extent = Array(2).fill(null)
+        .map((e, i) => Math.max(Math.abs(minV[i]), Math.abs(maxV[i])));
 
       return { data, extent };
     },
@@ -248,10 +263,10 @@ export default {
     cellColor(d) {
       const key = d.toISOString().substr(0, 10);
       if (this.actualData[key]) {
-        if (this.actualData[key] === 0) {
+        if (this.actualData[key][this.dataType] === 0) {
           return '#fff';
         }
-        return this.colorSchema(this.actualData[key]);
+        return this.colorSchema(this.actualData[key][this.dataType]);
       }
       return '#eee';
     },
@@ -276,6 +291,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .mask {
+    pointer-events: none;
+  }
   .s-tip {
     margin: 0;
     user-select: none;

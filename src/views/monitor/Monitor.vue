@@ -13,7 +13,7 @@
       <!-- menu -->
       <div class="s-header">
         <div class="text-lg-h6 text-md-h6">
-          <span>{{submenu}}</span> |
+          <span>{{menuTitle}}</span> |
           <span>{{menuSubtitle[tabActive]}}</span>
         </div>
 
@@ -118,16 +118,18 @@
           <!-- 日历图 -->
           <calendar
             v-bind="setting"
-            :datum="calendarDatum"
+            :datum="calendarDatum[0]"
             :year="years[0]"
             :type="itemSelect2"
+            :dataType="type"
           />
-          <!-- <calendar
+          <calendar
             v-bind="setting"
-            :datum="calendarDatum"
+            :datum="calendarDatum[1]"
             :year="years[1]"
             :type="itemSelect2"
-          /> -->
+            :dataType="type"
+          />
         </div>
       </div>
     </v-card>
@@ -140,7 +142,7 @@ import layout from '@/mixins/layout';
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
 import { fetchFeeStatistics, fetchFeeTimeSeries } from '@/util/http';
-import { FUND_TYPE } from '@/util/type';
+import { FUND_TYPE, ROUTE_PARAM } from '@/util/type';
 
 const chart1Size = {
   width: 800,
@@ -180,7 +182,7 @@ export default {
 
   props: {
     submenu: String,
-    fundType: String,
+    routeType: String,
   },
 
   data: () => ({
@@ -236,24 +238,33 @@ export default {
   computed: {
     calendarDatum() {
       // 日历图的数据
-      const data = {};
+      const data = [{}, {}];
       Object.keys(this.datum).forEach((key) => {
-        data[key] = this.datum[key][DATA_TYPE[this.type]];
+        const item = {};
+        Object.keys(this.datum[key]).forEach((d) => {
+          item[d] = [this.datum[key][d].year_ratio, this.datum[key][d].chain_ratio];
+        });
+        if (key === '2019') {
+          data[0] = item;
+        } else {
+          data[1] = item;
+        }
       });
+
       return data;
     },
     menuTitle() {
-      return this.fundType;
+      return ROUTE_PARAM[this.routeType];
     },
   },
 
   watch: {
-    fundType() {
+    routeType() {
       this.getFeeStatistics();
       this.getFeeTimeSeries();
     },
     tabActive() {
-      this.getFeeStatistics();
+      this.getFeeTimeSeries();
     },
   },
 
@@ -263,38 +274,39 @@ export default {
     },
 
     async getFeeStatistics() {
-      if (FUND_TYPE[this.submenu]) {
-        const data = await fetchFeeStatistics({
-          startDay: this.dateStart,
-          endDay: this.dateEnd,
-          fundType: FUND_TYPE[this.submenu],
-        });
+      // console.log(this.submenu);
+      // if (FUND_TYPE[this.submenu]) {
+      const data = await fetchFeeStatistics({
+        startDay: this.dateStart,
+        endDay: this.dateEnd,
+        fundType: this.routeType,
+      });
 
-        this.tabNumber = [
-          data.total,
-          data.liezhi,
-          data.fund,
-          data.outpatient_average,
-          data.inpatient_average,
-          data.person_time_head_count,
-        ];
-      }
+      this.tabNumber = [
+        data.total,
+        data.liezhi,
+        data.fund,
+        data.outpatient_average,
+        data.inpatient_average,
+        data.person_time_head_count,
+      ];
+      // }
     },
 
     async getFeeTimeSeries(granularity = 'day') {
-      if (FUND_TYPE[this.submenu]) {
-        const data = await fetchFeeTimeSeries({
-          year: 2020,
-          fundType: FUND_TYPE[this.submenu],
-          feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
-          granularity,
-          startDay: this.dateStart,
-          endDay: this.dateEnd,
-        });
+      // if (FUND_TYPE[this.submenu]) {
+      const data = await fetchFeeTimeSeries({
+        year: 2020,
+        fundType: this.routeType,
+        feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
+        granularity,
+        startDay: this.dateStart,
+        endDay: this.dateEnd,
+      });
 
-        // TODO 把日期分开？
-        this.datum = data;
-      }
+      // TODO 把日期分开？
+      this.datum = data;
+      // }
     },
   },
 

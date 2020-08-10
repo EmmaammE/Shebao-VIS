@@ -1,9 +1,9 @@
 <template>
   <component :is="layout" id="app" :links="$route.meta.links"
     :submenu="submenu"
-    :fundType="$route.params.fundType"
+    :routeType="$route.params.routeType"
   >
-    <router-view :layout.sync="layout" :submenu="submenu" />
+    <router-view :layout.sync="layout" :submenu="submenu" :routeType="$route.params.routeType"/>
   </component>
 </template>
 
@@ -25,11 +25,8 @@ export default {
 
         // 如果不是主页就计算submenu
         const { submenu } = this.$store.state;
-        const temp = this.$route.meta.links[submenu[0]];
-        if (temp.items.length === 0) {
-          return temp.title;
-        }
-        return temp.items[submenu[1]].title;
+        const temp = this.$route.meta.links[submenu];
+        return temp.key;
       } catch (err) {
         console.log(err);
       }
@@ -77,4 +74,16 @@ html {
   // html::-webkit-scrollbar {
   //   width: 0px;
   // }
+
+    .my-div-icon {
+  background-color: aqua;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 0 20px 20px 20px;
+  box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
 </style>

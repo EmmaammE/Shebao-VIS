@@ -1,6 +1,7 @@
 <template>
   <v-app class="s-container">
-    <v-navigation-drawer app floating class="s-drawer">
+    <v-navigation-drawer app floating class="s-drawer"
+      :mobile-breakpoint="0">
       <template v-slot:prepend>
         <v-sheet class="s-header">
           <v-img
@@ -20,7 +21,7 @@
 
       <v-sheet class="s-lists">
         <div class="icon-lists">
-          <router-link to="/"><HomeIcon /></router-link>
+          <router-link to="/landing"><HomeIcon /></router-link>
           <router-link to="/monitor"><MonitorIcon /></router-link>
           <router-link to="/search"><SearchIcon /></router-link>
           <router-link to="/warning"><WarningIcon /></router-link>
@@ -43,12 +44,13 @@
             <v-list-item
               v-for="(subItem,j) in item.items"
               :key="subItem.title"
-              v-on:click.stop="changeMenu(i,j)"
+              v-on:click.stop="changeSubMenu(i,j)"
+              :class="subItem.title === fundString ? 'active':''"
             >
-              <v-list-item-content>
+              <v-list-item-content
+              >
                 <v-list-item-title
                   v-text="subItem.title"
-                  :class="subItem.title === fundString ? 'active':''"
                 >
                 </v-list-item-title>
               </v-list-item-content>
@@ -62,12 +64,12 @@
           <v-list-item
             v-for="(item,i) in links"
             :key="item.title"
+            :class="item.title === ROUTE_PARAM[routeType]? 'active':''"
           >
             <v-list-item-content>
               <v-list-item-title
                 v-text="item.title"
-                :class="item.title === submenu ? 'active':''"
-                v-on:click.stop="changeMenu(i,0)"
+                v-on:click.stop="changeSubMenu(i)"
               >
               </v-list-item-title>
             </v-list-item-content>
@@ -120,7 +122,7 @@ export default {
   props: {
     links: Array,
     submenu: String,
-    fundType: String,
+    routeType: String,
   },
   components: {
     BackIcon,
@@ -140,18 +142,25 @@ export default {
       { title: 'warning', icon: WarningIcon },
     ],
     mini: true,
+    ROUTE_PARAM,
   }),
 
   methods: {
-    changeMenu(i, j) {
+    changeMenu(i) {
       // 修改submenu
       this.$store.commit({
         type: 'changeMenu',
         i,
-        j,
       });
+    },
+    changeSubMenu(i, j) {
+      this.$store.commit(
+        { type: 'changeMenu', i },
+      );
       if (j !== undefined) {
-        this.$router.push(`/monitor/${FUND_TYPE[this.links[i].items[j].title]}`);
+        this.$router.push(`/${this.submenu}/${FUND_TYPE[this.links[i].items[j].title]}`);
+      } else {
+        this.$router.push(`/search/${FUND_TYPE[this.links[i].title]}`);
       }
     },
   },
@@ -164,7 +173,7 @@ export default {
       return this.links[0].items.length !== 0;
     },
     fundString() {
-      return ROUTE_PARAM[this.fundType];
+      return ROUTE_PARAM[this.routeType];
     },
   },
 };
@@ -190,6 +199,18 @@ export default {
       cursor: pointer;
     }
 
+    .v-list {
+      width: 100%;
+      padding-left: 0;
+      // padding-right: 0;
+    }
+
+    .v-list-group__items {
+      .v-list-item {
+        text-indent: 2px;
+      }
+    }
+
     .s-drawer {
       background: $she-bg;
 
@@ -206,8 +227,13 @@ export default {
         border: 2px solid $she-bg;
       }
 
+      .v-list-item {
+        border-left: 5px solid #fff;
+      }
+
       .active {
-        color: #1976d2;
+        background: linear-gradient(to right, #eaf1f9, #f5f7fb);
+        border-left: 5px solid #94bfef;
       }
 
       .s-lists {
@@ -226,7 +252,7 @@ export default {
             transform: scale(0.8);
           }
 
-          .router-link-exact-active {
+          .router-link-active {
             path {
               fill: #4E80D1;
             }

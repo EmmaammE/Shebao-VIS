@@ -1,8 +1,5 @@
 <template>
-  <component :is="comp[submenu]" />
-  <!-- <Layout>
-    <router-view />
-  </Layout> -->
+  <component :is="comp[$route.params.routeType]" :routeType="$route.params.routeType" />
 </template>
 
 <script>
@@ -14,25 +11,20 @@ import Layout from '@/views/Layout.vue';
 
 export default {
   name: 'Search',
-  props: {
-    submenu: String,
-  },
   components: {
     Layout,
   },
   mixins: [layout],
-  // created() {
-  //   this.$emit('update:layout', 'div');
-  // },
+
   data() {
     return {
       comp: {
-        排名查看: SearchRank,
-        机构汇总: SearchMap,
-        参保人员汇总: SearchPanel,
-        药师医师汇总: SearchPanel,
-        费用明细: SearchMap,
-        就诊信息: SearchPanel,
+        rank: SearchRank,
+        jigou: SearchMap,
+        people: SearchPanel,
+        doctor: SearchPanel,
+        mingxi: SearchMap,
+        info: SearchPanel,
       },
     };
   },

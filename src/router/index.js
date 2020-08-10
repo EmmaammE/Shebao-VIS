@@ -6,7 +6,10 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
+    path: '/', redirect: '/landing',
+  },
+  {
+    path: '/landing',
     name: 'Landing',
     component: Landing,
   },
@@ -14,14 +17,14 @@ const routes = [
     path: '/monitor', redirect: '/monitor/public',
   },
   {
-    path: '/monitor/:fundType',
+    path: '/monitor/:routeType',
     name: 'Monitor',
     component: () => import('../views/monitor/Monitor.vue'),
     props: true,
     meta: {
       links: [
         {
-          action: '1',
+          key: 'monitor',
           title: '基金本地情况',
           active: true,
           items: [
@@ -33,7 +36,7 @@ const routes = [
           ],
         },
         {
-          action: '2',
+          key: 'monitor',
           title: '基金异地情况',
           items: [
             { title: '市内异地' },
@@ -42,7 +45,7 @@ const routes = [
           ],
         },
         {
-          action: '3',
+          key: 'monitor',
           title: '基金明细监测',
           items: [
             { title: '按列支渠道' },
@@ -52,16 +55,17 @@ const routes = [
       ],
     },
   },
+  { path: '/warning', redirect: '/warning/public' },
   {
-    path: '/warning',
+    path: '/warning/:routeType',
     name: 'Warning',
     component: () => import('../views/warning/Warning.vue'),
     meta: {
       links: [
         {
-          action: '1',
           title: '机构预算预警',
           active: true,
+          key: 'warning',
           items: [
             { title: '公立医院' },
             { title: '社区卫生服务中心' },
@@ -71,12 +75,11 @@ const routes = [
           ],
         },
         {
-          action: '2',
+          key: 'warning',
           title: '违规行为预警',
           items: [
             { title: '机构违规预警' },
             { title: '参保人员违规预警' },
-            { title: '医师违规预警' },
             { title: '药师违规预警' },
           ],
         },
@@ -84,7 +87,10 @@ const routes = [
     },
   },
   {
-    path: '/search',
+    path: '/search', redirect: '/search/rank',
+  },
+  {
+    path: '/search/:routeType',
     name: 'Search',
     component: () => import('../views/search/Search.vue'),
     meta: {

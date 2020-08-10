@@ -1,10 +1,12 @@
 <template>
   <div id="map-id">
+    <slot />
   </div>
 </template>
 
 <script>
 import L from 'leaflet';
+import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
 
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -14,9 +16,12 @@ const style = 'zrcccrz/ckd1yvaxs13an1imn3552xkss';
 export default {
   name: 'Map',
 
+  components: {
+  },
+
   data() {
     return {
-
+      map: L.map(),
     };
   },
 
@@ -41,9 +46,29 @@ export default {
       tileSize: 512,
       zoomOffset: -1,
     }).addTo(map);
+
+    const circle = L.circle([30.260574, 120.125254], 50, {
+      color: 'red',
+      fillColor: '#f03',
+      fillOpacity: 0.5,
+    });
+    circle.on('click', this.onClick);
+
+    circle.addTo(map);
+
+    this.map = map;
   },
 
   methods: {
+    onClick(e) {
+      console.log(e.latlng);
+      const pos = e.target.getLatLng();
+      // pos[1] += 1;
+      const { lat, lng } = pos;
+      console.log(lat, lng);
+      this.map.setView(L.latlng({ lat: lat + 0.01, lng }), 15);
+      // this.map.panTo([lat + 1, lng]);
+    },
   },
 };
 </script>
