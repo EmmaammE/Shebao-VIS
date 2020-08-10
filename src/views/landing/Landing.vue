@@ -28,16 +28,22 @@
         <div class="content-container">
           <div class="icon-lists">
           <div class="box">
-            <Icon4/>
-            <p>基金<br />实时监测</p>
+            <router-link to="/monitor">
+              <Icon4/>
+              <p>基金<br />实时监测</p>
+            </router-link>
           </div>
           <div class="box">
-            <Icon5/>
-            <p>智能<br>搜索引擎</p>
+            <router-link to="/search">
+              <Icon5/>
+              <p>智能<br>搜索引擎</p>
+            </router-link>
           </div>
           <div class="box">
-            <Icon6/>
-            <p>智能<br>风险预警</p>
+            <router-link to="/warning">
+              <Icon6/>
+              <p>智能<br>风险预警</p>
+            </router-link>
           </div>
 
         </div>
@@ -172,6 +178,10 @@ export default {
           color:#ffffff;
           letter-spacing:1.87px;
           text-align:center;
+        }
+         a {
+        color: #fff;
+        text-decoration: none;
         }
       }
 
