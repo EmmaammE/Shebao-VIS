@@ -16,8 +16,8 @@ export const FUND_TYPE = {
   费用明细: 'mingxi',
   就诊信息: 'info',
   机构违规预警: 'organization',
-  参保人员违规预警: 'people',
-  药师违规预警: 'doctor',
+  参保人违规预警: 'renyuan',
+  药师违规预警: 'yaoshi',
 };
 
 export const ROUTE_PARAM = {
@@ -35,6 +35,9 @@ export const ROUTE_PARAM = {
   mingxi: '费用明细',
   info: '就诊信息',
   doctor: '药师医师汇总',
+  organization: '机构违规预警',
+  renyuan: '参保人违规预警',
+  yaoshi: '药师违规预警',
 };
 
 export const token = 'pk.eyJ1IjoiendzdGFydCIsImEiOiJjazRjaDB0MDAwb2Q0M3Vud2NhYjNuZWN5In0.NbjC9BqTGfVEcJuxU7JcjA';

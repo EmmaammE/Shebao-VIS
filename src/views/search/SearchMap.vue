@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Map from '@/components/Map.vue';
+import Map from '@/components/charts/Map.vue';
 import FilterCard from '@/components/filterCard.vue';
 
 export default {

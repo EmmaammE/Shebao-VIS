@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Landing from '@/views/landing/Landing.vue';
+import WarningList from '@/views/warning/WarningList.vue';
 
 Vue.use(VueRouter);
 
@@ -26,7 +27,6 @@ const routes = [
         {
           key: 'monitor',
           title: '基金本地情况',
-          active: true,
           items: [
             { title: '公立医院' },
             { title: '民营医院' },
@@ -64,7 +64,6 @@ const routes = [
       links: [
         {
           title: '机构预算预警',
-          active: true,
           key: 'warning',
           items: [
             { title: '公立医院' },
@@ -79,7 +78,7 @@ const routes = [
           title: '违规行为预警',
           items: [
             { title: '机构违规预警' },
-            { title: '参保人员违规预警' },
+            { title: '参保人违规预警' },
             { title: '药师违规预警' },
           ],
         },
@@ -96,30 +95,24 @@ const routes = [
     meta: {
       links: [
         {
-          action: '1',
           title: '排名查看',
           active: true,
           items: [],
         },
         {
-          action: '2',
           title: '机构汇总',
           items: [],
         },
         {
-          action: '2',
           title: '参保人员汇总',
           items: [],
         }, {
-          action: '2',
           title: '药师医师汇总',
           items: [],
         }, {
-          action: '2',
           title: '费用明细',
           items: [],
         }, {
-          action: '2',
           title: '就诊信息',
           items: [],
         },

@@ -36,7 +36,9 @@
             v-model="item.active"
           >
             <template v-slot:activator>
-              <v-list-item-content>
+              <v-list-item-content
+               @click="changeSubMenu(i,0)"
+              >
                 <v-list-item-title v-text="item.title" />
               </v-list-item-content>
             </template>
@@ -47,12 +49,25 @@
               v-on:click.stop="changeSubMenu(i,j)"
               :class="subItem.title === fundString ? 'active':''"
             >
-              <v-list-item-content
-              >
+              <v-list-item-content>
                 <v-list-item-title
                   v-text="subItem.title"
                 >
                 </v-list-item-title>
+                <div v-if="subItem.title === '参保人违规预警' && subItem.title === fundString"
+                  class="layout-insert">
+                  <div>违规劣质费用</div>
+                  <div>违规人数</div>
+                  <div>违规机构数</div>
+                  <hr />
+                  <ul>
+                    <li>群体就医</li>
+                    <li>虚假住院</li>
+                    <li>刷空卡</li>
+                    <li>刷小卡</li>
+                  </ul>
+                  <hr />
+                </div>
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
@@ -232,8 +247,7 @@ export default {
       }
 
       .active {
-        background: linear-gradient(to right, #eaf1f9, #f5f7fb);
-        border-left: 5px solid #94bfef;
+        color: $she-primary!important;
       }
 
       .s-lists {
@@ -300,6 +314,72 @@ export default {
     .container--fluid {
       padding: 4px;
       height: 100%;
+    }
+
+    // 参保人违规预警，侧边栏插入内容
+    .layout-insert {
+      display: flex;
+      flex-direction: column;
+      color: $she-primary;
+      padding: 10px 0;
+      line-height: 25px;
+      div {
+        // TODO
+      }
+
+      hr {
+       background: $she-border;
+       color: $she-border;
+
+        height: 1px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+
+        li {
+          $radius: 10px;
+          $space: 3px;
+          position: relative;
+          padding-left: 30px;
+          display: flex;
+          align-items: center;
+
+          &::before,
+          &::after  {
+            content: '';
+            position: absolute;
+            width: 2 * ($radius - $space);
+            height: 2 * ($radius - $space);
+            left: 0;
+            top: 0;
+            border-radius: 50%;
+          }
+
+          &::after {
+            top: $space;
+            left: $space;
+          }
+
+          &::before {
+            width: 2*$radius;
+            height: 2*$radius;
+            background: #fff;
+          }
+        }
+
+        @each $c in $yujing {
+          $i: index($yujing, $c);
+          li:nth-child(#{$i})::after {
+            background: $c;
+          }
+
+          li:nth-child(#{$i})::before {
+            border: 1px solid $c;
+          }
+        }
+      }
     }
   }
 

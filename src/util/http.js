@@ -22,3 +22,12 @@ export const fetchFeeStatistics = (params) => fire('POST', 'getFeeStatistics', p
 export const fetchFeeTimeSeries = (params) => fire('POST', 'getFeeTimeSeries', params);
 
 export const fetchRank = (params) => fire('POST', 'getRank', params);
+
+// 智能风险预警
+export const fetchFundMonitorInfo = (params) => fire('POST', 'getFundMonitoringInfo', params);
+
+export const fetchOrgViolationInfo = () => fire('POST', 'getOrgViolationInfo', {});
+
+export const fetchDoctorViolationInfo = () => fire('POST', 'getDoctorViolationInfo', {});
+
+export const fetchOrgFalseHospital = (param) => fire('POST', 'getOrgFalseHospital', param);

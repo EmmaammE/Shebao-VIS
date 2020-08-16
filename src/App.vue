@@ -38,6 +38,8 @@ export default {
 
 /**为了修改Vuetify中slot的样式，这个组件不设置scoped */
 <style lang="scss">
+  @import "@/styles/markercluster.scss";
+
 #nav {
   padding: 30px;
 
@@ -74,16 +76,8 @@ html {
   // html::-webkit-scrollbar {
   //   width: 0px;
   // }
-
-    .my-div-icon {
-  background-color: aqua;
-  padding: 10px;
-  border: 1px solid #333;
-  border-radius: 0 20px 20px 20px;
-  box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  width: auto !important;
-  height: auto !important;
-  margin: 0 !important;
+.v-list-group__header.v-list-item--active {
+  background: linear-gradient(to right, #eaf1f9, #f5f7fb);
+  border-left: 5px solid #94bfef;
 }
 </style>
