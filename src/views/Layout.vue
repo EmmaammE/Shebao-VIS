@@ -28,33 +28,32 @@
         </div>
         <!-- NOTE v-if 是否是层级导航 -->
         <v-list nav dense
-          v-if="type"
+          v-if="$route.meta.linkIndex!==1"
         >
           <v-list-group
             v-for="(item,i) in links"
             :key="item.title"
-            v-model="item.active"
+            :value="i===activeMenu"
           >
             <template v-slot:activator>
-              <v-list-item-content
-               @click="changeSubMenu(i,0)"
-              >
+              <v-list-item-content>
                 <v-list-item-title v-text="item.title" />
               </v-list-item-content>
             </template>
 
             <v-list-item
-              v-for="(subItem,j) in item.items"
+              v-for="(subItem) in item.items"
               :key="subItem.title"
-              v-on:click.stop="changeSubMenu(i,j)"
-              :class="subItem.title === fundString ? 'active':''"
+              :to="subItem.href"
             >
+              <!-- active-class="active" -->
               <v-list-item-content>
                 <v-list-item-title
                   v-text="subItem.title"
                 >
                 </v-list-item-title>
-                <div v-if="subItem.title === '参保人违规预警' && subItem.title === fundString"
+                <div v-if="subItem.title === '参保人违规预警'
+                  && $route.fullPath==='/warning/action/people'"
                   class="layout-insert">
                   <div>违规劣质费用</div>
                   <div>违规人数</div>
@@ -77,14 +76,14 @@
           v-else
         >
           <v-list-item
-            v-for="(item,i) in links"
+            v-for="(item) in links"
             :key="item.title"
-            :class="item.title === ROUTE_PARAM[routeType]? 'active':''"
+            :to="item.href"
+            active-class="custom-active"
           >
             <v-list-item-content>
               <v-list-item-title
                 v-text="item.title"
-                v-on:click.stop="changeSubMenu(i)"
               >
               </v-list-item-title>
             </v-list-item-content>
@@ -94,7 +93,6 @@
     </v-navigation-drawer>
 
     <v-app-bar app outlined flat class="s-bar">
-      <!-- -->
       <div class="s-bar-content">
         <v-text-field
           flat
@@ -116,7 +114,7 @@
     <v-main>
       <!-- Provides the application the proper gutter -->
       <v-container fluid>
-        <slot></slot>
+        <router-view :routeType="$route.params.routeType" />
       </v-container>
     </v-main>
 
@@ -134,11 +132,6 @@ import WarningIcon from '@/assets/common/warning.svg';
 import { ROUTE_PARAM, FUND_TYPE } from '@/util/type';
 
 export default {
-  props: {
-    links: Array,
-    submenu: String,
-    routeType: String,
-  },
   components: {
     BackIcon,
     NextIcon,
@@ -161,34 +154,104 @@ export default {
   }),
 
   methods: {
-    changeMenu(i) {
-      // 修改submenu
-      this.$store.commit({
-        type: 'changeMenu',
-        i,
-      });
-    },
-    changeSubMenu(i, j) {
-      this.$store.commit(
-        { type: 'changeMenu', i },
-      );
-      if (j !== undefined) {
-        this.$router.push(`/${this.submenu}/${FUND_TYPE[this.links[i].items[j].title]}`);
-      } else {
-        this.$router.push(`/search/${FUND_TYPE[this.links[i].title]}`);
-      }
-    },
   },
 
   computed: {
-    type() {
-      if (!this.links) {
-        return false;
-      }
-      return this.links[0].items.length !== 0;
-    },
     fundString() {
       return ROUTE_PARAM[this.routeType];
+    },
+    // 返回展开的menu
+    activeMenu() {
+      if (this.$route.meta.linkIndex === 0) {
+        return {
+          local: 0,
+          other: 1,
+          mingxi: 2,
+
+        }[this.$route.params.submenu];
+      }
+      return this.$route.meta.activeIndex;
+    },
+    // 返回匹配的link数组
+    links() {
+      const index = this.$route.meta.linkIndex;
+      const linksArr = [
+        [
+          {
+            title: '基金本地情况',
+            items: [
+              { title: '公立医院', href: '/monitor/local/public' },
+              { title: '民营医院', href: '/monitor/local/private' },
+              { title: '零售药店', href: '/monitor/local/drugstore' },
+              { title: '社区卫生服务中心', href: '/monitor/local/community' },
+              { title: '其他社会办医', href: '/monitor/local/social' },
+            ],
+          },
+          {
+            title: '基金异地情况',
+            items: [
+              { title: '市内异地', href: '/monitor/other/city' },
+              { title: '省内异地', href: '/monitor/other/province' },
+              { title: '跨省异地', href: '/monitor/other/trans_province' },
+            ],
+          },
+          {
+            title: '基金明细监测',
+            items: [
+              { title: '按列支渠道', href: '/monitor/mingxi/liezhi' },
+              { title: '按费用结构', href: '/monitor/mingxi/feiyong' },
+            ],
+          },
+        ],
+        [
+          {
+            title: '排名查看',
+            href: '/search/rank',
+          },
+          {
+            title: '机构汇总',
+            href: '/search/jigou',
+          },
+          {
+            title: '参保人员汇总',
+            href: '/search/people',
+
+          }, {
+            title: '药师医师汇总',
+            href: '/search/doctor',
+
+          }, {
+            title: '费用明细',
+            href: '/search/mingxi',
+
+          }, {
+            title: '就诊信息',
+            href: '/search/info',
+          },
+        ],
+        [
+          {
+            title: '机构预算预警',
+            items: [
+              { title: '公立医院', href: '/warning/budget/public' },
+              { title: '民营医院', href: '/warning/budget/private' },
+              { title: '零售药店', href: '/warning/budget/drugstore' },
+              { title: '社区卫生服务中心', href: '/warning/budget/community' },
+              { title: '其他社会办医', href: '/warning/budget/social' },
+            ],
+          },
+          {
+            title: '违规行为预警',
+            items: [
+              { title: '机构违规预警', href: '/warning/action/organization' },
+              { title: '参保人违规预警', href: '/warning/action/people' },
+              { title: '药师违规预警', href: '/warning/action/doctor' },
+            ],
+          },
+        ],
+      ];
+
+      return linksArr[index];
     },
   },
 };
@@ -248,6 +311,10 @@ export default {
 
       .active {
         color: $she-primary!important;
+
+        * {
+          background: #fff!important;
+        }
       }
 
       .s-lists {

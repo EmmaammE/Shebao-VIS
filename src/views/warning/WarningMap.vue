@@ -81,10 +81,10 @@
       </v-card>
 
       <!-- 机构预警 -->
-      <org-table v-else-if="compType===1"
+      <org-table v-else
         :title="title"
         :id="id"
-        :data="tipData"
+        :data="tipData[0]"
       />
     </div>
   </div>
@@ -181,7 +181,7 @@ export default {
   computed: {
     // 组件类型
     compType() {
-      if (this.$route.params.routeType === 'organization') {
+      if (this.$route.meta.activeIndex === 1) {
         return 1;
       }
       return 0;
@@ -201,6 +201,7 @@ export default {
     getData() {
       if (this.compType === 0) {
         this.getFundInfo();
+        console.log('fund');
       } else {
         this.getOrganizationInfo();
       }
@@ -240,10 +241,14 @@ export default {
       this.id = name;
       this.title = this.datum[index][name][TITLE_P];
 
-      this.tipData = [
-        this.datum[index][name].ren_tou_ren_ci_bi,
-        this.datum[index][name].jun_ci_fei_yong,
-      ];
+      if (this.compType === 1) {
+        this.tipData = [this.datum[index][name]];
+      } else {
+        this.tipData = [
+          this.datum[index][name].ren_tou_ren_ci_bi,
+          this.datum[index][name].jun_ci_fei_yong,
+        ];
+      }
     },
   },
 
@@ -298,7 +303,7 @@ export default {
       margin: 0;
     }
     z-index: 500;
-    height: 45vh;
+    height: 0;
     opacity: 0;
     position: absolute;
     // 地图容器高度的一半90vh - 一半的container高度22.5vh
@@ -404,7 +409,7 @@ export default {
   }
 
   .active {
-    height: 60vh;
+    height: 55vh;
     opacity: 1;
   }
 

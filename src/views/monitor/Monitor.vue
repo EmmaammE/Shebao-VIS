@@ -138,7 +138,6 @@
 
 <script>
 import Zhexian from '@/views/home/Zhexian.vue';
-import layout from '@/mixins/layout';
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
 import { fetchFeeStatistics, fetchFeeTimeSeries } from '@/util/http';
@@ -175,13 +174,11 @@ export default {
 
   components: {
     Badge,
-    // LineChart,
     Calendar,
     Zhexian,
   },
 
   props: {
-    submenu: String,
     routeType: String,
   },
 
@@ -221,13 +218,6 @@ export default {
     // 获得的数据原始值
     datum: {},
   }),
-
-  mixins: [layout],
-
-  // beforeRouteUpdate(to, from, next) {
-  //   console.log(to, from);
-  //   next();
-  // },
 
   mounted() {
     // fetch 总医疗的四个值
@@ -274,8 +264,6 @@ export default {
     },
 
     async getFeeStatistics() {
-      // console.log(this.submenu);
-      // if (FUND_TYPE[this.submenu]) {
       const data = await fetchFeeStatistics({
         startDay: this.dateStart,
         endDay: this.dateEnd,
@@ -290,13 +278,11 @@ export default {
         data.inpatient_average,
         data.person_time_head_count,
       ];
-      // }
     },
 
     async getFeeTimeSeries(granularity = 'day') {
       // if (FUND_TYPE[this.submenu]) {
       const data = await fetchFeeTimeSeries({
-        year: 2020,
         fundType: this.routeType,
         feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
         granularity,
@@ -304,9 +290,7 @@ export default {
         endDay: this.dateEnd,
       });
 
-      // TODO 把日期分开？
       this.datum = data;
-      // }
     },
   },
 
@@ -316,8 +300,6 @@ export default {
 <style scoped lang="scss">
   .m-container {
     display: flex;
-    // grid-template-columns: 22% auto;
-    // grid-gap: 0.8rem;
     height: 100%;
     padding: 0.8rem;
     background: $she-bg;

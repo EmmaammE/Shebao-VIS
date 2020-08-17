@@ -29,6 +29,8 @@ export const ROUTE_PARAM = {
   city: '市内异地',
   province: '省内异地',
   trans_province: '跨省异地',
+  liezhi: '按列支渠道',
+  feiyong: '按费用结构',
   rank: '排名查看',
   jigou: '机构汇总',
   people: '参保人员汇总',
