@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Landing from '@/views/landing/Landing.vue';
-import WarningList from '@/views/warning/WarningList.vue';
 import Layout from '@/views/Layout.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
+  { path: '/', redirect: '/landing' },
   {
     path: '/landing',
     name: 'Landing',

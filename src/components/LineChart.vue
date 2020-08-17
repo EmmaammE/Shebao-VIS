@@ -13,10 +13,9 @@
       <g class="barchart-axis"
         :transform='`translate(${margin.left}, ${margin.top})`'
       >
-        <g v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
+        <!-- <g v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
           :transform='`translate(0, ${chartHeight})`'
-          class="xaxis"
-        />
+          /> -->
         <!-- <g v-axis:x="{scale: chartX}" /> -->
         <g v-axis:x="{scale: chartX, inner: chartHeight, tickFormat: ''}"
           v-if="gridLine"
