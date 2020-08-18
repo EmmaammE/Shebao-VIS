@@ -1,5 +1,5 @@
 <template>
-  <svg width="200px" height="200px" viewBox="0 0 200 200">
+  <svg width="150px" height="150px" viewBox="0 0 200 200">
     <path class="bg"
       stroke="#ccc"
       stroke-linecap="round"
@@ -12,8 +12,15 @@
       stroke-width="12"
       :stroke-dasharray="`${350*ratio} ${350-350*ratio}`"
       stroke-dashoffset="350"/>
-<!-- TODO 居中 -->
-    <text x="74" y="100">{{ratio*100 + '%'}}</text>
+    <text x="50%" y="50%"
+      dominant-baseline="middle"
+      text-anchor="middle"
+    >{{ratio*100 + '%'}}</text>
+    <text x="50%" y="80%"
+      class="label"
+      dominant-baseline="middle"
+      text-anchor="middle"
+    >{{label}}</text>
   </svg>
 </template>
 
@@ -21,6 +28,7 @@
 export default {
   props: {
     ratio: Number,
+    label: String,
   },
 
 };
@@ -36,5 +44,9 @@ export default {
 
     text {
       font-size: 30px;
+    }
+
+    text.label {
+      font-size: 14px;
     }
 </style>

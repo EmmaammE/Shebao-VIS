@@ -35,7 +35,13 @@ export const fetchOrgViolationInfo = () => fire('POST', 'getOrgViolationInfo', {
 
 export const fetchDoctorViolationInfo = () => fire('POST', 'getDoctorViolationInfo', {});
 
-export const fetchOrgFalseHospital = (param) => fire('POST', 'getOrgFalseHospital', param);
-
 // 机构
 export const fetchOrgGroupHospital = (param) => fire('POST', 'getOrgGroupHospital', param);
+
+export const fetchOrgMultiPlacePrescribe = (param) => fire('POST', 'getOrgMultiPlacePrescribe', param);
+
+export const fetchOrgSwipeLittleCard = (param) => fire('POST', 'getOrgSwipeLittleCard', param);
+
+export const fetchOrgFalseHospital = (param) => fire('POST', 'getOrgFalseHospital', param);
+
+export const fetchPatientViolationInfo = () => fire('POST', 'getPatientViolationInfo', {});

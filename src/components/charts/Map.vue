@@ -15,18 +15,18 @@
         @ready="onLayerReady"
       />
       <slot :clickMarker="clickMarker" />
-      <l-circle
+      <!-- <l-circle
         :lat-lng="circle.center"
         :radius="circle.radius"
         @click="clickMarker"
       >
-      </l-circle>
-      <l-marker :lat-lng="[29.260574, 120.125254]">
+      </l-circle> -->
+      <!-- <l-marker :lat-lng="[29.260574, 120.125254]"> -->
         <!-- l-icon必须写在这 -->
-        <l-icon class-name="ring-icon" :iconSize="[radius, radius]">
+        <!-- <l-icon class-name="ring-icon" :iconSize="[radius, radius]">
           <ring-mark :data="faked" :hover="fakeh" />
         </l-icon>
-      </l-marker>
+      </l-marker> -->
     </l-map>
   </div>
 </template>
@@ -45,11 +45,11 @@ export default {
   name: 'Map',
   components: {
     LMap,
-    LMarker,
+    // LMarker,
     LTileLayer,
-    LCircle,
-    RingMark,
-    LIcon,
+    // LCircle,
+    // RingMark,
+    // LIcon,
   },
 
   props: {

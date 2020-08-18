@@ -22,47 +22,46 @@
         </ul>
       </div>
     </v-card>
-    <v-card class="card-divide card-margin">
-      <div class="table-item">
-        <span>序号</span>
-        <span>组内人数</span>
-        <span>群体就医次数</span>
-        <span>处方数量</span>
-        <span>处方病诊断数</span>
-        <span>处方药品类数</span>
-        <span>报销费用</span>
-      </div>
-       <v-list-group
-          v-for="(item,i) in datum"
-          :key="item.title"
-          :value="active===i"
+    <v-card class="card-divide card-margin" v-if="tabIndex!==-1">
+      <v-data-table
+        dense
+        :headers="modelHeader[tabIndex]"
+        :items="datum"
+        single-expand
+        :expanded.sync="expanded"
+        :hide-default-footer="true"
+        item-key="index"
+        :show-expand="tabIndex === 0"
+      >
+        <template v-slot:expanded-item="{ headers, item }"
+          v-if="tabIndex===0"
         >
-          <template v-slot:activator>
-            <v-list-item-content>
-              <div class="table-item">
-                <span v-for="d in item.title" :key="d">{{d}}</span>
-              </div>
-            </v-list-item-content>
-          </template>
-
-          <!-- <v-list-item
-          >
-            <v-list-item-content class="item-content"> -->
-              <circle-progress
-                v-for="(subItem) in item.items"
-                :key="subItem+'cir'"
-                :ratio="subItem"
-              />
-            <!-- </v-list-item-content>
-          </v-list-item> -->
-        </v-list-group>
+          <td :colspan="headers.length" class="expand-content">
+            <circle-progress
+              :ratio="item.chu_fang_xiang_si_du"
+              label="处方相似度"
+            />
+            <circle-progress
+              :ratio="item.risk"
+              label="风险度"
+            />
+          </td>
+        </template>
+        <!-- <template v-slot:item="{ item }">
+          <bar :scale="item.scale" />
+        </template> -->
+      </v-data-table>
     </v-card>
   </v-sheet>
 </template>
 
 <script>
 import CircleProgress from '@/components/small/CircleProgress.vue';
-import { fetchOrgGroupHospital } from '@/util/http';
+import {
+  fetchOrgGroupHospital, fetchOrgMultiPlacePrescribe,
+  fetchOrgSwipeLittleCard, fetchOrgFalseHospital,
+} from '@/util/http';
+import Bar from '@/components/small/Bar.vue';
 
 export default {
   props: {
@@ -74,6 +73,7 @@ export default {
 
   components: {
     CircleProgress,
+    // Bar,
   },
 
   data() {
@@ -84,6 +84,56 @@ export default {
         { key: 'shua_kong_ka', title: '刷空卡' },
         { key: 'shua_xiao_ka', title: '刷小卡' },
         { key: 'xu_jia_zhu_yuan', title: '虚假住院' },
+      ],
+      expanded: [],
+      modelHeader: [
+        // NOTE群体就医
+        [
+          { align: 'center', value: 'index', text: '序号' },
+          { align: 'center', value: 'zu_nei_ren_shu', text: '组内人数' },
+          { align: 'center', value: 'qun_ti_jiu_yi_ci_shu', text: '群体就医次数' },
+          { align: 'center', value: 'chu_fang_shu_liang', text: '处方数量' },
+          { align: 'center', value: 'chu_fang_bing_zhen_duan_shu', text: '处方病诊断数' },
+          { align: 'center', value: 'chu_fang_yao_pin_zhong_lei_shu', text: '处方药品类数' },
+          { align: 'center', value: 'yi_chang_lie_zhi_fei_yong', text: '报销费用' },
+          { align: 'center', text: '', value: 'data-table-expand' },
+          // { value: '', text: '处方相似度' },
+          // { value: 'risk', text: '风险' },
+        ],
+        // NOTE多地开药
+        [
+          { align: 'center', value: 'index', text: '序号' },
+          // 键值
+          { align: 'center', value: 'key', text: '医师编号' },
+          { align: 'center', value: 'yi_shi_xing_ming', text: '医师姓名' },
+          { align: 'center', value: 'yi_chang_ji_gou', text: '异常机构' },
+          { align: 'center', value: 'yi_chang_fei_yong', text: '异常费用' },
+          // 额外处理
+          { align: 'center', value: 'duo_di_kai_yao', text: '多地开药次数' },
+
+        ],
+        // NOTE刷空卡
+        [
+        ],
+        // NOTE刷小卡
+        [
+          { align: 'center', value: 'index', text: '序号' },
+          { align: 'center', value: 'key', text: '参保人编号' },
+          { align: 'center', value: 'can_bao_ren_xing_ming', text: '参保人姓名' },
+          { align: 'center', value: 'zong_ju_li', text: '总距离' },
+          { align: 'center', value: 'jinge', text: '刷卡总金额' },
+        ],
+        // NOTE虚假住院
+        [
+          { align: 'center', value: 'index', text: '序号' },
+          { align: 'center', value: 'key', text: '编码' },
+          { align: 'center', value: 'patient_name', text: '姓名' },
+          { align: 'center', value: 'hospital_interval', text: '住院间隔' },
+          { align: 'center', value: 'zhu_yuan_zong_fei_yong', text: '住院总费用' },
+          // 额外处理
+          { align: 'center', value: 'zhu_yuan_ci_shu', text: '住院次数' },
+          { align: 'center', value: 'yao_zhan_bi', text: '药占比' },
+        ],
       ],
       tabIndex: -1,
       datum: [],
@@ -107,6 +157,15 @@ export default {
         case 0:
           this.getOrgGroupHospital();
           break;
+        case 1:
+          this.getOrgMultiPlacePrescribe();
+          break;
+        case 3:
+          this.getOrgSwipeLittleCard();
+          break;
+        case 4:
+          this.getOrgFalseHosipital();
+          break;
         default:
           console.log('.');
       }
@@ -117,17 +176,37 @@ export default {
         hospitalId: this.id,
       });
 
-      this.datum = Object.values(data).map((d, index) => ({
-        title: [
-          index, d.zu_nei_ren_shu, d.qun_ti_jiu_yi_ci_shu, d.chu_fang_shu_liang,
-          d.chu_fang_bing_zhen_duan_shu, d.chu_fang_yao_pin_zhong_lei_shu,
-          d.bao_xiao_fei_yong,
-        ],
-        items: [
-          d.chu_fang_xiang_si_du,
-          d.risk,
-        ],
-      }));
+      this.datum = Object.values(data).map((d, index) => ({ ...d, ...{ index: index + 1 } }));
+    },
+
+    async getOrgMultiPlacePrescribe() {
+      const data = await fetchOrgMultiPlacePrescribe({
+        hospitalId: this.id,
+      });
+
+      this.datum = Object.keys(data).map((key, index) => (
+        { ...data[key], ...{ index: index + 1, key } }
+      ));
+    },
+
+    async getOrgSwipeLittleCard() {
+      const data = await fetchOrgSwipeLittleCard({
+        hospitalId: this.id,
+      });
+
+      this.datum = Object.keys(data).map((key, index) => (
+        { ...data[key], ...{ index: index + 1, key } }
+      ));
+    },
+
+    async getOrgFalseHosipital() {
+      const data = await fetchOrgFalseHospital({
+        hospitalId: this.id,
+      });
+
+      this.datum = Object.keys(data.xu_jia_zhu_yuan).map((key, index) => (
+        { ...data.xu_jia_zhu_yuan[key], ...{ index: index + 1, key } }
+      ));
     },
   },
 };
@@ -151,8 +230,9 @@ export default {
       display: flex;
       flex-direction: column;
       width: 100%;
-      margin: 15px 0;
+      margin: 10px 0;
       pointer-events: initial;
+      overflow: auto;
 
       span {
         width: 5vw;
@@ -198,25 +278,27 @@ export default {
     pointer-events: initial;
 
     &::-webkit-scrollbar {
-      width:  10px;
+      width:  2px;
     }
     &::-webkit-scrollbar-track {
       background: #eee;
       border: 1px solid #ccc;
     }
 
-    .table-item {
-      display: flex;
-      justify-content: space-between;
-      span {
-        display: inline-block;
-        width: px;
-        text-align: center;
-      }
+    .v-data-table__wrapper {
+      overflow-x: hidden;
+    }
+    th, td {
+      padding: 0!important;
     }
 
-    .item-content {
-      display: flex;
+    .expand-content {
+      width: 150px;
+      height: 150px!important;
+
+      svg {
+        width: 50%;
+      }
     }
   }
 </style>

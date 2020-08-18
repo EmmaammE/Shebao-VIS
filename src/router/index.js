@@ -89,7 +89,7 @@ const routes = [
       },
       {
         path: 'warning/action/organization',
-        name: '智能预警',
+        name: '智能预警-机构',
         component: () => import('@/views/warning/WarningMap.vue'),
         meta: {
           linkIndex: 2,

@@ -266,7 +266,7 @@ export default {
     $nav-height: 9vh;
 
     .v-main {
-      padding: $nav-height 0px 0px 256px;
+      padding: $nav-height 0px 0px 256px!important;
     }
 
     .v-toolbar {
