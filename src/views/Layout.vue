@@ -294,6 +294,7 @@ export default {
 
       .s-header {
         display: flex;
+        align-items: center;
 
         .v-image {
           flex: 0 0 30%;
@@ -390,24 +391,21 @@ export default {
       color: $she-primary;
       padding: 10px 0;
       line-height: 25px;
-      div {
-        // TODO
-      }
+      font-size: $sub-title;
 
       hr {
-       background: $she-border;
-       color: $she-border;
+        background: $she-border;
+        color: $she-border;
 
         height: 1px;
       }
+
       ul {
         list-style: none;
         padding: 0;
         margin: 10px 0;
 
         li {
-          $radius: 10px;
-          $space: 3px;
           position: relative;
           padding-left: 30px;
           display: flex;
@@ -417,22 +415,20 @@ export default {
           &::after  {
             content: '';
             position: absolute;
-            width: 2 * ($radius - $space);
-            height: 2 * ($radius - $space);
-            left: 0;
-            top: 0;
             border-radius: 50%;
+            left: 1px;
           }
 
           &::after {
-            top: $space;
-            left: $space;
+            width: 12px;
+            height: 12px;
+            top: 6px;
+            left: 4px;
           }
 
           &::before {
-            width: 2*$radius;
-            height: 2*$radius;
-            background: #fff;
+            width: 18px;
+            height: 18px;
           }
         }
 

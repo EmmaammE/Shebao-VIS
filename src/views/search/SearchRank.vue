@@ -256,6 +256,7 @@ export default {
         position: absolute;
         right: 0;
         top: 0;
+        font-size: $f-small;
 
         svg {
           transform: scale(0.7);

@@ -12,10 +12,6 @@ export default {
 <style lang="scss">
   @import "@/styles/markercluster.scss";
 
-  body {
-    font-size: 62.5%;
-  }
-
   header .v-input__slot {
     background: $she-bg!important;
   }

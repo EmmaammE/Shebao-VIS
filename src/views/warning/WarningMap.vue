@@ -39,19 +39,22 @@
     <div :class="['map-charts-container',
       compType===1?'cmp':'',isShowing?'active':''].join(' ')">
       <svg viewBox="0 0 100 200" class="line-box">
-        <path d="M5 80, L70,20 L100,20"/>
-        <!-- TODO circle加上外发光 -->
-        <circle cx="95" cy="20" r="5" />
+        <!-- <circle fill="#bc2933" fill-opacity="0.3" cx="90" cy="20" r="15" /> -->
+        <circle fill="#bc2933" fill-opacity="0.3" cx="90" :cy="circlePos[1]" r="10" />
+        <circle fill="#bc2933" fill-opacity="0.5" cx="90" :cy="circlePos[1]" r="8" />
+        <path :d="`M5 ${circlePos[0]}, L65,${circlePos[1]} L95,${circlePos[1]}`"/>
+        <circle fill="#bc2933" cx="90" :cy="circlePos[1]" r="5" />
       </svg>
 
       <!-- 地图上显示不同类型的图表 -->
       <v-card class="card-container" v-if="compType===0">
-        <!-- <div> -->
+        <div>
           <h4>{{title}}</h4>
           <h4>{{type}} {{ id}}</h4>
-        <!-- </div> -->
-        <div class="two-charts">
-          <p>均次指标</p>
+        </div>
+        <div>
+          <div class="two-charts">
+          <p class="chart-title">均次指标</p>
           <!-- 图例 -->
           <div class="c-header">
             <div class="legends">
@@ -61,7 +64,7 @@
           </div>
           <!-- 图表一 -->
           <div class="s-two">
-            <div>
+            <div class="chart-title">
               <span>人次人头比（次）</span>
               <span>均次费用（元）</span>
             </div>
@@ -77,6 +80,7 @@
         <div>
           <p>年度指标</p>
           <!-- 图表一 -->
+        </div>
         </div>
       </v-card>
 
@@ -186,6 +190,12 @@ export default {
       }
       return 0;
     },
+    circlePos() {
+      if (this.$route.meta.activeIndex === 1) {
+        return [110, 15];
+      }
+      return [80, 1];
+    },
   },
 
   mounted() {
@@ -201,7 +211,7 @@ export default {
     getData() {
       if (this.compType === 0) {
         this.getFundInfo();
-        console.log('fund');
+        // console.log('fund');
       } else {
         this.getOrganizationInfo();
       }
@@ -269,7 +279,7 @@ export default {
     position: absolute;
     top: 35px;
     right: 8%;
-    z-index: 1100;
+    z-index: 420;
     width: 100%;
     padding: 0 10% 0 20%;
     display: flex;
@@ -280,7 +290,7 @@ export default {
       display: flex;
       justify-content: space-evenly;
       align-items: center;
-      font-size: rem;
+      font-size: 1rem;
 
       .number {
         margin-right: 1rem;
@@ -306,8 +316,8 @@ export default {
     height: 0;
     opacity: 0;
     position: absolute;
-    // 地图容器高度的一半90vh - 一半的container高度22.5vh
-    top: 22.5vh;
+    // 地图容器高度的一半45vh - 一半的container高度30vh 还要看svg的比例
+    top: 20vh;
     left: 150px;
     // width: 25vw;
     // display: grid;
@@ -326,21 +336,20 @@ export default {
         stroke: #cc4b58;
         fill: none;
       }
-      circle {
-        fill: #cc4b58;
-      }
     }
 
     .card-container {
-      height: 100%;
-      width: 22vw;
-      margin-left: -0.5vw;
+      height: 99%;
+      width: 20vw;
+      margin-left: -1vw;
       padding: 15px;
-      display: grid;
-      // display: flex;
-      // flex-direction: column;
-      grid-template-rows: 4% 4% 46% 46%;
+      // display: grid;
+      display: flex;
+      flex-direction: column;
+      // grid-template-rows: 4% 4% 46% 46%;
       justify-items: center;
+      align-items: center;
+      text-align: center;
 
       hr {
         width: 100%;
@@ -359,38 +368,47 @@ export default {
         width: 18vw;
       }
 
+      p.chart-title {
+        font-size: $sub-title;
+        font-weight: bold;
+      }
       .s-two {
         display: flex;
         width: 100%;
         flex-direction: column;
 
-        div {
+        div.chart-title  {
           display: flex;
           justify-content: space-evenly;
+          font-size: $f-small;
+          font-weight: bold;
+          margin-left: 17%;
         }
       }
-
       // 图例
       .legends {
         $size: 10px;
         $color1: #1e5dc3;
         $color2: #d40309;
+        height: 15px;
+        font-size: $f-small;
+        margin: 0 0 4px 0;
 
         span {
           position: relative;
-          display: inline-block;
-          margin: 0 15px;
+          margin: 0 5px;
+          display: inline-flex;
+          align-items: center;
+          line-height: 15px;
         }
 
         span::before {
           content: '';
-          position: absolute;
-          // TODO 大小和行高一样
+          display: inline-block;
           width: $size;
           height: $size;
-
+          margin: 0 5px;
           border-radius: 50%;
-          left: -1.5*$size;
         }
 
         span:nth-child(1) {
@@ -409,7 +427,7 @@ export default {
   }
 
   .active {
-    height: 55vh;
+    height: 60vh;
     opacity: 1;
   }
 

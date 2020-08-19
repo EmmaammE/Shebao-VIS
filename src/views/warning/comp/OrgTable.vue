@@ -22,7 +22,7 @@
         </ul>
       </div>
     </v-card>
-    <v-card class="card-divide card-margin" v-if="tabIndex!==-1">
+    <v-card class="card-divide card-margin" v-if="tabIndex!==-1 && tabIndex !== 2">
       <v-data-table
         dense
         :headers="modelHeader[tabIndex]"
@@ -32,7 +32,32 @@
         :hide-default-footer="true"
         item-key="index"
         :show-expand="tabIndex === 0"
+        single-select
+        @click:row="rowClick"
       >
+        <template v-slot:[`item.jine`]="{ item }">
+          <!-- 多地开药次数 -->
+          <div class="bar-container" v-if="tabIndex === 1">
+            <bar
+              :scale="scale"
+              :datum="[item.five_min, item.ten_min, item.sixty_min]"
+              :data="item.day"
+            />
+            <p>{{item.day}}</p>
+          </div>
+          <!-- 多地开药次数 -->
+          <div class="bar-container" v-else-if="tabIndex === 3">
+            <bar
+              :scale="scale"
+              :datum="item.jine"
+              :data="item.zong_jin_e"
+            />
+            <p>{{item.zong_jin_e}}</p>
+          </div>
+        </template>
+        <template v-slot:[`item.yao_zhan_bi`]="{ item }">
+          {{item.yao_zhan_bi.toFixed(4) * 100 +'%'}}
+        </template>
         <template v-slot:expanded-item="{ headers, item }"
           v-if="tabIndex===0"
         >
@@ -47,10 +72,22 @@
             />
           </td>
         </template>
-        <!-- <template v-slot:item="{ item }">
-          <bar :scale="item.scale" />
-        </template> -->
       </v-data-table>
+      <v-sheet v-if="tabIndex === 4 && datum.length > 0" class="chart">
+       <radial
+        :scales="scales"
+        :data="[
+            datum[activeIndex].zhu_yuan_ci_shu,
+            datum[activeIndex].yao_zhan_bi,
+            datum[activeIndex].zhu_yuan_zong_fei_yong
+          ]"
+        :standard="standard"
+       />
+       <div class="legends">
+         <span><i />实际数据</span>
+         <span> <i />标准指标</span>
+       </div>
+      </v-sheet>
     </v-card>
   </v-sheet>
 </template>
@@ -62,7 +99,10 @@ import {
   fetchOrgSwipeLittleCard, fetchOrgFalseHospital,
 } from '@/util/http';
 import Bar from '@/components/small/Bar.vue';
+import * as d3 from 'd3';
+import Radial from '@/components/charts/Radial.vue';
 
+const RANGE = [0, 100];
 export default {
   props: {
     title: String,
@@ -73,7 +113,8 @@ export default {
 
   components: {
     CircleProgress,
-    // Bar,
+    Bar,
+    Radial,
   },
 
   data() {
@@ -108,8 +149,9 @@ export default {
           { align: 'center', value: 'yi_shi_xing_ming', text: '医师姓名' },
           { align: 'center', value: 'yi_chang_ji_gou', text: '异常机构' },
           { align: 'center', value: 'yi_chang_fei_yong', text: '异常费用' },
-          // 额外处理
-          { align: 'center', value: 'duo_di_kai_yao', text: '多地开药次数' },
+          {
+            align: 'center', value: 'jine', text: '多地开药次数', width: 150,
+          },
 
         ],
         // NOTE刷空卡
@@ -121,7 +163,9 @@ export default {
           { align: 'center', value: 'key', text: '参保人编号' },
           { align: 'center', value: 'can_bao_ren_xing_ming', text: '参保人姓名' },
           { align: 'center', value: 'zong_ju_li', text: '总距离' },
-          { align: 'center', value: 'jinge', text: '刷卡总金额' },
+          {
+            align: 'center', value: 'jine', text: '刷卡总金额', width: 150,
+          },
         ],
         // NOTE虚假住院
         [
@@ -129,15 +173,29 @@ export default {
           { align: 'center', value: 'key', text: '编码' },
           { align: 'center', value: 'patient_name', text: '姓名' },
           { align: 'center', value: 'hospital_interval', text: '住院间隔' },
-          { align: 'center', value: 'zhu_yuan_zong_fei_yong', text: '住院总费用' },
+          {
+            align: 'center', value: 'zhu_yuan_zong_fei_yong', text: '住院总费用', width: 100,
+          },
           // 额外处理
-          { align: 'center', value: 'zhu_yuan_ci_shu', text: '住院次数' },
-          { align: 'center', value: 'yao_zhan_bi', text: '药占比' },
+          {
+            align: 'center', value: 'zhu_yuan_ci_shu', text: '住院次数',
+          },
+          {
+            align: 'center', value: 'yao_zhan_bi', text: '药占比', width: 120,
+          },
         ],
       ],
       tabIndex: -1,
       datum: [],
       active: 0,
+
+      // bar的比例尺
+      scale: d3.scaleLinear(),
+
+      // 虚假住院的三个比例尺
+      scales: Array.from({ length: 3 }, () => d3.scaleLinear().range([0, 90])),
+      activeIndex: 0,
+      standard: [],
     };
   },
 
@@ -149,6 +207,13 @@ export default {
 
   methods: {
     clickTab(index) {
+      if (this.tabIndex === 4) {
+        const el = document.querySelector('tbody tr');
+
+        if (el) {
+          el.classList.remove('v-data-table__selected');
+        }
+      }
       this.tabIndex = index;
     },
 
@@ -184,9 +249,12 @@ export default {
         hospitalId: this.id,
       });
 
-      this.datum = Object.keys(data).map((key, index) => (
-        { ...data[key], ...{ index: index + 1, key } }
-      ));
+      let maxValue = Number.MIN_VALUE;
+      this.datum = Object.keys(data).map((key, index) => {
+        maxValue = Math.max(maxValue, data[key].day);
+        return { ...data[key], ...{ index: index + 1, key, jine: '' } };
+      });
+      this.scale.range(RANGE).domain([0, maxValue]);
     },
 
     async getOrgSwipeLittleCard() {
@@ -194,9 +262,21 @@ export default {
         hospitalId: this.id,
       });
 
-      this.datum = Object.keys(data).map((key, index) => (
-        { ...data[key], ...{ index: index + 1, key } }
-      ));
+      let maxValue = Number.MIN_VALUE;
+      this.datum = Object.keys(data).map((key, index) => {
+        const item = data[key];
+        maxValue = Math.max(maxValue, item.zong_jin_e);
+        return {
+          ...item,
+          ...{
+            index: index + 1,
+            key,
+            jine: Array.from({ length: item.zong_ci_shu },
+              () => item.jun_ci_fei_yong),
+          },
+        };
+      });
+      this.scale.range(RANGE).domain([0, maxValue]);
     },
 
     async getOrgFalseHosipital() {
@@ -204,25 +284,64 @@ export default {
         hospitalId: this.id,
       });
 
-      this.datum = Object.keys(data.xu_jia_zhu_yuan).map((key, index) => (
-        { ...data.xu_jia_zhu_yuan[key], ...{ index: index + 1, key } }
-      ));
+      // 获得住院次数、住院总费用、药占比的最大值
+      const maxArr = [Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE];
+      const keys = ['zhu_yuan_ci_shu', 'yao_zhan_bi', 'zhu_yuan_zong_fei_yong'];
+      this.datum = Object.keys(data.xu_jia_zhu_yuan).map((key, index) => {
+        keys.forEach((d, i) => {
+          maxArr[i] = Math.max(maxArr[i], data.xu_jia_zhu_yuan[key][d]);
+        });
+        return {
+          ...data.xu_jia_zhu_yuan[key],
+          ...{ index: index + 1, key },
+        };
+      });
+
+      this.scales = this.scales.map((scale, index) => scale.domain([0, maxArr[index]]));
+      this.standard = [
+        data.standard.zhu_yuan_ci_shu,
+        data.standard.yao_zhan_bi,
+        data.standard.zhu_yuan_zong_fei_yong,
+      ];
+
+      setTimeout(() => {
+        document.querySelector('tbody tr')
+          .classList.add('v-data-table__selected');
+      });
+      // const e = document.querySelector('tbody tr');
+      // .classList.add('v-data-table__selected');
+    },
+
+    rowClick(item, row) {
+      if (this.tabIndex === 4) {
+        document.querySelector('tbody tr')
+          .classList.remove('v-data-table__selected');
+        row.select(true);
+        this.activeIndex = item.index - 1;
+      }
     },
   },
 };
 </script>
 <style lang="scss">
+  .cmp {
+    svg {
+      height: 80%;
+    }
+  }
   .sheet-container {
     display: flex;
     background: transparent!important;
+    margin-left: -1vw;
   }
   .card-divide {
-    height: 53%;
+    height: 55%;
   }
   .card-container-1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 15px;
     width: 15vw;
 
@@ -243,6 +362,7 @@ export default {
         display: flex;
         justify-content: space-between;
         width: 100%;
+        font-size: $f-small;
       }
 
       ul {
@@ -259,11 +379,12 @@ export default {
           border-left: 2px solid #fff;
           transition: all ease-in-out 300ms;
           cursor: pointer;
+          font-size: $f-small;
         }
 
         li.active {
-          background: linear-gradient(to right, #eaf1f9, #f5f7fb);
-          border-left: 2px solid #94bfef;
+          background: linear-gradient(to right, #cee6ff, #f5f7fb);
+          border-left: 2px solid #87bcf4!important;
           color: #3294f8;
         }
       }
@@ -274,8 +395,9 @@ export default {
     margin: 0 5px;
     padding: 10px;
     overflow: auto;
-    max-height: 55*0.53vh;
+    // max-height: 55*0.53vh;
     pointer-events: initial;
+    position: relative;
 
     &::-webkit-scrollbar {
       width:  2px;
@@ -300,5 +422,73 @@ export default {
         width: 50%;
       }
     }
+  }
+
+  .bar-container {
+    display: grid;
+    grid-template-columns: 67% auto;
+    align-items: center;
+    margin: 0 2px;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .chart {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 280px;
+    height: calc(100% - 84px);
+    display: flex;
+
+    svg {
+      flex: 1;
+      // border: 1px solid #f00;
+    }
+
+    .legends {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      font-size: $f-small;
+
+      span {
+        position: relative;
+        line-height: 20px;
+        display: flex;
+        align-items: center;
+
+        i {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          margin-right: 4px;
+        }
+
+        &:nth-child(1)  {
+          i {
+            background:#137601;
+          }
+        }
+
+        &:nth-child(2) {
+          i {
+            background:#024ec4;
+          }
+        }
+      }
+    }
+  }
+
+  tr {
+    cursor: pointer;
+  }
+  tr.v-data-table__selected {
+    background: linear-gradient(to right, #cee6ff, #f5f7fb)!important;
+    border-left: 2px solid #024ec4!important;
   }
 </style>

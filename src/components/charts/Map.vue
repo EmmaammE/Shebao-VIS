@@ -59,9 +59,9 @@ export default {
   data() {
     return {
       zoom: 8,
-      currentCenter: L.latLng([30.260574, 120.125254]),
+      currentCenter: L.latLng([30.05, 119.95]),
       circle: {
-        center: L.latLng(30.260574, 120.125254),
+        center: L.latLng(30.05, 119.95),
         radius: 45,
       },
 
@@ -79,7 +79,7 @@ export default {
       // 计算一个像素值范围
       radius: 100,
 
-      center: [30.260574, 120.125254],
+      center: [30.05, 119.95],
     };
   },
 
