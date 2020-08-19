@@ -214,6 +214,9 @@ export default {
           el.classList.remove('v-data-table__selected');
         }
       }
+      if (index === 2) {
+        return;
+      }
       this.tabIndex = index;
     },
 
@@ -351,7 +354,8 @@ export default {
       width: 100%;
       margin: 10px 0;
       pointer-events: initial;
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
 
       span {
         width: 5vw;
@@ -361,8 +365,9 @@ export default {
       .header {
         display: flex;
         justify-content: space-between;
-        width: 100%;
+        // width: 100%;
         font-size: $f-small;
+        margin-right: 4px;
       }
 
       ul {
@@ -373,6 +378,7 @@ export default {
         li {
           display: flex;
           justify-content: space-between;
+          align-items: center;
           padding: 4px 0;
           color: #aeaeae;
           border-bottom: 1px solid #aeaeae;
@@ -380,12 +386,31 @@ export default {
           transition: all ease-in-out 300ms;
           cursor: pointer;
           font-size: $f-small;
+
+          &::after {
+            // 小箭头
+            display: inline-block;
+            content: '';
+            padding: 0;
+            margin: 0;
+            padding: 4px; /* Arrow size */
+            box-shadow: 1px -1px 0 1px $she-primary inset;
+            -webkit-box-shadow: 1px -1px $she-primary inset;
+            border: solid transparent;
+            border-width: 0 0 3px 3px;
+            transform: rotate(225deg);
+            opacity: 0;
+          }
         }
 
         li.active {
           background: linear-gradient(to right, #cee6ff, #f5f7fb);
           border-left: 2px solid #87bcf4!important;
-          color: #3294f8;
+          color: $she-primary;
+
+          &::after {
+            opacity: 1;
+          }
         }
       }
     }

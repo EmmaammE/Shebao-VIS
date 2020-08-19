@@ -15,41 +15,21 @@
         @ready="onLayerReady"
       />
       <slot :clickMarker="clickMarker" />
-      <!-- <l-circle
-        :lat-lng="circle.center"
-        :radius="circle.radius"
-        @click="clickMarker"
-      >
-      </l-circle> -->
-      <!-- <l-marker :lat-lng="[29.260574, 120.125254]"> -->
-        <!-- l-icon必须写在这 -->
-        <!-- <l-icon class-name="ring-icon" :iconSize="[radius, radius]">
-          <ring-mark :data="faked" :hover="fakeh" />
-        </l-icon>
-      </l-marker> -->
     </l-map>
   </div>
 </template>
 
 <script>
-import RingMark from '@/components/small/RingMark.vue';
-
 import { token, style } from '@/util/type';
 
 import L from 'leaflet';
-import {
-  LMap, LTileLayer, LCircle, LMarker, LIcon,
-} from 'vue2-leaflet';
+import { LMap, LTileLayer } from 'vue2-leaflet';
 
 export default {
   name: 'Map',
   components: {
     LMap,
-    // LMarker,
     LTileLayer,
-    // LCircle,
-    // RingMark,
-    // LIcon,
   },
 
   props: {

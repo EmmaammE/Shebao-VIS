@@ -5,12 +5,13 @@
         v-for="orgData in org"
         :key="orgData.name"
         :lat-lng="[orgData.LAT, orgData.LNG]">
-        <l-icon class-name="ring-icon" :iconSize="[radius, radius]">
+        <l-icon class-name="ring-icon" :iconSize="[rScale(orgData.sum), rScale(orgData.sum)]">
           <ring-mark
-            :data="[orgData.qun_ti_jiu_yi.all,
-              orgData.shua_kong_ka.all,
-              orgData.shua_xiao_ka.all,
-              orgData.xu_jia_zhu_yuan.all]" />
+            :data="[orgData.qun_ti_jiu_yi,
+              orgData.shua_kong_ka,
+              orgData.shua_xiao_ka,
+              orgData.xu_jia_zhu_yuan]"
+            :sum ="orgData.sum"/>
         </l-icon>
       </l-marker>
     </Map>
@@ -28,10 +29,11 @@
       <div class="content">
         <div
           v-for="(d,i) in datum"
-          :key = d[1]
+          :key = "d.tableData[1]"
           :class="activeIndex===i?'s-row active':'s-row'"
+          @click="onClick(i)"
         >
-          <span v-for="(data,index) in d"
+          <span v-for="(data,index) in d.tableData"
             :key="index"
           >
             {{data}}
@@ -47,6 +49,7 @@ import Map from '@/components/charts/Map.vue';
 import { fetchPatientViolationInfo } from '@/util/http';
 import { LMarker, LIcon } from 'vue2-leaflet';
 import RingMark from '@/components/small/RingMark.vue';
+import * as d3 from 'd3';
 
 export default {
   components: {
@@ -59,32 +62,62 @@ export default {
     return {
       datum: [],
       activeIndex: 0,
-      radius: 100,
-      org: [],
+      radius: 200,
+      rScale: d3.scaleLinear().range([200, 350]),
     };
   },
   mounted() {
     this.getPatientViolationInfo();
   },
+  computed: {
+    org() {
+      if (this.datum.length > 0) {
+        return { ...this.datum[this.activeIndex].chart };
+      }
+      return {};
+    },
+  },
   methods: {
     async getPatientViolationInfo() {
       const data = await fetchPatientViolationInfo({});
-      console.log(data);
+      // console.log(data);
+
+      let minV = Number.MAX_VALUE;
+      let maxV = Number.MIN_VALUE;
 
       this.datum = Object.keys(data.patient_page)
         .map((key, index) => {
-          if (index === 0) {
-            this.org = Object.values(data.patient_page[key].yi_chang_ji_gou);
-          }
-          return [index + 1,
-            key,
-            data.patient_page[key].name,
-            Object.keys(data.patient_page[key].yi_chang_ji_gou).length,
-            data.patient_page[key].qun_ti_jiu_yi,
-            data.patient_page[key].shua_kong_ka,
-            data.patient_page[key].shua_xiao_ka,
-            data.patient_page[key].xu_jia_zhu_yuan];
+          const chart = Object.values(data.patient_page[key].yi_chang_ji_gou).map((orgData) => {
+            const a = orgData.qun_ti_jiu_yi.all;
+            const b = orgData.shua_kong_ka.all;
+            const c = orgData.shua_xiao_ka.all;
+            const d = orgData.xu_jia_zhu_yuan.all;
+
+            minV = Math.min(a, b, c, d, minV);
+            maxV = Math.max(a, b, c, d, maxV);
+
+            return { ...orgData, ...{ sum: a + b + c + d } };
+          });
+
+          // 获得最大值和最小值
+          return {
+            tableData: [index + 1,
+              key,
+              data.patient_page[key].name,
+              Object.keys(data.patient_page[key].yi_chang_ji_gou).length,
+              data.patient_page[key].qun_ti_jiu_yi,
+              data.patient_page[key].shua_kong_ka,
+              data.patient_page[key].shua_xiao_ka,
+              data.patient_page[key].xu_jia_zhu_yuan],
+            chart,
+          };
         });
+
+      this.rScale = this.rScale.domain([minV, maxV]);
+    },
+
+    onClick(index) {
+      this.activeIndex = index;
     },
   },
 };

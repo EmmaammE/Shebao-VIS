@@ -1,10 +1,40 @@
 <template>
-  <svg :viewBox="`-100 -100 200 200`  ">
-    <path v-for="(d,index) in arcs"
-      :key="index"
-      :fill="color[index]"
-      :d="arc(d)"
-    />
+  <svg :viewBox="`-200 -200 400 400`">
+    <circle fill="#eff0f0" cx="0" :cy="0" r="60" />
+    <text font-size="30px" text-anchor="middle" dominant-baseline="middle">{{sum}}次</text>
+    <g v-for="(d,index) in arcs"
+      :key="index">
+      <path
+        :fill="color[parseInt(index/2)]"
+        :d="arcRadius(d)"
+      />
+
+      <g v-if="index%2===0 && d.data !== 0"
+        class="hover"
+        :transform="`translate(${arc.centroid(d)})`"
+      >
+        <circle cx="0" cy="0"
+          fill="#fff"
+          opacity="0.5"
+          r="16"/>
+        <circle
+          cx="0" cy="0"
+          fill="#fff"
+          :num="d.data"
+          r="8"/>
+        <path d="M5,-5 L40,-40 h40"
+          :stroke="color[parseInt(index/2)]"
+          stroke-width="5"
+        />
+        <polygon points="70,-50 90,-40 70,-30" :fill="color[parseInt(index/2)]"/>
+        <text x="90" y="-38"
+          text-anchor="right" dominant-baseline="middle"
+        >{{d.data}}次</text>
+        <!-- <text x="100" y="-20">
+          {{arcs[index+1].data}}
+        </text> -->
+      </g>
+    </g>
   </svg>
 </template>
 
@@ -20,8 +50,7 @@ export default {
   props: {
     // 大小
     data: Array,
-    // data[hover[0]] = hover[1]
-    hover: Array,
+    sum: Number,
   },
 
   data() {
@@ -33,14 +62,30 @@ export default {
   computed: {
     arc() {
       return d3.arc().innerRadius(67)
-        .outerRadius(99);
+        .outerRadius(100);
+      // .cornerRadius(20);
     },
 
     arcs() {
+      const data = [];
+      this.data.forEach((d) => {
+        data.push(d.patient, d.all - d.patient);
+      });
+
       const pie = d3.pie()
         .padAngle(0.005)
         .sort(null).value((d) => d);
-      return pie(this.data);
+      return pie(data);
+    },
+  },
+
+  methods: {
+    arcRadius(d) {
+      if (d.index * 2 === 1) {
+        return this.arc(d);
+      }
+      return this.arc.startAngle(d.startAngle)
+        .endAngle(d.endAngle + (20 * (Math.PI / 180))).cornerRadius(20)();
     },
   },
 
@@ -51,15 +96,26 @@ export default {
 // icon样式需要全局设置
 
   .ring-icon {
-    // // box-shadow: 5px 3px 10px rgba(0, 0, 0, 0.2);
-    // text-align: center;
-    // width: 10vw!important;
-    // height: auto !important;
-    // margin: -5vw 0 0 -5vw!important;
     outline: none!important;
 
     svg {
       filter: drop-shadow(1px 1px 4px rgba(0,0,0,.5));
+      opacity: 0.9;
+
+      path {
+        fill-opacity: 0.9;
+      }
+
+      .hover {
+        path {
+          fill: none;
+        }
+      }
+
+      text {
+        text-align: center;
+        font-size: 25px;
+      }
     }
   }
 </style>
