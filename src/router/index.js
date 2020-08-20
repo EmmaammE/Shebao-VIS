@@ -36,8 +36,8 @@ const routes = [
         },
       },
       {
-        path: 'search/huaxiang',
-        component: () => import('../views/search/SearchRank'),
+        path: 'search/profile',
+        component: () => import('../views/search/SearchProfile'),
         name: '智能搜索引擎-机构画像',
         meta: {
           linkIndex: 1,

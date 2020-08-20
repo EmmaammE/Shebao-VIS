@@ -449,17 +449,6 @@ export default {
     }
   }
 
-  .bar-container {
-    display: grid;
-    grid-template-columns: 67% auto;
-    align-items: center;
-    margin: 0 2px;
-
-    p {
-      margin: 0;
-    }
-  }
-
   .chart {
     position: absolute;
     bottom: 10px;

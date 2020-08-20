@@ -228,6 +228,10 @@ export default {
             title: '就诊信息',
             href: '/search/info',
           },
+          {
+            title: '机构画像',
+            href: '/search/profile',
+          },
         ],
         [
           {

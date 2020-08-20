@@ -40,4 +40,10 @@ export default {
   .v-list-item--link:before {
     background: #fff!important;
   }
+
+  .w-container {
+    .v-data-table__wrapper {
+      height: calc(90vh - 80px);
+    }
+  }
 </style>
