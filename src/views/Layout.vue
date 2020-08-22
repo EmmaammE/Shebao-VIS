@@ -351,6 +351,8 @@ export default {
     .s-bar {
       // 设置header的高度
       min-height: $nav-height;
+      display: flex;
+      align-items: center;
     }
 
     .s-header {

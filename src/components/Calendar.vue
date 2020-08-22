@@ -291,6 +291,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  text {
+    font-size: 10px;
+  }
+
   .mask {
     pointer-events: none;
   }

@@ -501,8 +501,4 @@ export default {
   tr {
     cursor: pointer;
   }
-  tr.v-data-table__selected {
-    background: linear-gradient(to right, #cee6ff, #f5f7fb)!important;
-    border-left: 2px solid #024ec4!important;
-  }
 </style>

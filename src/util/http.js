@@ -28,6 +28,12 @@ export const fetchOrgInfo = (params) => fire('POST', 'getOrgInfo', params);
 
 export const fetchDetail = (params) => fire('POST', 'getFeeDetail', params);
 
+export const fetchDoctorInfo = (params) => fire('POST', 'getDoctorInfo', params);
+// 参保人员汇总
+export const fetchPatientInfo = (params) => fire('POST', 'getPatientInfo', params);
+// 就诊信息
+export const fetchInfo = (params) => fire('POST', 'getTreatmentInfo', params);
+
 // 智能风险预警
 export const fetchFundMonitorInfo = (params) => fire('POST', 'getFundMonitoringInfo', params);
 

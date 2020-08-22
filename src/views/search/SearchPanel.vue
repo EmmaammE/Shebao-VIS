@@ -72,32 +72,46 @@
       <p class="sub-title">数据结果</p>
 
       <v-data-table
+        class="s-table"
         :headers="headers"
-        :items="datum"
-        :items-per-page="5"
-        class="elevation-1"
+        :items="tableData"
+        item-key="index"
+        disable-sort
+        hide-default-header
+        @click:row="rowClick"
+        single-select
+        v-model="activeIndex"
       >
-        <template v-slot:item="{ item }">
+        <template v-slot:[`item.xing_bie`]="{ item }">
           <div class="custom-avatar">
-            <component :is="avatar(item.sex)">
+            <component :is="avatar(item.xing_bie)"
+              width="45"
+              height="45"
+            >
             </component>
           </div>
         </template>
       </v-data-table>
     </v-card>
 
-    <v-card outlined class="content-card"></v-card>
+    <search-info
+      :data="datum[activeKey]"
+      v-bind="panel"
+      :people="people"
+    />
   </div>
 </template>
 
 <script>
-import layout from '@/mixins/layout';
 import GirlIcon from '@/assets/search/icon_1.svg';
 import BoyIcon from '@/assets/search/icon_2.svg';
+import { fetchDoctorInfo, fetchPatientInfo, fetchInfo } from '@/util/http';
+import SearchInfo from './SearchInfo.vue';
 
 export default {
   name: 'Search',
   components: {
+    SearchInfo,
   },
   data: () => ({
     dateBegin: new Date().toISOString().substr(0, 10),
@@ -105,37 +119,180 @@ export default {
     menu: false,
     modal: false,
     menu2: false,
-    id: '',
-    headers: [
-      {
-        text: '性别',
-        align: 'start',
-        sortable: false,
-        value: 'sex',
-      },
-      { text: '姓名', value: 'name' },
-      { text: '社保卡号', value: 'sheid' },
-      { text: '身份证号', value: 'id' },
-      { text: '参保类型', value: 'type' },
-      { text: '就职状态', value: 'status' },
+    id: null,
+    pageNum: 1,
+    headers: [{
+      align: 'center', text: '性别', value: 'xing_bie',
+    }, {
+      align: 'center', text: '序号', value: 'index',
+    }, {
+      align: 'center', text: '姓名', value: 'name',
+    }, {
+      align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
+    }, {
+      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
+    }, {
+      align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
+    }, {
+      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
+    }],
+    // 表格数据
+    tableData: [
     ],
-    datum: [
-      {
-        sex: 0,
-        name: '郑丽萍',
-        sheid: '3333',
-        id: '421003',
-        type: '在职非公务员',
-        status: '在职',
-      },
-    ],
+    activeIndex: [{ index: 1 }],
+    activeKey: '',
+    // 原始数据
+    datum: {},
+    people: [],
   }),
 
-  mixins: [layout],
+  mounted() {
+    this.getData();
+  },
+
+  watch: {
+    $route: 'getData',
+  },
+
+  computed: {
+    compType() {
+      const { routeType } = this.$route.params;
+      switch (routeType) {
+        case 'people':
+          return 1;
+        case 'doctor':
+          return 2;
+        case 'info':
+          return 0;
+        default:
+          return 3;
+      }
+    },
+    // header() {
+    //   switch (this.compType) {
+    //     case 1:
+    //       return ['医疗费用']
+    //     case 2:
+    //     default:
+    //       return
+    //   }
+    // },
+    panel() {
+      // 返回不同组件panel的信息
+      switch (this.compType) {
+        case 1:
+          // 参保人员汇总
+          return {
+            menu: [
+              { value: 'yi_liao_fei_yong', text: '医疗费用' },
+              { value: 'fei_yong_gou_cheng', text: '费用构成' },
+              { value: 'ji_jin_lie_zhi', text: '基金列支' },
+            ],
+            info: [
+              { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
+              { text: '参保类别', value: 'can_bao_lei_xing' },
+              { text: '身份证号', value: 'shen_fen_zheng_hao' },
+              { text: '社保编号', value: 'she_bao_bian_hao' },
+            ],
+          };
+        case 2:
+          return {
+
+          };
+        default:
+          return {
+
+          };
+      }
+    },
+  },
 
   methods: {
     avatar(d) {
-      return d === 0 ? GirlIcon : BoyIcon;
+      return d === '女' ? GirlIcon : BoyIcon;
+    },
+
+    getData() {
+      switch (this.compType) {
+        case 1:
+          this.getPeopleInfo();
+          break;
+        case 2:
+          this.getDoctorInfo();
+          break;
+        default:
+      }
+    },
+
+    async getDoctorInfo() {
+      const data = await fetchDoctorInfo({
+        startDay: this.dateBegin,
+        endDay: this.dateEnd,
+        searchItem: this.id,
+        pageNum: this.pageNum,
+      });
+
+      this.datum = data.patient_page;
+
+      this.tableData = Object.keys(data.doctor_page).map((key, index) => {
+        if (index === 0) {
+          this.activeKey = key;
+        }
+        return {
+          ...data.doctor_page[key], ...{ key, index: index + 1 },
+        };
+      });
+    },
+
+    async getPeopleInfo() {
+      const data = await fetchPatientInfo({
+        startDay: this.dateBegin,
+        endDay: this.dateEnd,
+        searchItem: this.id,
+        pageNum: this.pageNum,
+      });
+
+      const people = [];
+      this.datum = data.patient_page;
+      this.tableData = Object.keys(data.patient_page).map((key, index) => {
+        if (index === 0) {
+          this.activeKey = key;
+        }
+        people.push({
+          text: data.patient_page[key].ji_ben_qing_kuang.name,
+          value: key,
+          index: index + 1,
+        });
+        return { ...data.patient_page[key].ji_ben_qing_kuang, ...{ index: index + 1, key } };
+      });
+
+      this.people = people;
+      // this.datum = Object.keys1data.patient_page).map((key, index) => (
+      //   {...data.}
+      // ));
+    },
+    async getTreatmentInfo() {
+      const data = await fetchInfo({
+        startDay: this.dateBegin,
+        endDay: this.dateEnd,
+        searchItem: this.id,
+        pageNum: this.pageNum,
+        //       orgType: 机构类型(列表)
+
+        // treatmentType: 就诊类型
+
+        // patientId: 就诊人编码
+
+        // doctorName: 处方医师
+
+        // orgName: 机构名称,
+
+      });
+    },
+    rowClick(item, row) {
+      row.select(true);
+      this.activeIndex = [{ index: item.index }];
+      this.activeKey = item.key;
     },
   },
 };
@@ -151,12 +308,15 @@ export default {
   }
 
   .content-card {
-    padding: 1rem;
+    padding: 10px 10px 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
   }
 
   p.sub-title {
     font-family:PingFangSC-Semibold;
-    font-size: 18px;
+    font-size: $chart-title;
     color:#262626;
     letter-spacing:0;
     text-align:left;
@@ -173,8 +333,9 @@ export default {
     border-radius: 0;
 
     p {
-      font-size: 1rem;
+      font-size: $sub-title;
       line-height: 40px;
+      color: $she-grey;
     }
 
     .v-input {
@@ -184,5 +345,19 @@ export default {
 
   .custom-input {
     border-bottom: 2px solid #eee;
+  }
+
+  .custom-avatar {
+    display: flex;
+  }
+
+  .v-data-table {
+    height: 30vh;
+    flex: 1 1 60%;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
   }
 </style>

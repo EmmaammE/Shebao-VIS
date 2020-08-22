@@ -1,15 +1,14 @@
 <template>
   <v-sheet class="m-container">
-    <v-card class="s-tab-lists">
-      <badge v-for="(item, index) in tabTitle" :key="item"
+    <v-card class="s-charts">
+      <div class="s-tab-lists">
+        <badge v-for="(item, index) in tabTitle" :key="item"
         :active="index === tabActive"
         :data="tabNumber[index]"
         :type="item"
         @click.native="changeTab(index)"
       />
-    </v-card>
-
-    <v-card class="s-charts">
+      </div>
       <!-- menu -->
       <div class="s-header">
         <div class="text-lg-h6 text-md-h6">
@@ -18,53 +17,12 @@
         </div>
 
         <!-- 时间选择 -->
-        <div class="time-container">
-          <v-menu
-            ref="menu1"
-            v-model="menu1"
-            :close-on-content-click="false"
-            :return-value.sync="dateStart"
-            transition="scale-transition"
-            offset-y
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <input
-                v-model="dateStart"
-                v-bind="attrs"
-                v-on="on"
-                class="date-input"
-              />
-            </template>
-            <v-date-picker v-model="dateStart" no-title scrollable>
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="menu1 = false">取消</v-btn>
-              <v-btn text color="primary" @click="$refs.menu1.save(dateStart)">保存</v-btn>
-            </v-date-picker>
-          </v-menu>
-          <div>—</div>
-          <v-menu
-            ref="menu2"
-            v-model="menu2"
-            :close-on-content-click="false"
-            :return-value.sync="dateEnd"
-            transition="scale-transition"
-            offset-y
-          >
-            <template v-slot:activator="{ on, attrs }">
-            <input
-                v-model="dateEnd"
-                v-bind="attrs"
-                v-on="on"
-                class="date-input"
-              />
-            </template>
-            <v-date-picker v-model="dateEnd" no-title scrollable>
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="menu2 = false">取消</v-btn>
-              <v-btn text color="primary" @click="$refs.menu2.save(dateEnd)">保存</v-btn>
-            </v-date-picker>
-          </v-menu>
-        </div>
+        <time-picker
+          :dateEnd="dateEnd"
+          :dateStart="dateStart"
+          :menu1="menu1"
+          :menu2="menu2"
+        />
         <!-- 时间选择 end-->
       </div>
 
@@ -86,7 +44,14 @@
               flat
             ></v-select>
           </div>
-          <zhexian />
+
+            <!-- :datum="datumXY"
+            :scale ="{xDomain, xType, yDomain, yType}" -->
+          <line-chart
+            v-bind="chart1Size"
+            :gridLine = "true"
+          >
+          </line-chart>
 
         </div>
 
@@ -137,11 +102,12 @@
 </template>
 
 <script>
-import Zhexian from '@/views/home/Zhexian.vue';
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
 import { fetchFeeStatistics, fetchFeeTimeSeries } from '@/util/http';
 import { FUND_TYPE, ROUTE_PARAM } from '@/util/type';
+import TimePicker from '@/components/small/TimePicker.vue';
+import LineChart from '@/components/LineChart.vue';
 
 const chart1Size = {
   width: 800,
@@ -175,7 +141,8 @@ export default {
   components: {
     Badge,
     Calendar,
-    Zhexian,
+    TimePicker,
+    LineChart,
   },
 
   props: {
@@ -301,55 +268,33 @@ export default {
   .m-container {
     display: flex;
     height: 100%;
-    padding: 0.8rem;
+    padding: 0.5rem 0.8rem;
     background: $she-bg;
 
     .s-tab-lists {
       display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      align-items: flex-start;
-      padding: 0 20px;
-      min-width: max-content;
-      flex-grow: 1;
+      justify-content: space-between;
+      // padding: 0 20px;
     }
 
     .s-header {
       display: flex;
       justify-content: space-between;
-
-      .time-container {
-        display: flex;
-        align-items: center;
-        background: #fcfcfc;
-      }
-
-      .date-input {
-        border: 2px solid #efefef;
-        padding: 2px 5px;
-        color: #7589a2;
-        border-radius: 15px;
-        width: 70px;
-      }
-
-      .date-input:focus {
-        outline: none;
-      }
+      margin-top: 30px;
     }
 
     .s-charts {
       display: flex;
       flex-direction: column;
       padding: 1rem 2rem;
-      // width: 100%;
-      margin-left: 1rem;
       width: 100%;
 
       .s-charts-list {
-        display: grid;
-        grid-template-rows: 48% 1% auto;
-        width: 100%;
-        height: 70vh;
+        display: flex;
+        flex-direction: column;
+        height: 68vh;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
       .chart-legends {
@@ -393,8 +338,8 @@ export default {
       }
     }
 
-    .caledar-view {
-      display: flex;
+    .calendar-view {
+      flex: 1 0 45%;
     }
   }
 </style>

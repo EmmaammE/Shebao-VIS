@@ -46,4 +46,33 @@ export default {
       height: calc(90vh - 80px);
     }
   }
+
+  .s-bar .v-toolbar__content {
+    width: 100%;
+  }
+
+  .border .v-select__slot .v-select__selection ,
+  .border .v-select__slot .v-label{
+    color: $she-c!important;
+  }
+
+  .s-table {
+    .v-data-table__wrapper {
+      overflow: auto;
+      flex: 1 0 80%;
+      // height: 100%;
+
+      td {
+        font-size: 12px!important;
+        color: $she-grey;
+      }
+
+      td:nth-child(2),
+      td:nth-child(3) {
+        color: black;
+        font-size: 16px!important;
+      }
+
+    }
+  }
 </style>
