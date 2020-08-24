@@ -51,8 +51,9 @@ export default {
     width: 100%;
   }
 
-  .border .v-select__slot .v-select__selection ,
-  .border .v-select__slot .v-label{
+// 下拉框蓝色
+  .v-select__slot .v-select__selection ,
+  .v-select__slot .v-label{
     color: $she-c!important;
   }
 
@@ -73,6 +74,13 @@ export default {
         font-size: 16px!important;
       }
 
+    }
+  }
+
+  .s-lists {
+    .v-list-item__content {
+      // 修改layout左侧侧边
+      padding: 1rem 0 !important;
     }
   }
 </style>

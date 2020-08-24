@@ -65,9 +65,18 @@
                 class="radio"
               >
                 <input type="radio" class="radio-btn" :name="d.value"/>
-                <label class="label">{{d.text}}</label>
+                <label class="label">
+                  <span :style="{background: color(index)}"></span>
+                  {{d.text}}</label>
               </div>
             </div>
+
+            <!-- 图 -->
+            <sunburst
+              v-bind="sunburstSetting"
+              :root="data2"
+              :colorSchema="color"
+            />
           </div>
         </div>
       </template>
@@ -78,6 +87,21 @@
 import GirlIcon from '@/assets/search/icon_3.svg';
 import BoyIcon from '@/assets/search/icon_4.svg';
 import TimePicker from '@/components/small/TimePicker.vue';
+import Sunburst from '@/components/Sunburst.vue';
+import * as d3 from 'd3';
+
+const sunburstSetting = {
+  width: 500,
+};
+sunburstSetting.radius = sunburstSetting.width / 7;
+const partition = (data) => {
+  const root = d3.hierarchy(data)
+    .sum((d) => d.value)
+    .sort((a, b) => b.value - a.value);
+
+  return d3.partition()
+    .size([2 * Math.PI, root.height + 1])(root);
+};
 
 export default {
   props: {
@@ -91,6 +115,7 @@ export default {
 
   components: {
     TimePicker,
+    Sunburst,
   },
   data() {
     return {
@@ -100,7 +125,36 @@ export default {
       dateEnd: new Date().toISOString().substr(0, 10),
       menu1: false,
       menu2: false,
+
+      sunburstSetting,
     };
+  },
+
+  computed: {
+    data2() {
+      const data = this.data[this.menu[this.menuIndex].value];
+      const sundata = {};
+      Object.keys(data).forEach((key) => {
+        if (typeof data[key] === 'number') {
+          sundata.name = key;
+          sundata.value = data[key];
+        } else {
+          sundata.name = key;
+          sundata.children = Object.keys(data[key]).map((ikey) => ({
+            name: ikey,
+            value: data[key][ikey],
+          }));
+        }
+      });
+      // eslint-disable-next-line
+      return partition(sundata).each((d) => d.current = d);
+    },
+
+    color() {
+      return d3.scaleLinear()
+        .range(['#5d77ff', '#889aff', '#a7b5ff', '#c8d0ff', '#d1d7f9'])
+        .domain(d3.ticks(0, this.menu.length, 5));
+    },
   },
 
   methods: {
@@ -241,7 +295,7 @@ export default {
             transition: all 0.25s linear;
         }
 
-        .label::before {
+        .label span {
             display: inline-block;
             content: "";
             height: 1.125rem;

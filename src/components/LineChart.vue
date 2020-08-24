@@ -1,8 +1,8 @@
 <template>
   <div class="line-chart">
     <svg
-      v-if ="datum.y"
-      height='100%' :viewBox="`0 0 ${width} ${height}`"
+      v-if ="datum.length!==0"
+      :viewBox="`0 0 ${width} ${height}`"
     >
       <defs>
         <clipPath id="clip">
@@ -13,21 +13,24 @@
       <g class="barchart-axis"
         :transform='`translate(${margin.left}, ${margin.top})`'
       >
-        <!-- <g v-axis:x="{scale: chartX, tickFormat: xTickFormat}"
+
+        <g class="grid-line">
+          <line y2="240" v-for="n in 11" :key="n"
+            :transform="`translate(${chartX[1](new Date(Date.UTC(2020, n, 1)))},0)`"
+            :id="new Date(Date.UTC(2020, n, 0))"
+           />
+          <line :transform="`translate(${chartX[1](new Date(Date.UTC(2020, 12, 0)))},0)`"
+            y2="240" />
+        </g>
+
+        <g v-axis:x="{scale: chartX[1], tickFormat: timeParse}"
           :transform='`translate(0, ${chartHeight})`'
-          /> -->
-        <!-- <g v-axis:x="{scale: chartX}" /> -->
-        <g v-axis:x="{scale: chartX, inner: chartHeight, tickFormat: ''}"
-          v-if="gridLine"
-          class="grid-line"
+          class="xaxis"
         />
 
         <g v-axis:y="{scale: chartY}"
           class="yaxis"
         />
-        <!-- <g v-axis:y="{scale: chartY, inner: -chartWidth, tickFormat: ''}"
-          v-if="gridLine" class="grid-line"
-        /> -->
       </g>
 
       <g clip-path ="url(#clip)"
@@ -35,10 +38,12 @@
         ref="paths"
       >
         <path
-          v-for="kind in Object.keys(datum.y)" :key="kind"
-          :id="kind"
-          :d="line(datum.y[kind])"
-          :stroke="color(kind)"
+          :d="line(datum[0])"
+          stroke="#6672fb"
+        />
+        <path
+          :d="line(datum[1])"
+          stroke="#d8adf2"
         />
       </g>
 
@@ -50,7 +55,6 @@
 <script>
 import * as d3 from 'd3';
 import { axisDirective } from '@/directives/axis';
-import { color } from '@/mixins/color';
 // d3 reference：
 // https://observablehq.com/@connor-roche/multi-line-chart-focus-context-w-mouseover-tooltip
 export default {
@@ -69,27 +73,27 @@ export default {
       }),
     },
     // 比例尺
-    scale: Object,
-    xTickFormat: Function,
-    xTicks: Number,
-    yTickFormat: Function,
-    yTicks: Number,
+    // xScale: Function,
+    yScale: Function,
     // 数据
-    datum: Object,
+    datum: Array,
+    colorScheme: Array,
 
     // 是否有格子线
     gridLine: {
       type: Boolean,
       default: false,
     },
+    /*
+      NOTE 粒度
+      月 周 日 （0，1，2）
+    */
+    type: Number,
   },
 
   data() {
     return {
-      color: d3
-        .scaleOrdinal()
-        .domain(Object.keys(this.datum.y))
-        .range(color),
+      timeParse: d3.timeFormat('%m-%d'),
     };
   },
 
@@ -102,10 +106,22 @@ export default {
     },
     // 设置比例尺的range
     chartX() {
-      return d3[this.scale.xType]().domain(this.scale.xDomain).range([0, this.chartWidth]);
+      switch (this.type) {
+        case 0:
+        case 1:
+        default:
+          return [
+            d3.scaleLinear()
+              .domain([0, 365])
+              .range([0, this.chartWidth]),
+            d3.scaleTime()
+              .domain([new Date(Date.UTC(2020, 0, 0)), new Date(Date.UTC(2020, 11, 31))])
+              .range([0, this.chartWidth]),
+          ];
+      }
     },
     chartY() {
-      return d3[this.scale.yType]().domain(this.scale.yDomain).range([this.chartHeight, 0]).nice();
+      return this.yScale.range([this.chartHeight, 0]).nice();
     },
 
     line() {
@@ -113,7 +129,7 @@ export default {
       return d3
         .line()
         .curve(d3.curveCardinal)
-        .x((d, i) => chartX(this.datum.x[i]))
+        .x((d, index) => chartX[0](index))
         .y((d) => chartY(d));
     },
   },
@@ -153,16 +169,11 @@ export default {
 
     path {
       fill:none;
-      stroke-width: 3px;
+      stroke-width: 2px;
     }
 
     .grid-line {
       stroke: #ccc;
-      opacity: 0.2;
-
-      path {
-        display: none;
-      }
     }
 
     .xaxis, .yaxis {

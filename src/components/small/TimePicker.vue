@@ -1,6 +1,6 @@
 <template>
 <!-- 时间选择 -->
-  <div class="time-container">
+  <div :class="type?'time-container type-2':'time-container'">
     <v-menu
       ref="menu1"
       v-model="menu1"
@@ -57,6 +57,7 @@ export default {
     dateEnd: String,
     menu1: Boolean,
     menu2: Boolean,
+    type: Boolean,
   },
 };
 </script>
@@ -68,11 +69,25 @@ export default {
     background: #fcfcfc;
   }
 
+  .type-2 {
+    border: 2px solid #efefef;
+  }
+
+  .type-2 .date-input {
+    border: 0!important;
+  }
+
   .date-input {
     border: 2px solid #efefef;
     padding: 2px 5px;
     color: #7589a2;
     border-radius: 15px;
+    font-family:PingFangSC-Semibold;
+    font-size:12px;
+    color:#597390;
+    letter-spacing:0;
+    text-align:center;
+    width: 90px;
   }
 
   .date-input:focus {

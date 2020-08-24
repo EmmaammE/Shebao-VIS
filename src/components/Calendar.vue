@@ -4,20 +4,33 @@
     <svg  height='100%' :viewBox="`0 0 ${width} ${height}`"
       @mouseleave="isShowing=false"
     >
+      <defs>
+        <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="100%">
+          <stop offset="0%" stop-color="#ff5f43" />
+          <stop offset="50%" stop-color="#eee" />
+          <stop offset="100%" stop-color="#5bd7c2" />
+        </linearGradient>
+      </defs>
       <text x="5" y="50%">{{year}}</text>
+
+      <g :transform="`translate(${width-marginRight-marginLeft}, ${marginTop})`">
+          <text>{{-100*handledDatum.extent[dataType].toFixed(4)}}</text>
+          <rect x="10" y="12" class="legend"
+            width="5" :height="height/2" />
+          <text  y="75%">{{100 * handledDatum.extent[dataType].toFixed(4)}}</text>
+        </g>
       <g :transform="`translate(${marginLeft}, ${marginTop})`">
         <!-- <text v-for="(day,index) in daysLabel" :key="index"
           :x="-marginLeft"
           :y="(cellSize+cellPadding)*(index+0.5)"
           font-size="10px"
         >{{day}}</text> -->
-
         <template v-for="(data,j) in cellData">
           <rect v-for="(d,i) in data" :key="i+'r'+j"
-            :width="i>=data.length-7 && !type ? cellLength-3 : cellLength"
+            :width="i>=data.length-7 && !type ? cellLength-3 : cellLength-1"
             :height="i===data.length-1 && !type && d.getDay()!==0
               ? cellLength-3
-              : (type === 1 ? cellLength + 3:cellLength )"
+              : (type === 1 ? cellLength + 3:cellLength-1 )"
             :x="cellX(d)"
             :y="cellY(d)"
             :fill="cellColor(d)"
@@ -242,7 +255,7 @@ export default {
     },
     cellLength() {
       if (this.type) {
-        return this.cellSize - this.cellPadding * 2;
+        return this.cellSize - this.cellPadding;
       }
       return this.cellSize;
     },
@@ -309,5 +322,9 @@ export default {
 
   rect {
     cursor: pointer;
+  }
+
+  rect.legend {
+     fill: url(#gradient) #fff
   }
 </style>

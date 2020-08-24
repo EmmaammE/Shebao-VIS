@@ -30,16 +30,12 @@
     </g>
 
     <g :transform='`translate(${margin.left}, ${margin.top})`'
-      class="charts"
-      >
+      class="charts" ref="svg">
 
       <g :transform='`translate(0, ${yScalePadding})`' clip-path ="url(#clip)">
-        <!-- 折线图 -->
-        <path id="line" :d="line(scales.datumArr)" />
-
         <g v-for="d in scales.datumArr"
           :key="d[0]">
-<!-- TODO 把这些坐标存一下？老重复用 -->
+          <!-- TODO 把这些坐标存一下？老重复用 -->
           <!-- 柱状图 -->
           <rect
             :height="yScalePadding"
@@ -57,18 +53,29 @@
                 M ${scales.xTopScale(d[1].money)-yScalePadding/2}
                 ${scales.yScale(d[0]) - yScalePadding/2} Z`"
             />
-
-          <!-- 折线图上的点 -->
-          <circle
-            :cx="scales.xBottomScale(d[1].num)"
-            :cy="scales.yScale(d[0])"
-            r="2"
-          />
-
         </g>
 
-         <use xlink:href="#line" />
+        <!-- 折线图 -->
+        <path id="line" :d="line(scales.datumArr)" />
+
+        <!-- 折线图上的点 -->
+        <circle
+          v-for="d in scales.datumArr"
+          :key="d[0]+'circle'"
+          :cx="scales.xBottomScale(d[1].num)"
+          :cy="scales.yScale(d[0])"
+          r="2"
+        />
+
+        <line
+          v-show="tipX!==0"
+          stroke="#babec7"
+          stroke-dasharray="4 2"
+          :x1="tipX" y1="-10" :x2="tipX" :y2="width-margin.bottom-margin.top" />
+
+         <!-- <use xlink:href="#line" /> -->
       </g>
+
     </g>
 
   </svg>
@@ -92,6 +99,12 @@ export default {
         left: 20,
       }),
     },
+  },
+
+  data() {
+    return {
+      tipX: 0,
+    };
   },
 
   directives: {
@@ -155,6 +168,28 @@ export default {
     },
   },
 
+  mounted() {
+    this.setTooltip();
+    console.log(d3.select(this.$refs.svg).selectAll('circle'));
+  },
+
+  methods: {
+    setTooltip() {
+      const $circles = d3.select(this.$refs.svg).selectAll('circle');
+      const that = this;
+      $circles.on('mousemove', function mousemoveAction() {
+        // const { id } = d3.event.path[0];
+        const pos = d3.mouse(this);
+        // eslint-disable-next-line
+        that.tipX = pos[0];
+        console.log(pos, d3.event);
+      });
+      // .on('mouseout', () => {
+      //   that.tipX = 0;
+      // });
+    },
+  },
+
 };
 </script>
 
@@ -193,8 +228,9 @@ export default {
     }
 
     circle {
-      fill: #b1d3dc;
+      fill: #81d7e9;
       stroke: #1c899f;
+      cursor: pointer;
     }
 
     rect {
@@ -204,5 +240,10 @@ export default {
     path.eclipse {
       fill:#b1d3dc;
     }
+  }
+
+  line {
+    stroke: #babec7;
+    // stroke-dasharray: 2 2;
   }
 </style>

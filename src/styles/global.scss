@@ -9,6 +9,7 @@ $black: #efefef;
 $she-primary: #2061c8;
 $she-border:#dddddd;
 $she-c: #0f63e3;
+$darkblue: #3365bb;
 $she-grey: #5c5b5b;
 // 群体就医、虚假住院、刷空卡、刷小卡的颜色
 $yujing: #c11f48, #f87e4b,#ffcc60,#d84e5e;
@@ -46,36 +47,37 @@ tr.v-data-table__selected {
   box-shadow: 0px 2px 3px darken($black, 5%), 2px 2px 6px darken($black, 2%)!important;
 }
 
-// scroll-bar
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
 body {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
   /* Estilos barra (thumb) de scroll */
-::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
+  ::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background-color: #999999;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #b3b3b3;
+    box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Estilos track de scroll */
+  ::-webkit-scrollbar-track {
+    background: #e1e1e1;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-track:hover, 
+  ::-webkit-scrollbar-track:active {
+    background: #d4d4d4;
+  }
 }
 
-::-webkit-scrollbar-thumb:active {
-  background-color: #999999;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #b3b3b3;
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-}
-
- /* Estilos track de scroll */
-::-webkit-scrollbar-track {
-  background: #e1e1e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-track:hover, 
-::-webkit-scrollbar-track:active {
-  background: #d4d4d4;
-}
+html {
+  font-size: 1vw!important;
 }

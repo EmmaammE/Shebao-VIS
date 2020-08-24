@@ -50,6 +50,9 @@
           <line-chart
             v-bind="chart1Size"
             :gridLine = "true"
+            :yScale="yscale"
+            :type="itemSelect"
+            :datum="lineDatum"
           >
           </line-chart>
 
@@ -104,21 +107,24 @@
 <script>
 import Badge from '@/views/monitor/badge.vue';
 import Calendar from '@/components/Calendar.vue';
-import { fetchFeeStatistics, fetchFeeTimeSeries } from '@/util/http';
+import {
+  fetchFeeStatistics, fetchFeeTimeSeries, fetchFundDetailStatistics, fetchFundDetailTimeSeries,
+} from '@/util/http';
 import { FUND_TYPE, ROUTE_PARAM } from '@/util/type';
 import TimePicker from '@/components/small/TimePicker.vue';
 import LineChart from '@/components/LineChart.vue';
+import * as d3 from 'd3';
 
 const chart1Size = {
-  width: 800,
-  height: 350,
+  width: 1200,
+  height: 300,
   margin: {
     bottom: 50, left: 80, top: 10, right: 20,
   },
 };
 
 const setting = {
-  width: 800,
+  width: 850,
   height: 100,
   cellSize: 14,
   marginLeft: 40,
@@ -132,6 +138,30 @@ const FEE_TYPE = {
   门诊均次费用: 'outpatient_average',
   住院均次费用: 'inpatient_average',
   人次人头: 'person_time_head_count',
+};
+
+const FEE_STRUCTURE = {
+  // fee_structure
+  药品费用: 'drug_fee',
+  检查费用: 'check_fee',
+  手术治疗: 'surgical_fee',
+  物理治疗: 'physical_fee',
+  中医治疗: 'tcm_fee',
+  口腔治疗: 'oral_fee',
+};
+
+const LIE_ZHI_TYPE = {
+  // liezhi
+  统筹金额: 'overall_fund',
+  当年账户: 'current_year',
+  历年账户: 'past_year',
+  大病保险: 'serious_illness',
+  医疗救助: 'medical_assistance',
+};
+
+const funds = {
+  liezhi: LIE_ZHI_TYPE,
+  fee_structure: FEE_STRUCTURE,
 };
 
 const DATA_TYPE = ['chain_ratio', 'year_ratio'];
@@ -169,6 +199,9 @@ export default {
       { value: 2, title: '日' },
     ],
     itemSelect: 0,
+    lineDatum: [],
+    xscale: d3.scaleLinear(),
+    yscale: d3.scaleLinear(),
 
     // 日历图
     itemSelect2: 0,
@@ -179,46 +212,33 @@ export default {
     ],
     setting,
     years: [2019, 2020],
+    calendarDatum: [{}, {}],
 
     // type为0： 同比， 1：环比
     type: 0,
     // 获得的数据原始值
     datum: {},
+
+    // 0就是默认的， 1是liezhi, 2fee_structure
+    param_type: '',
   }),
 
   mounted() {
     // fetch 总医疗的四个值
-    this.getFeeStatistics();
-    this.getFeeTimeSeries();
+    this.getData(this.routeType);
   },
 
   computed: {
-    calendarDatum() {
-      // 日历图的数据
-      const data = [{}, {}];
-      Object.keys(this.datum).forEach((key) => {
-        const item = {};
-        Object.keys(this.datum[key]).forEach((d) => {
-          item[d] = [this.datum[key][d].year_ratio, this.datum[key][d].chain_ratio];
-        });
-        if (key === '2019') {
-          data[0] = item;
-        } else {
-          data[1] = item;
-        }
-      });
 
-      return data;
-    },
     menuTitle() {
       return ROUTE_PARAM[this.routeType];
     },
   },
 
   watch: {
-    routeType() {
-      this.getFeeStatistics();
-      this.getFeeTimeSeries();
+    routeType(newValue) {
+      this.tabActive = 0;
+      this.getData(newValue);
     },
     tabActive() {
       this.getFeeTimeSeries();
@@ -226,6 +246,22 @@ export default {
   },
 
   methods: {
+    getData(value) {
+      let type = 0;
+      if (value === 'liezhi') {
+        this.param_type = 'liezhi';
+        this.getFund();
+      } else if (value === 'feiyong') {
+        this.param_type = 'fee_structure';
+        this.getFund();
+      } else {
+        type = 1;
+        this.getFeeStatistics();
+      }
+
+      this.getFeeTimeSeries(type);
+    },
+
     changeTab(index) {
       this.tabActive = index;
     },
@@ -247,17 +283,74 @@ export default {
       ];
     },
 
-    async getFeeTimeSeries(granularity = 'day') {
-      // if (FUND_TYPE[this.submenu]) {
-      const data = await fetchFeeTimeSeries({
-        fundType: this.routeType,
-        feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
-        granularity,
+    async getFund() {
+      const data = await fetchFundDetailStatistics({
         startDay: this.dateStart,
         endDay: this.dateEnd,
+        type: this.param_type,
       });
 
-      this.datum = data;
+      this.tabNumber = Object.values(funds[this.param_type]).map((value) => data[value]);
+
+      this.tabTitle = Object.keys(funds[this.param_type]).map((d) => `${d}（元)`);
+
+      this.menuSubtitle = Object.keys(funds[this.param_type]);
+    },
+
+    async getFeeTimeSeries(type, granularity = 'day') {
+      let datafetch;
+      if (type === 1) {
+        datafetch = await fetchFeeTimeSeries({
+          fundType: this.routeType,
+          feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
+          granularity,
+          startDay: this.dateStart,
+          endDay: this.dateEnd,
+        });
+      } else {
+        datafetch = await fetchFundDetailTimeSeries({
+          type: this.param_type,
+          subtype: Object.keys(funds[this.param_type])[this.tabActive],
+          granularity,
+          startDay: this.dateStart,
+          endDay: this.dateEnd,
+        });
+      }
+
+      this.datum = datafetch;
+      // 日历图的数据
+      const data = [{}, {}];
+      // 折线图的数据
+      const data2 = [{}, {}];
+      let maxValue = Number.MIN_VALUE;
+
+      Object.keys(datafetch).forEach((key) => {
+        const item = {};
+        const item2 = [];
+        Object.keys(datafetch[key]).forEach((d) => {
+          item[d] = [datafetch[key][d].year_ratio, datafetch[key][d].chain_ratio];
+          let { value } = datafetch[key][d];
+          // NOTE 以万元作为单位
+          value /= 10000;
+          maxValue = Math.max(maxValue, value);
+
+          item2.push(value);
+          if (d === '2019-02-28') {
+            item2.push(0);
+          }
+        });
+        if (key === '2019') {
+          data[0] = item;
+          data2[0] = item2;
+        } else {
+          data[1] = item;
+          data2[1] = item2;
+        }
+      });
+
+      this.calendarDatum = data;
+      this.lineDatum = data2;
+      this.yscale = this.yscale.domain([0, maxValue]);
     },
   },
 
@@ -268,7 +361,7 @@ export default {
   .m-container {
     display: flex;
     height: 100%;
-    padding: 0.5rem 0.8rem;
+    padding: 0.8rem;
     background: $she-bg;
 
     .s-tab-lists {
@@ -286,7 +379,7 @@ export default {
     .s-charts {
       display: flex;
       flex-direction: column;
-      padding: 1rem 2rem;
+      padding: 2rem;
       width: 100%;
 
       .s-charts-list {
@@ -295,6 +388,7 @@ export default {
         height: 68vh;
         overflow-y: auto;
         overflow-x: hidden;
+        padding-bottom: 2rem;
       }
 
       .chart-legends {
@@ -326,9 +420,20 @@ export default {
           i {
             width: 1rem;
             height: 1rem;
-            background: coral;
             border-radius: 50%;
             margin: 0 0.5rem 0 0;
+          }
+        }
+
+        span:nth-child(1) {
+          i {
+            background: #6672fb;
+          }
+        }
+
+        span:nth-child(2) {
+          i {
+            background: #d8adf2;
           }
         }
 

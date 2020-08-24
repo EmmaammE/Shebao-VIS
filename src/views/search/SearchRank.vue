@@ -2,7 +2,15 @@
   <v-card class="s-rank-container">
     <div>
       <p class="text-lg-h6">筛选条件</p>
-      <div class="s-box text-lg-body-2">时间区间</div>
+      <div class="s-box text-lg-body-2">时间区间
+        <time-picker
+          :dateEnd="endDay"
+          :dateStart="startDay"
+          :menu1="menu1"
+          :menu2="menu2"
+          :type="true"
+        />
+      </div>
 
       <div class="s-divider" />
 
@@ -50,7 +58,8 @@
       <div class="s-divider" />
 
       <div class="type-container look-container s-box">
-        <!-- 查询条件 -->
+        <div class="inputs">
+          <!-- 查询条件 -->
         <v-select
           v-model="selected"
           :items="selectItems"
@@ -79,6 +88,12 @@
           v-model="lookup"
           label="可输入药品或服务名"
         ></v-text-field>
+        </div>
+
+        <div class="btn-container">
+          <button @click="reset">重置</button>
+          <button @click="getData">查询</button>
+        </div>
       </div>
 
       <div class="s-divider" />
@@ -115,6 +130,7 @@ import MIcon from '@/assets/search/金额.svg';
 import { fetchRank } from '@/util/http';
 import { FUND_TYPE } from '@/util/type';
 import DuraChart from '@/components/charts/DualChart.vue';
+import TimePicker from '@/components/small/TimePicker.vue';
 
 const chart1Size = {
   width: 900,
@@ -155,6 +171,8 @@ export default {
       // 查询时间
       startDay: new Date('2020-01-01').toISOString().substr(0, 10),
       endDay: new Date().toISOString().substr(0, 10),
+      menu1: false,
+      menu2: false,
 
       // 排序类型
       selected: { value: '按结构排序', key: 'organization' },
@@ -169,6 +187,7 @@ export default {
     AmountIcon,
     MIcon,
     DuraChart,
+    TimePicker,
   },
 
   mounted() {
@@ -190,6 +209,14 @@ export default {
       // 类型
       this.datum = data.public;
     },
+
+    getData() {
+
+    },
+
+    reset() {
+
+    },
   },
 };
 </script>
@@ -203,6 +230,16 @@ export default {
     margin: 1rem;
     height: 95%;
     padding: 1rem;
+
+    .s-box {
+      display: flex;
+      align-items: center;
+      margin: 2px 0;
+
+      .time-container {
+        margin: 0 18px;
+      }
+    }
 
     .s-divider{
       background: #dcdff8;
@@ -237,15 +274,19 @@ export default {
     }
 
     .look-container {
-      padding-right: 50%;
-      display: grid;
-      grid-template-columns: 33% 33% 33%;
-      grid-gap: 20px;
+      display: flex;
+      justify-content: space-around;
 
-      .v-input {
-        border: 1px solid #dadef8;
-        border-radius: 0;
-        margin: 2px 0;
+      .inputs {
+        padding-right: 40%;
+        display: flex;
+        grid-gap: 20px;
+
+        .v-input {
+          border: 1px solid #dadef8;
+          border-radius: 0;
+          margin: 2px 0;
+        }
       }
     }
 
@@ -272,6 +313,26 @@ export default {
           margin: 10px 0;
           height: 35px;
         }
+      }
+    }
+
+    .btn-container {
+      margin: 0 20px;
+      display: flex;
+
+      button {
+        padding: 3px 20px;
+        border: 1px solid #c0c0c0;
+        letter-spacing: 4px;
+        margin: 5px;
+        outline:none;
+        height: 30px;
+        width: 90px;
+        text-align: center;
+      }
+      button:nth-child(2) {
+        background: #3365ba;
+        color: #fff;
       }
     }
   }

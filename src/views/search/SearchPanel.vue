@@ -95,7 +95,7 @@
     </v-card>
 
     <search-info
-      :data="datum[activeKey]"
+      :data="datum?datum[activeKey]:{}"
       v-bind="panel"
       :people="people"
     />
@@ -121,21 +121,53 @@ export default {
     menu2: false,
     id: null,
     pageNum: 1,
-    headers: [{
-      align: 'center', text: '性别', value: 'xing_bie',
-    }, {
-      align: 'center', text: '序号', value: 'index',
-    }, {
-      align: 'center', text: '姓名', value: 'name',
-    }, {
-      align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
-    }, {
-      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
-    }, {
-      align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
-    }, {
-      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
-    }],
+    headersData: [
+      [
+        // 就诊信息
+        {
+          align: 'center', text: '性别', value: 'xing_bie',
+        }, {
+          align: 'center', text: '序号', value: 'index',
+        }, {
+          align: 'center', text: '姓名', value: 'name',
+        }, {
+          align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
+        }, {
+          align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
+        }, {
+          align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
+        }, {
+          align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
+        },
+      ], [
+        {
+          align: 'center', text: '性别', value: 'xing_bie',
+        }, {
+          align: 'center', text: '序号', value: 'index',
+        }, {
+          align: 'center', text: '姓名', value: 'xing_ming',
+        }, {
+          align: 'center', text: '社保编号', value: 'key',
+        }, {
+          align: 'center', text: '服务机构名称', value: 'fu_wu_ji_gou_ming_cheng',
+        },
+      ], [
+        {
+          align: 'center', text: '性别', value: 'xing_bie',
+        }, {
+          align: 'center', text: '序号', value: 'index',
+        }, {
+          align: 'center', text: '姓名', value: 'name',
+        }, {
+          align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
+        }, {
+          align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
+        }, {
+          align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
+        }, {
+          align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
+        },
+      ]],
     // 表格数据
     tableData: [
     ],
@@ -159,9 +191,9 @@ export default {
       const { routeType } = this.$route.params;
       switch (routeType) {
         case 'people':
-          return 1;
-        case 'doctor':
           return 2;
+        case 'doctor':
+          return 1;
         case 'info':
           return 0;
         default:
@@ -177,16 +209,18 @@ export default {
     //       return
     //   }
     // },
+    headers() {
+      return this.headersData[this.compType];
+    },
     panel() {
       // 返回不同组件panel的信息
       switch (this.compType) {
         case 1:
-          // 参保人员汇总
+          // 药师医师汇总
           return {
             menu: [
-              { value: 'yi_liao_fei_yong', text: '医疗费用' },
-              { value: 'fei_yong_gou_cheng', text: '费用构成' },
-              { value: 'ji_jin_lie_zhi', text: '基金列支' },
+              { value: 'yi_bao_fen_lei', text: '医保分类' },
+              { value: 'fei_yong_gou_cheng_qing_kuang', text: '费用构成' },
             ],
             info: [
               { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
@@ -194,10 +228,26 @@ export default {
               { text: '身份证号', value: 'shen_fen_zheng_hao' },
               { text: '社保编号', value: 'she_bao_bian_hao' },
             ],
+            header: [
+              { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
+              { text: '医保服务人次数', value: 'shen_fen_zheng_hao' },
+              { text: '医保服务人数', value: 'yi_bao_fu_wu_ren_shu' },
+            ],
           };
         case 2:
+          // 参保人员汇总
           return {
-
+            menu: [
+              { value: 'yi_liao_fei_yong', text: '医疗费用' },
+              { value: 'fei_yong_gou_cheng_qing_kuang', text: '费用构成' },
+              { value: 'ji_jin_lie_zhi_qing_kuang', text: '基金列支' },
+            ],
+            info: [
+              { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
+              { text: '参保类别', value: 'can_bao_lei_xing' },
+              { text: '身份证号', value: 'shen_fen_zheng_hao' },
+              { text: '社保编号', value: 'she_bao_bian_hao' },
+            ],
           };
         default:
           return {
@@ -213,12 +263,13 @@ export default {
     },
 
     getData() {
+      this.activeKey = '';
       switch (this.compType) {
         case 1:
-          this.getPeopleInfo();
+          this.getDoctorInfo();
           break;
         case 2:
-          this.getDoctorInfo();
+          this.getPeopleInfo();
           break;
         default:
       }

@@ -21,6 +21,9 @@ export const fetchFeeStatistics = (params) => fire('POST', 'getFeeStatistics', p
 
 export const fetchFeeTimeSeries = (params) => fire('POST', 'getFeeTimeSeries', params);
 
+export const fetchFundDetailStatistics = (params) => fire('POST', 'getFundDetailStatistics', params);
+
+export const fetchFundDetailTimeSeries = (params) => fire('POST', 'getFundDetailTimeSeries', params);
 // 搜索引擎
 export const fetchRank = (params) => fire('POST', 'getRank', params);
 

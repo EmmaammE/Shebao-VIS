@@ -1,9 +1,9 @@
 <template>
   <v-sheet class="s-badge">
     <component :is="active?IconOn:Icon" class="svg-style" viewBox="0 0 59 59"/>
-    <div class="s-info">
-      <p class="text-lg-body-1 text-md-body-1">{{type}}</p>
-      <p class="text-lg-h5 text-md-h6">{{data}}</p>
+    <div :class="active?'s-info active':'s-info'">
+      <p class="text-title">{{type}}</p>
+      <p class="text-number">{{data.toLocaleString()}}</p>
     </div>
   </v-sheet>
 </template>
@@ -52,7 +52,26 @@ export default {
       margin: 0 4px;
 
       p {
-        margin: 2px;
+        margin: 0;
+        color:#747474;
+      }
+
+      p.text-number {
+        font-family:LcdD;
+        font-size:1.5rem;
+        letter-spacing:0;
+      }
+
+      p.text-title {
+        font-family:STHeitiSC-Medium;
+        font-size: 1rem;
+        letter-spacing:-0.96px;
+      }
+
+      &.active {
+        p {
+          color: $darkblue;
+        }
       }
     }
   }
