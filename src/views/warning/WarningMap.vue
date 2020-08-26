@@ -38,12 +38,13 @@
     <!-- 地图上显示的图表container-->
     <div :class="['map-charts-container',
       compType===1?'cmp':'',isShowing?'active':''].join(' ')">
-      <svg viewBox="0 0 100 200" class="line-box">
+      <svg viewBox="0 0 100 200" class="line-box" :fill="color[colorIndex]">
         <!-- <circle fill="#bc2933" fill-opacity="0.3" cx="90" cy="20" r="15" /> -->
-        <circle fill="#bc2933" fill-opacity="0.3" cx="90" :cy="circlePos[1]" r="10" />
-        <circle fill="#bc2933" fill-opacity="0.5" cx="90" :cy="circlePos[1]" r="8" />
-        <path :d="`M5 ${circlePos[0]}, L65,${circlePos[1]} L95,${circlePos[1]}`"/>
-        <circle fill="#bc2933" cx="90" :cy="circlePos[1]" r="5" />
+        <circle fill-opacity="0.3" cx="90" :cy="circlePos[1]" r="10" />
+        <circle fill-opacity="0.5" cx="90" :cy="circlePos[1]" r="8" />
+        <path :stroke="color[colorIndex]"
+          :d="`M5 ${circlePos[0]}, L65,${circlePos[1]} L95,${circlePos[1]}`"/>
+        <circle cx="90" :cy="circlePos[1]" r="5" />
       </svg>
 
       <!-- 地图上显示不同类型的图表 -->
@@ -54,12 +55,11 @@
         </div>
         <div>
           <div class="two-charts">
-          <p class="chart-title">均次指标</p>
           <!-- 图例 -->
           <div class="c-header">
-            <div class="legends">
-              <span>实际</span>
-              <span>预算</span>
+            <p class="chart-title">2020年均次指标</p>
+            <div class="img-wrapper">
+              <img src="@/assets/warning/图例2.png"/>
             </div>
           </div>
           <!-- 图表一 -->
@@ -77,10 +77,24 @@
             />
           </div>
         </div>
-        <div>
-          <p>年度指标</p>
-          <!-- 图表一 -->
-        </div>
+          <div class="down-chart">
+            <!-- 图例 -->
+            <div class="c-header">
+              <p class="chart-title">2020年年度指标</p>
+              <div class="img-wrapper">
+                <img src="@/assets/warning/图例3.png"/>
+              </div>
+            </div>
+
+            <!-- 图表一 -->
+            <!-- <barchart
+              :type="0"
+              :width="200"
+              :height="100"
+              :datum = "tipData"
+              :yDomain="downX"
+            /> -->
+          </div>
         </div>
       </v-card>
 
@@ -168,6 +182,8 @@ export default {
       type: '医疗机构',
       id: ' 5026',
       tipData: [],
+      // 底部的数据
+      downData: [],
 
       // x轴
       upX: [
@@ -177,8 +193,16 @@ export default {
         { title: '购药', key: 'gou_yao' },
       ],
       downX: [
-
+        { title: '家庭病床', key: 'jia_ting_bing_chuang' },
+        { title: '规定病种', key: 'gui_ding_bing_zhong' },
+        { title: '普通门诊', key: 'pu_tong_men_zhen' },
+        { title: '住院', key: 'zhu_yuan' },
+        { title: '购药', key: 'gou_yao' },
       ],
+
+      // svglinebox的颜色
+      color: ['#b31011', '#ffb844', '#3ea264'],
+      colorIndex: 0,
     };
   },
 
@@ -250,6 +274,7 @@ export default {
     getOrgShowData(name, index) {
       this.id = name;
       this.title = this.datum[index][name][TITLE_P];
+      this.colorIndex = index;
 
       if (this.compType === 1) {
         this.tipData = [this.datum[index][name]];
@@ -257,6 +282,12 @@ export default {
         this.tipData = [
           this.datum[index][name].ren_tou_ren_ci_bi,
           this.datum[index][name].jun_ci_fei_yong,
+        ];
+
+        // 底部的数据
+        this.downData = [
+          this.datum[index][name].nian_du_zhi_biao,
+          this.datum[index][name].yue_du_zhi_biao,
         ];
       }
     },
@@ -333,7 +364,6 @@ export default {
       width: 10vw;;
 
       path {
-        stroke: #cc4b58;
         fill: none;
       }
     }
@@ -350,6 +380,7 @@ export default {
       justify-items: center;
       align-items: center;
       text-align: center;
+      border-radius: 15px;
 
       hr {
         width: 100%;
@@ -364,8 +395,20 @@ export default {
 
       .c-header {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         width: 18vw;
+        padding: 10px;
+        line-height: 40px;
+
+        .img-wrapper {
+          height: 40px;
+          width: 8vw;
+
+          img {
+            object-fit: cover;
+            height: 40px;
+          }
+        }
       }
 
       p.chart-title {
@@ -431,4 +474,11 @@ export default {
     opacity: 1;
   }
 
+  .down-chart {
+    border-top: 1px solid #c7c7c7;
+
+    .c-header img {
+      height: 30px!important;
+    }
+  }
 </style>

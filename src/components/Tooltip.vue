@@ -23,8 +23,9 @@ export default {
 
 <style scoped lang="scss">
   .tooltip-container {
-    padding: 2px;
-    border-radius: 5px;
+    padding: 2px 5px;
+    // width: 100px;
+    // height: 35px;
     background: #777;
     color: #fff;
     opacity: .78;
@@ -35,11 +36,11 @@ export default {
   .tooltip-container::before {
     content: '';
     position: absolute;
-    bottom: -20px;
-    left: calc(50% - 5*1.414px);
+    bottom: -12px;
+    left: calc(50% - 3*1.414px);
     width: 0;
     height: 0;
-    border: 10px solid transparent;
-    border-top: 10px solid #777;
+    border: 6px solid transparent;
+    border-top: 6px solid #777;
   }
 </style>

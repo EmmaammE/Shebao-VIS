@@ -5,6 +5,8 @@
         class="s-table"
         :headers="headers"
         :items-per-page="5"
+        :options.sync="options"
+        :server-items-length="10"
         :items="pageData">
 
         <template v-slot:[`item.key`]="{ item }">
@@ -20,6 +22,7 @@
                 Object.keys(item.ten_min).length,
                 Object.keys(item.sixty_min).length]"
               :data="item.type"
+              :colorScale="colorScale"
             />
             <p>{{item.type}}</p>
           </div>
@@ -46,10 +49,18 @@
               >{{text}}</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="item in desserts" :key="item.name">
-              <td>{{ item.name }}</td>
-              <td>{{ item.calories }}</td>
+          <tbody v-if="pageData[pageIndex]">
+            <tr v-for="(item, value) in pageData[pageIndex][tabsKey[activeIndex]]"
+              :key="item.jiu_zhen_liu_shui">
+              <td>{{ value }}</td>
+              <td>{{item.ji_gou_dai_ma}}</td>
+              <td>{{item.ji_gou_ming_cheng}}</td>
+              <td>{{item.jie_suan_shi_jian}}</td>
+              <td>{{item.jiu_zhen_ren}}</td>
+              <td>{{item.jiu_zhen_liu_shui}}</td>
+              <td>{{item.yi_liao_fei_zong_e}}</td>
+              <td>{{item.bao_xiao_zong_e}}</td>
+              <!-- <td>{{item.yi_shi}}</td> -->
             </tr>
           </tbody>
         </template>
@@ -116,18 +127,46 @@ export default {
 
       pageData: [],
       scale: d3.scaleLinear().range([0, 100]),
-      activeIndex: 1,
+      activeIndex: 0,
       tabs: ['5分钟', '10分钟', '20分钟', '1天'],
+      tabsKey: ['five_min', 'ten_min', 'sixty_min', 'day'],
+
+      // 分页
+      pageNum: 1,
+      loading: true,
+      options: {},
+
+      colorScale: d3.scaleLinear().range(['#8eaee1', '#02317a']),
+
+      // 另一半的数据
+      pageIndex: 0,
     };
   },
 
   mounted() {
-    this.getDoctorViolationInfo();
+    // this.getDoctorViolationInfo();
+  },
+
+  watch: {
+    options: {
+      handler() {
+        this.getDoctorViolationInfo();
+      },
+      deep: true,
+    },
   },
 
   methods: {
     async getDoctorViolationInfo() {
-      const data = await fetchDoctorViolationInfo();
+      this.loading = true;
+      const { page } = this.options;
+      const data = await fetchDoctorViolationInfo({
+        pageNum: page,
+      });
+
+      // setTimeout(() => {
+      //   this.loading = false;
+      // }, 0);
       // console.log(data);
 
       let maxValue = Number.MIN_VALUE;
@@ -141,6 +180,7 @@ export default {
         });
 
       this.scale = this.scale.domain([0, maxValue]);
+      this.colorScale = this.colorScale.domain([0, maxValue]);
     },
 
     changeTab(e) {
@@ -204,6 +244,11 @@ export default {
           color: #fff;
         }
       }
+    }
+
+    td {
+      font-size: 14px!important;
+      text-align: center;
     }
   }
 </style>

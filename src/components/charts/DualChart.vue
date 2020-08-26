@@ -1,5 +1,5 @@
 <template>
-  <svg :viewBox="`0 0 ${width} ${height}`">
+  <svg :viewBox="`0 0 ${width} ${height}`" class="dualchart">
     <defs>
       <clipPath id="clip">
         <rect x="0" :y="-yScalePadding" :width="chartWidth" :height="chartHeight" />
@@ -9,22 +9,28 @@
     <!-- 坐标轴 -->
     <g class="barchart-axis"
       :transform='`translate(${margin.left}, ${margin.top})`'>
-      <g v-axis:x="{scale: scales.xBottomScale, ticksAmount:8}"
+      <g v-axis:x="{scale: scales.xBottomScale, }"
         :transform='`translate(0, ${chartHeight})`'
         class="xaxis"
       />
-      <g v-axis:top="{scale: scales.xTopScale, ticksAmount:8}"
+      <g v-axis:top="{scale: scales.xTopScale, }"
         class="xaxis"
       />
       <g v-axis:y="{scale: scales.yScale}"
         class="yaxis"
       />
       <g v-axis:x="{
-            scale: scales.xBottomScale,
+            scale: scales.xTopScale,
             inner: chartHeight,
-            ticksAmount:8, tickFormat: ''}"
+            tickFormat: ''}"
         class="gridline"
       />
+      <!-- <g v-axis:x="{
+            scale: scales.xBottomScale,
+            inner: chartHeight,
+            , tickFormat: ''}"
+        class="gridline"
+      /> -->
       <path class="grid" d="M0.5,240H620.5"></path>
       <path class="grid" d="M0.5,0H620.5"></path>
     </g>
@@ -32,7 +38,7 @@
     <g :transform='`translate(${margin.left}, ${margin.top})`'
       class="charts" ref="svg">
 
-      <g :transform='`translate(0, ${yScalePadding})`' clip-path ="url(#clip)">
+      <g :transform='`translate(0, ${yScalePadding})`'  clip-path ="url(#clip)">
         <g v-for="d in scales.datumArr"
           :key="d[0]">
           <!-- TODO 把这些坐标存一下？老重复用 -->
@@ -64,11 +70,11 @@
           :key="d[0]+'circle'"
           :cx="scales.xBottomScale(d[1].num)"
           :cy="scales.yScale(d[0])"
+          :id="d[0]"
           r="2"
         />
 
         <line
-          v-show="tipX!==0"
           stroke="#babec7"
           stroke-dasharray="4 2"
           :x1="tipX" y1="-10" :x2="tipX" :y2="width-margin.bottom-margin.top" />
@@ -78,12 +84,23 @@
 
     </g>
 
+    <!-- tooltip -->
+    <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
+      <!-- <Tooltip v-show="isShowing" v-bind="tipPos"
+      >
+        <div class="s-tip">
+          <p>金额：{{tipData.money}}万元</p>
+          <p>数量：{{tipData.num}}例</p>
+        </div>
+      </Tooltip> -->
+    </foreignObject>
   </svg>
 </template>
 
 <script>
 import { axisDirective } from '@/directives/axis';
 import * as d3 from 'd3';
+import Tooltip from '../Tooltip.vue';
 
 export default {
   props: {
@@ -100,6 +117,10 @@ export default {
       }),
     },
   },
+
+  // components: {
+  //   Tooltip,
+  // },
 
   data() {
     return {
@@ -170,23 +191,32 @@ export default {
 
   mounted() {
     this.setTooltip();
-    console.log(d3.select(this.$refs.svg).selectAll('circle'));
   },
 
   methods: {
     setTooltip() {
-      const $circles = d3.select(this.$refs.svg).selectAll('circle');
+      const $svg = d3.select(this.$refs.svg);
+      const $circles = $svg.selectAll('circle');
       const that = this;
       $circles.on('mousemove', function mousemoveAction() {
         // const { id } = d3.event.path[0];
         const pos = d3.mouse(this);
         // eslint-disable-next-line
         that.tipX = pos[0];
-        console.log(pos, d3.event);
+
+        // console.log(d3.event);
+
+        that.$emit('tooltip', true, {
+          // left: pos[0] + that.margin.left + 190,
+          // top: pos[1] + 80,
+          left: d3.event.pageX - 370,
+          top: d3.event.pageY - 390,
+        }, that.datum[this.id]);
       });
-      // .on('mouseout', () => {
-      //   that.tipX = 0;
-      // });
+      $svg.on('mouseout', () => {
+        that.tipX = 0;
+        that.$emit('tooltip', false, { left: 0, top: 0 }, { money: 0, num: 0 });
+      });
     },
   },
 
@@ -194,6 +224,10 @@ export default {
 </script>
 
 <style lang="scss">
+  .dualchart {
+    svg {
+    position: relative;
+  }
   .xaxis,
   .yaxis {
     path {
@@ -245,5 +279,19 @@ export default {
   line {
     stroke: #babec7;
     // stroke-dasharray: 2 2;
+  }
+
+  .mask {
+    pointer-events: none;
+
+    .s-tip {
+      p {
+        margin: 0;
+        padding: 0;
+        font-size: 10px;
+        line-height: 15px;
+      }
+    }
+  }
   }
 </style>

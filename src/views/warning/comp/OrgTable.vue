@@ -1,8 +1,7 @@
 <template>
   <v-sheet class="sheet-container">
     <v-card class="card-container-1 card-divide">
-      <h4>{{title}}</h4>
-      <h4>{{ id}}</h4>
+      <h4>{{title}} {{id}}</h4>
       <div class="s-card-table">
         <div class="header">
           <span>均次指标</span>
@@ -347,6 +346,10 @@ export default {
     justify-content: center;
     padding: 15px;
     width: 15vw;
+
+    h4 {
+      text-align: center;
+    }
 
     .s-card-table {
       display: flex;

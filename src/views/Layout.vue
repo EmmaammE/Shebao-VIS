@@ -46,28 +46,37 @@
               :key="subItem.title"
               :to="subItem.href"
             >
-              <!-- active-class="active" -->
-              <v-list-item-content>
+              <v-list-item-group v-if="subItem.title === '参保人违规预警'
+                  && $route.fullPath==='/warning/action/people'" class="layout-insert">
+                  <v-list-item-content>
+                    <v-list-item-title v-text="subItem.title" />
+                  </v-list-item-content>
+
+                  <div class="info-box">
+                    <div>违规劣质费用
+                    <div>{{$store.state.menudata[0].toLocaleString()}}</div>
+                    </div>
+                    <div>违规人数
+                    <div>{{$store.state.menudata[1].toLocaleString()}}</div>
+                    </div>
+                    <div>违规机构数
+                     <div>{{$store.state.menudata[2].toLocaleString()}}</div>
+                    </div>
+                  </div>
+                   <ul>
+                      <li>群体就医</li>
+                      <li>虚假住院</li>
+                      <li>刷空卡</li>
+                      <li>刷小卡</li>
+                    </ul>
+              </v-list-item-group>
+
+              <v-list-item-content v-else>
                 <v-list-item-title
-                  v-text="subItem.title"
-                >
+                  v-text="subItem.title">
                 </v-list-item-title>
-                <div v-if="subItem.title === '参保人违规预警'
-                  && $route.fullPath==='/warning/action/people'"
-                  class="layout-insert">
-                  <div>违规劣质费用</div>
-                  <div>违规人数</div>
-                  <div>违规机构数</div>
-                  <hr />
-                  <ul>
-                    <li>群体就医</li>
-                    <li>虚假住院</li>
-                    <li>刷空卡</li>
-                    <li>刷小卡</li>
-                  </ul>
-                  <hr />
-                </div>
               </v-list-item-content>
+
             </v-list-item>
           </v-list-group>
         </v-list>
@@ -151,6 +160,7 @@ export default {
     ],
     mini: true,
     ROUTE_PARAM,
+    insertMenu: ['违规列支费用', '违规人数', '违规机构数'],
   }),
 
   methods: {
@@ -269,6 +279,10 @@ export default {
     $gap: 4px;
     $nav-height: 9vh;
 
+    .title {
+      font-size: 1rem!important;
+    }
+
     .v-main {
       padding: $nav-height 0px 0px 256px!important;
     }
@@ -311,6 +325,7 @@ export default {
       }
 
       .v-list-item {
+        // border-bottom: 2px solid $she-border;
         border-left: 5px solid #fff;
       }
 
@@ -394,28 +409,35 @@ export default {
     .layout-insert {
       display: flex;
       flex-direction: column;
-      color: $she-primary;
-      padding: 10px 0;
+      color: #1976d2;
       line-height: 25px;
       font-size: $sub-title;
+      border-bottom: 2px solid $she-border;
+      border-top: 2px solid $she-border;
 
-      hr {
-        background: $she-border;
-        color: $she-border;
+      .info-box {
+        margin: -5px 0 0 20px;
+        border-bottom: 2px solid $she-border;
 
-        height: 1px;
+        div {
+          margin: 10px 0;
+        }
+      }
+      .v-list-item {
+        border: 0;
       }
 
       ul {
         list-style: none;
         padding: 0;
-        margin: 10px 0;
+        margin: 10px 0 10px 20px;
 
         li {
           position: relative;
           padding-left: 30px;
           display: flex;
           align-items: center;
+          margin: 5px 0;
 
           &::before,
           &::after  {
@@ -428,7 +450,7 @@ export default {
           &::after {
             width: 12px;
             height: 12px;
-            top: 6px;
+            top: 7px;
             left: 4px;
           }
 

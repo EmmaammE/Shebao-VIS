@@ -102,18 +102,33 @@
 
     <p class="text-lg-h6">数据结果</p>
     <div class="s-chart-container text-lg-body-2">
-      <div>
-        <HosIcon />
-        公立医院
+      <div class="charts">
+        <div v-for="(value, name) in datum"
+          :key="name"
+          class="wrapper"
+        >
+          <div>
+            <HosIcon />
+            {{TITLE[name]}}
+          </div>
+
+          <!-- 折线图 -->
+
+          <dura-chart
+            :datum="value"
+            v-bind="chart1Size"
+            @tooltip="updateTooltip"
+          />
+
+          <Tooltip v-show="isShowing" v-bind="tipPos">
+            <div class="s-tip">
+              <p>金额：{{tipData.money}}万元</p>
+              <p>数量：{{tipData.num}}例</p>
+            </div>
+          </Tooltip>
+        </div>
+
       </div>
-
-      <!-- 折线图 -->
-
-      <dura-chart
-        :datum="datum"
-        v-bind="chart1Size"
-      />
-
       <!-- legends -->
       <div class="legends">
         <span>金额 <MIcon /></span>
@@ -131,6 +146,7 @@ import { fetchRank } from '@/util/http';
 import { FUND_TYPE } from '@/util/type';
 import DuraChart from '@/components/charts/DualChart.vue';
 import TimePicker from '@/components/small/TimePicker.vue';
+import Tooltip from '@/components/Tooltip.vue';
 
 const chart1Size = {
   width: 900,
@@ -165,8 +181,8 @@ export default {
         { value: '按医师排序', key: 'doctor' },
       ],
 
-      number: 0,
-      lookup: 1,
+      number: 15,
+      lookup: '阿司匹林',
 
       // 查询时间
       startDay: new Date('2020-01-01').toISOString().substr(0, 10),
@@ -179,6 +195,25 @@ export default {
 
       datum: {},
       chart1Size,
+
+      TITLE: {
+        public: '公立医院',
+        community: '社区卫生服务中心',
+        private: '民营医院',
+        social: '其他社会办医',
+        drugstore: '零售药店',
+      },
+
+      // 是否显示tooltip
+      isShowing: false,
+      tipData: {
+        money: 0,
+        num: 0,
+      },
+      tipPos: {
+        left: 0,
+        top: 0,
+      },
     };
   },
 
@@ -188,6 +223,7 @@ export default {
     MIcon,
     DuraChart,
     TimePicker,
+    Tooltip,
   },
 
   mounted() {
@@ -202,20 +238,34 @@ export default {
         orgType: this.model.map((d) => FUND_TYPE[d]),
         searchType: this.selected.key,
         // TODO 查询的药品
-        drugItem: '阿司匹林',
-        displayNum: 15,
+        drugItem: this.lookup,
+        displayNum: this.number,
       });
 
       // 类型
-      this.datum = data.public;
+      this.datum = data;
     },
 
     getData() {
-
+      this.getRankData();
     },
 
     reset() {
+      this.model = [
+        '公立医院',
+        '民营医院',
+        '其他社会办医',
+        '社区卫生服务中心',
+        '零售药店',
+      ];
+      this.number = 15;
+      this.lookup = '阿司匹林';
+    },
 
+    updateTooltip(isShowing, tipPos, tipData) {
+      this.isShowing = isShowing;
+      this.tipPos = tipPos;
+      this.tipData = tipData;
     },
   },
 };
@@ -275,12 +325,12 @@ export default {
 
     .look-container {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
 
       .inputs {
-        padding-right: 40%;
-        display: flex;
+        display: grid;
         grid-gap: 20px;
+        grid-template-columns: 150px 150px 150px;
 
         .v-input {
           border: 1px solid #dadef8;
@@ -292,6 +342,15 @@ export default {
 
     .s-chart-container {
       position: relative;
+
+      .charts {
+        overflow: auto;
+        height: 60vh;
+
+        .wrapper {
+          position: relative;
+        }
+      }
 
       .legends {
         position: absolute;
@@ -322,13 +381,14 @@ export default {
 
       button {
         padding: 3px 20px;
-        border: 1px solid #c0c0c0;
+        border: 1px solid #3365ba;
         letter-spacing: 4px;
         margin: 5px;
         outline:none;
         height: 30px;
         width: 90px;
         text-align: center;
+        color: #3365ba;
       }
       button:nth-child(2) {
         background: #3365ba;

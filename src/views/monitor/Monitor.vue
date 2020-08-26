@@ -45,8 +45,6 @@
             ></v-select>
           </div>
 
-            <!-- :datum="datumXY"
-            :scale ="{xDomain, xType, yDomain, yType}" -->
           <line-chart
             v-bind="chart1Size"
             :gridLine = "true"
@@ -221,6 +219,7 @@ export default {
 
     // 0就是默认的， 1是liezhi, 2fee_structure
     param_type: '',
+    lidu: ['month', 'week', 'day'],
   }),
 
   mounted() {
@@ -240,8 +239,13 @@ export default {
       this.tabActive = 0;
       this.getData(newValue);
     },
-    tabActive() {
-      this.getFeeTimeSeries();
+    tabActive(newValue) {
+      if (this.$route.params.routeType === 'liezhi'
+        || this.$route.params.routeType === 'feiyong') {
+        this.getFeeTimeSeries(0, newValue);
+      } else {
+        this.getFeeTimeSeries(1);
+      }
     },
   },
 
@@ -329,9 +333,9 @@ export default {
         const item2 = [];
         Object.keys(datafetch[key]).forEach((d) => {
           item[d] = [datafetch[key][d].year_ratio, datafetch[key][d].chain_ratio];
-          let { value } = datafetch[key][d];
-          // NOTE 以万元作为单位
-          value /= 10000;
+          const { value } = datafetch[key][d];
+
+          // value /= 10000;
           maxValue = Math.max(maxValue, value);
 
           item2.push(value);

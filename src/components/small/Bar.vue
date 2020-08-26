@@ -1,12 +1,17 @@
 <template>
   <svg :viewBox="`0 0 100 20`">
-    <rect
-      x="2"
-      y="3"
-      :width="scale(data)"
-      height="14"
-      @mouseout="showTip"
-    />
+    <g v-for="(d,index) in res"
+      :key="index"
+    >
+      <rect
+        :x="index===0?0:scale(datum[index-1])"
+        y="3"
+        :width="scale(d)"
+        :fill="colorScale(d)"
+        height="14"
+        @mouseout="showTip"
+      />
+    </g>
 
     <line v-for="(d,index) in datum"
       :key="index"
@@ -25,6 +30,20 @@ export default {
     scale: Function,
     datum: Array,
     data: Number,
+    colorScale: Function,
+  },
+
+  computed: {
+    res() {
+      const arr = [0, ...this.datum, this.data];
+      const res = [];
+      arr.forEach((d, index) => {
+        if (index) {
+          res.push(arr[index] - arr[index - 1]);
+        }
+      });
+      return res;
+    },
   },
 
   methods: {
@@ -43,7 +62,7 @@ export default {
   }
 
   line {
-    stroke: #000;
-    stroke-dasharray: 2 1;
+    stroke: #ffffff;
+    stroke-width: 2;
   }
 </style>

@@ -5,12 +5,15 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    // 页面左侧选中的子菜单
-    submenu: 0,
+    // wei_gui_ji_gou_shu: 0,
+    //   wei_gui_ren_shu: 0,
+    //   wei_gui_lie_zhi_fei_yong
+    menudata: [0, 0, 0],
+
   },
   mutations: {
-    changeMenu(state, payload) {
-      state.submenu = payload.i;
+    updatemenu(state, payload) {
+      state.menudata = payload.data;
     },
   },
   actions: {

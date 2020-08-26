@@ -79,11 +79,23 @@ export default {
   },
   methods: {
     async getPatientViolationInfo() {
-      const data = await fetchPatientViolationInfo({});
+      const data = await fetchPatientViolationInfo({
+        // TODO 这个参数
+        pageNum: 2,
+      });
       // console.log(data);
 
       let minV = Number.MAX_VALUE;
       let maxV = Number.MIN_VALUE;
+
+      this.$store.commit({
+        type: 'updatemenu',
+        data: [
+          data.wei_gui_ji_gou_shu,
+          data.wei_gui_ren_shu,
+          data.wei_gui_lie_zhi_fei_yong,
+        ],
+      });
 
       this.datum = Object.keys(data.patient_page)
         .map((key, index) => {
@@ -144,10 +156,13 @@ export default {
 
   .header {
     font-weight: bold;
-    display: flex;
-    justify-content: space-evenly;
+    // display: flex;
+    // justify-content: space-evenly;
+    display: grid;
+    grid-template-columns: 12% 25% 15% 18% 8% 8% 8% 7.5%;
     line-height: 26px;
     align-items: center;
+    text-align: center;
     font-size: 14px;
 
     .type-icon {

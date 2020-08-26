@@ -271,7 +271,7 @@ export default {
         });
       });
 
-      const scale = d3.scaleLinear().domain([minV, maxV]).range([0.1, 1]);
+      const scale = d3.scaleLinear().domain([minV, maxV]).range([0.6, 1.5]);
 
       Object.keys(icons).forEach((d) => {
         icons[d] = iconFactory(scale(icons[d]));

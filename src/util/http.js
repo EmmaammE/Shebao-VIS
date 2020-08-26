@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const prefix = '/api/';
-const prefix = '/mock/'; // 代理接口
+const prefix = '/api/';
+// const prefix = '/mock/'; // 代理接口
 
 function fire(method, URL, data) {
   if (method === 'POST') {
@@ -42,7 +42,7 @@ export const fetchFundMonitorInfo = (params) => fire('POST', 'getFundMonitoringI
 
 export const fetchOrgViolationInfo = () => fire('POST', 'getOrgViolationInfo', {});
 
-export const fetchDoctorViolationInfo = () => fire('POST', 'getDoctorViolationInfo', {});
+export const fetchDoctorViolationInfo = (params) => fire('POST', 'getDoctorViolationInfo', params);
 
 // 机构
 export const fetchOrgGroupHospital = (param) => fire('POST', 'getOrgGroupHospital', param);
@@ -53,4 +53,4 @@ export const fetchOrgSwipeLittleCard = (param) => fire('POST', 'getOrgSwipeLittl
 
 export const fetchOrgFalseHospital = (param) => fire('POST', 'getOrgFalseHospital', param);
 
-export const fetchPatientViolationInfo = () => fire('POST', 'getPatientViolationInfo', {});
+export const fetchPatientViolationInfo = (params) => fire('POST', 'getPatientViolationInfo', params);

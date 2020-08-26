@@ -20,22 +20,44 @@
       :transform='`translate(${margin.left + index*(chartWidth/2+margin.padding)}, ${margin.top})`'
       :key="'rect'+index">
 
-      <rect v-for="catagory in yDomain"
-        :key ='catagory+"bar"+"index"'
-        :x="0.5"
-        :y="yScale(catagory.title)+5"
-        :width="xScale[index](data[catagory.key].shi_ji)"
-        :height="10"
-      />
+      <g v-for="catagory in yDomain"
+        :key="catagory"
+      >
+        <template v-if="data[catagory.key]!==undefined">
+          <template v-if="data[catagory.key].shi_ji > data[catagory.key].yu_suan">
+            <!-- 如果超过了预算 -->
+            <rect
+              :x="0.5"
+              :y="yScale(catagory.title)+5"
+              :width="xScale[index](data[catagory.key].yu_suan)"
+              :height="10"
+            />
+            <rect
+              class="warning"
+              :x="xScale[index](data[catagory.key].yu_suan) + 0.5"
+              :y="yScale(catagory.title)+5"
+              :width="xScale[index](data[catagory.key].shi_ji)
+                - xScale[index](data[catagory.key].yu_suan)"
+              :height="10"
+            />
+          </template>
+          <template v-else>
+            <rect
+              :x="0.5"
+              :y="yScale(catagory.title)+5"
+              :width="xScale[index](data[catagory.key].shi_ji)"
+              :height="10"
+            />
+          </template>
 
-      <line v-for="catagory in yDomain"
-        :key ='catagory+"line"+"index"'
-        :y1="yScale(catagory.title)+5"
-        :x1="xScale[index](data[catagory.key].yu_suan)"
-        :x2="xScale[index](data[catagory.key].yu_suan)"
-        :y2="yScale(catagory.title)+15"
-      />
-
+          <line
+            :y1="yScale(catagory.title)+3"
+            :x1="xScale[index](data[catagory.key].yu_suan)"
+            :x2="xScale[index](data[catagory.key].yu_suan)"
+            :y2="yScale(catagory.title)+17"
+          />
+        </template>
+      </g>
     </g>
   </svg>
 </template>
@@ -146,8 +168,12 @@ export default {
       stroke: #2462c6;
     }
 
+    rect.warning {
+      fill: #b90000
+    }
+
     line {
-      stroke: #d40309;
+      stroke: #064dc1;
     }
   }
 
