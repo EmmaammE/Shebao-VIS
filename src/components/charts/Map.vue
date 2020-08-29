@@ -14,7 +14,7 @@
         :attribution="attribution"
         @ready="onLayerReady"
       />
-      <slot :clickMarker="clickMarker" />
+      <slot :clickMarker="clickMarker" :map="mapObject"/>
     </l-map>
   </div>
 </template>
@@ -34,11 +34,12 @@ export default {
 
   props: {
     isShowing: Boolean,
+    zoomcb: Function,
   },
 
   data() {
     return {
-      zoom: 8,
+      zoom: 12,
       currentCenter: L.latLng([30.05, 119.95]),
       circle: {
         center: L.latLng(30.05, 119.95),
@@ -60,6 +61,7 @@ export default {
       radius: 100,
 
       center: [30.05, 119.95],
+      mapObject: null,
     };
   },
 
@@ -91,12 +93,16 @@ export default {
     },
     zoomUpdated(zoom) {
       this.zoom = zoom;
+      if (this.zoomcb) {
+        this.zoomcb(zoom);
+      }
     },
     centerUpdate(center) {
       this.currentCenter = center;
     },
     onLayerReady() {
       const map = this.$refs.map.mapObject;
+      this.mapObject = this.$refs.map;
 
       map.on('movestart', () => {
         this.updateShowStatus(false);

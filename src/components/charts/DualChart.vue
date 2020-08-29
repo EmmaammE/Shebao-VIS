@@ -1,5 +1,5 @@
 <template>
-  <svg :viewBox="`0 0 ${width} ${height}`" class="dualchart">
+  <svg :viewBox="`0 0 ${width} ${height}`" class="dualchart" ref="chart">
     <defs>
       <clipPath id="clip">
         <rect x="0" :y="-yScalePadding" :width="chartWidth" :height="chartHeight" />
@@ -25,12 +25,8 @@
             tickFormat: ''}"
         class="gridline"
       />
-      <!-- <g v-axis:x="{
-            scale: scales.xBottomScale,
-            inner: chartHeight,
-            , tickFormat: ''}"
-        class="gridline"
-      /> -->
+      <text :transform='`translate(${chartWidth+20}, -10)`'>金额（万元）</text>
+      <text :transform='`translate(${chartWidth+20}, ${chartHeight+14})`'>数量（例）</text>
       <path class="grid" d="M0.5,240H620.5"></path>
       <path class="grid" d="M0.5,0H620.5"></path>
     </g>
@@ -81,26 +77,13 @@
 
          <!-- <use xlink:href="#line" /> -->
       </g>
-
     </g>
-
-    <!-- tooltip -->
-    <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
-      <!-- <Tooltip v-show="isShowing" v-bind="tipPos"
-      >
-        <div class="s-tip">
-          <p>金额：{{tipData.money}}万元</p>
-          <p>数量：{{tipData.num}}例</p>
-        </div>
-      </Tooltip> -->
-    </foreignObject>
   </svg>
 </template>
 
 <script>
 import { axisDirective } from '@/directives/axis';
 import * as d3 from 'd3';
-import Tooltip from '../Tooltip.vue';
 
 export default {
   props: {
@@ -118,13 +101,10 @@ export default {
     },
   },
 
-  // components: {
-  //   Tooltip,
-  // },
-
   data() {
     return {
       tipX: 0,
+      bbox: {},
     };
   },
 
@@ -190,68 +170,86 @@ export default {
   },
 
   mounted() {
+    this.setBBox();
     this.setTooltip();
   },
 
   methods: {
     setTooltip() {
       const $svg = d3.select(this.$refs.svg);
-      const $circles = $svg.selectAll('circle');
       const that = this;
-      $circles.on('mousemove', function mousemoveAction() {
-        // const { id } = d3.event.path[0];
+      $svg.on('mousemove', function mousemoveAction() {
         const pos = d3.mouse(this);
         // eslint-disable-next-line
         that.tipX = pos[0];
+        const { x, y } = that.bbox;
 
-        // console.log(d3.event);
+        const { xBottomScale, xTopScale } = that.scales;
 
         that.$emit('tooltip', true, {
-          // left: pos[0] + that.margin.left + 190,
-          // top: pos[1] + 80,
-          left: d3.event.pageX - 370,
-          top: d3.event.pageY - 390,
-        }, that.datum[this.id]);
-      });
-      $svg.on('mouseout', () => {
+          left: d3.event.pageX - x - 70,
+          top: d3.event.pageY - y - 45,
+        }, {
+          num: xBottomScale.invert(pos[0]).toFixed(2),
+          money: xTopScale.invert(pos[0]).toFixed(2),
+        });
+      }).on('mouseout', () => {
         that.tipX = 0;
         that.$emit('tooltip', false, { left: 0, top: 0 }, { money: 0, num: 0 });
       });
     },
-  },
 
+    setBBox() {
+      const bbox = d3.select(this.$refs.chart)
+        .node().getBoundingClientRect();
+      this.bbox = bbox;
+    },
+  },
 };
 </script>
 
 <style lang="scss">
   .dualchart {
-    svg {
-    position: relative;
-  }
-  .xaxis,
-  .yaxis {
-    path {
-      display: none;
+    .barchart-axis {
+      text {
+        font-size: 9px;
+      }
+
+      .xaxis,
+      .yaxis {
+        path {
+          display: none;
+        }
+
+        .tick line{
+          display: none;
+        }
+        text {
+          font-size: 9px;
+        }
+      }
+
+      .gridline {
+        line {
+          stroke-dasharray: 2 2;
+          stroke: #ccc;
+        }
+        path {
+          display: none;
+        }
+      }
     }
 
-    .tick line{
-      display: none;
-    }
-  }
-
-  .gridline {
-    line {
+    path.grid {
       stroke-dasharray: 2 2;
       stroke: #ccc;
     }
-    path {
-      display: none;
-    }
-  }
 
-  path.grid {
-    stroke-dasharray: 2 2;
-    stroke: #ccc;
+    line {
+      stroke: #babec7;
+      // stroke-dasharray: 2 2;
+    }
+
   }
 
   // 图
@@ -259,6 +257,7 @@ export default {
     path {
       fill: none;
       stroke: #1c899f;
+      cursor: pointer;
     }
 
     circle {
@@ -276,11 +275,6 @@ export default {
     }
   }
 
-  line {
-    stroke: #babec7;
-    // stroke-dasharray: 2 2;
-  }
-
   .mask {
     pointer-events: none;
 
@@ -292,6 +286,5 @@ export default {
         line-height: 15px;
       }
     }
-  }
   }
 </style>

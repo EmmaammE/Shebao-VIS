@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const prefix = '/api/';
-// const prefix = '/mock/'; // 代理接口
+// const prefix = '/api/';
+const prefix = '/mock/'; // 代理接口
 
 function fire(method, URL, data) {
   if (method === 'POST') {
@@ -36,7 +36,10 @@ export const fetchDoctorInfo = (params) => fire('POST', 'getDoctorInfo', params)
 export const fetchPatientInfo = (params) => fire('POST', 'getPatientInfo', params);
 // 就诊信息
 export const fetchInfo = (params) => fire('POST', 'getTreatmentInfo', params);
-
+// 机构画像基本信息
+export const fetchOrgPortraitBasic = (params) => fire('POST', 'getOrgPortraitBasic', params);
+// 机构画像详细信息
+export const fetchOrgPortraitDetail = (params) => fire('POST', 'getOrgPortraitDetail', params);
 // 智能风险预警
 export const fetchFundMonitorInfo = (params) => fire('POST', 'getFundMonitoringInfo', params);
 

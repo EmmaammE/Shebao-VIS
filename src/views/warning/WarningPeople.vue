@@ -81,7 +81,7 @@ export default {
     async getPatientViolationInfo() {
       const data = await fetchPatientViolationInfo({
         // TODO 这个参数
-        pageNum: 2,
+        pageNum: null,
       });
       // console.log(data);
 

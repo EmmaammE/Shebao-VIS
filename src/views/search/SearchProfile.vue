@@ -1,7 +1,12 @@
 <template>
- <v-card flat class="profile-container">
+  <v-overlay v-if="loading" :value="loading" :opacity="1" color="#fff">
+    <v-progress-circular indeterminate size="64"></v-progress-circular>
+  </v-overlay>
+ <v-card flat class="profile-container" v-else>
    <v-card class="header">
-     <div>icon</div>
+     <div class="icon-wrapper">
+       <HosIcon />
+     </div>
      <p>{{title}}</p>
      <div class="s-info">
        <span>机构编码：{{id}}</span>
@@ -37,16 +42,22 @@
 
       <div class="first-row">
         <line-container
-          title="2020年总列支费用费"
+          v-for="d in charts1"
+          :key="d.text"
+          :title="d.text"
           :amount="189"
-          :rank="1"
+          :rank="charts[d.value].rank[radioValues[radioGroup]]"
+          :data="charts[d.value].time_series"
         />
       </div>
       <div class="second-row">
         <line-container
-          title="2020年总列支费用费"
+          v-for="d in charts2"
+          :key="d.text"
+          :title="d.text"
           :amount="189"
-          :rank="1"
+          :rank="charts[d.value].rank[radioValues[radioGroup]]"
+          :data="charts[d.value].time_series"
         />
       </div>
     </div>
@@ -79,9 +90,12 @@
             >{{d}}</v-btn>
           </div>
         </div>
-        <div>
+        <div class="jiegou-wrapper">
           <p>{{menu[menuIndex]}}{{submenu[submenuIndex]}}排名</p>
           <!--svg -->
+          <round-barchart
+            :data="fuwuData[menuValue[menuIndex]][submenuValue[submenuIndex]]"
+          />
         </div>
       </v-card>
     </div>
@@ -93,23 +107,47 @@
 <script>
 import LineContainer from '@/components/charts/LineContainer.vue';
 import ProfileCard from '@/components/charts/ProfileCard.vue';
+import { fetchOrgPortraitDetail } from '@/util/http';
+import HosIcon from '@/assets/search/hospital.svg';
+import RoundBarchart from '@/components/charts/RoundBarchart.vue';
 
 export default {
   components: {
     LineContainer,
     ProfileCard,
+    HosIcon,
+    RoundBarchart,
   },
   data() {
     return {
+      // 是否未加载完数据
+      loading: true,
+
       title: '杭州市富阳区中医院',
       id: 9101,
       person: 'XXX',
       type: '非营利性医疗机构',
       address: 'hhhhhhhhhhhh',
 
+      // 第一排的linechart
+      charts1: [
+        { text: '次均列支费用', value: 'ci_jun_lie_zhi_fei_yong' },
+        { text: '人次人头比', value: 'ren_ci_ren_tou_bi' },
+        { text: '人均列支费用', value: 'ren_jun_lie_zhi_fei_yong' },
+      ],
+      charts2: [
+        { text: '总列支费用', value: 'zong_lie_zhi_fei_yong' },
+        { text: '总人次数', value: 'zong_ren_ci_shu' },
+        { text: '总人头数', value: 'zong_ren_tou_shu' },
+        { text: '总医药费用', value: 'zong_yi_yao_fei_yong' },
+      ],
+      // 上面两派图的数据
+      charts: {},
+
       // 医保费用
-      radioGroup: 1,
+      radioGroup: 0,
       radioLabels: ['区内', '市内', '省内', '国内'],
+      radioValues: ['qu_nei', 'shi_nei', 'sheng_nei', 'guo_nei'],
 
       // barchart + piechart
       titles: ['就诊类别分析', '费用结构分析', '总医药费用'],
@@ -130,13 +168,41 @@ export default {
       menu: [
         '住院就诊人员', '门诊就诊人员', '规定病种就诊人员', '家庭病床就诊人员',
       ],
+      menuValue: [
+        'zhu_yuan_jiu_zhen',
+        'men_zhen_jiu_zhen',
+        'gui_ding_bing_zhong',
+        'jia_ting_bing_chuang',
+      ],
       submenu: [
         '人次数', '金额',
+      ],
+      submenuValue: [
+        'ren_ci_shu', 'jin_e',
       ],
     };
   },
 
+  mounted() {
+    this.getData();
+  },
+
   methods: {
+    async getData() {
+      // 根据机构编码获得数据
+      const data = await fetchOrgPortraitDetail({
+        orgId: this.$route.params.orgId,
+      });
+      this.title = data.basicInfo.name;
+      this.id = data.basicInfo.ji_gou_dai_ma;
+      this.type = data.basicInfo.ying_li_lei_xing;
+      this.address = data.basicInfo.di_zhi;
+      this.person = data.basicInfo.fa_ding_dai_biao_ren;
+      // console.log(data);
+      this.loading = false;
+      this.charts = data.zong_ti_qing_kuang;
+      this.fuwuData = data.fu_wu_ren_qun_jie_gou_fen_xi;
+    },
     changeTab(index) {
       this.menuIndex = index;
     },
@@ -160,6 +226,20 @@ export default {
       height: 11vh;
       align-items: center;
       justify-content: space-evenly;
+
+      .icon-wrapper {
+        border: 1.5px solid #034ec4;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+          transform: scale(1.2);
+        }
+      }
       // padding: 10px;
 
       p {
@@ -208,18 +288,27 @@ export default {
         display: flex;
       }
     }
+
     .first-row {
       display: flex;
       margin: 10px 0;
+      justify-content: space-between;
 
       .line-card {
-        flex: 0 0 33%;
+        flex: 0 0 32.4%;
+        border-radius: 10px;
       }
     }
 
     .second-row {
       display: flex;
-      flex: 0 0 25%;
+      justify-content: space-between;
+      margin: 10px 0;
+
+      .line-card {
+        flex: 0 0 24%;
+        border-radius: 10px;
+      }
     }
 
     // 服务人群结构分析
@@ -255,6 +344,10 @@ export default {
           flex: 0 0 46%;
         }
       }
+    }
+
+    .jiegou-wrapper {
+      width: 100%;
     }
   }
 </style>

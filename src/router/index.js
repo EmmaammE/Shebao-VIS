@@ -37,8 +37,17 @@ const routes = [
       },
       {
         path: 'search/profile',
-        component: () => import('../views/search/SearchProfile'),
+        component: () => import('../views/search/SearchMap'),
         name: '智能搜索引擎-机构画像',
+        meta: {
+          linkIndex: 1,
+          type: 2,
+        },
+      },
+      {
+        path: 'search/profile/:orgId',
+        component: () => import('../views/search/SearchProfile'),
+        name: '智能搜索引擎-机构画像-详细信息',
         meta: {
           linkIndex: 1,
         },

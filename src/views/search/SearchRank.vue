@@ -107,9 +107,9 @@
           :key="name"
           class="wrapper"
         >
-          <div>
+          <div class="header">
             <HosIcon />
-            {{TITLE[name]}}
+            <p>{{TITLE[name]}} </p>
           </div>
 
           <!-- 折线图 -->
@@ -122,8 +122,10 @@
 
           <Tooltip v-show="isShowing" v-bind="tipPos">
             <div class="s-tip">
-              <p>金额：{{tipData.money}}万元</p>
-              <p>数量：{{tipData.num}}例</p>
+              <div>
+                <p>金额：{{tipData.money}}万元</p>
+                <p>数量：{{tipData.num}}例</p>
+              </div>
             </div>
           </Tooltip>
         </div>
@@ -181,8 +183,8 @@ export default {
         { value: '按医师排序', key: 'doctor' },
       ],
 
-      number: 15,
-      lookup: '阿司匹林',
+      number: null,
+      lookup: null,
 
       // 查询时间
       startDay: new Date('2020-01-01').toISOString().substr(0, 10),
@@ -226,10 +228,6 @@ export default {
     Tooltip,
   },
 
-  mounted() {
-    this.getRankData();
-  },
-
   methods: {
     async getRankData() {
       const data = await fetchRank({
@@ -237,13 +235,18 @@ export default {
         endDay: this.endDay,
         orgType: this.model.map((d) => FUND_TYPE[d]),
         searchType: this.selected.key,
-        // TODO 查询的药品
         drugItem: this.lookup,
-        displayNum: this.number,
+        displayNum: this.number || 15,
       });
 
+      const d = {};
       // 类型
-      this.datum = data;
+      Object.keys(data).forEach((key) => {
+        if (Object.keys(data[key]).length !== 0) {
+          d[key] = data[key];
+        }
+      });
+      this.datum = d;
     },
 
     getData() {
@@ -258,8 +261,8 @@ export default {
         '社区卫生服务中心',
         '零售药店',
       ];
-      this.number = 15;
-      this.lookup = '阿司匹林';
+      this.number = null;
+      this.lookup = null;
     },
 
     updateTooltip(isShowing, tipPos, tipData) {
@@ -330,7 +333,7 @@ export default {
       .inputs {
         display: grid;
         grid-gap: 20px;
-        grid-template-columns: 150px 150px 150px;
+        grid-template-columns: 150px 150px 200px;
 
         .v-input {
           border: 1px solid #dadef8;
@@ -348,14 +351,21 @@ export default {
         height: 60vh;
 
         .wrapper {
-          position: relative;
+          .header {
+            display: flex;
+            align-items: center;
+
+            p {
+              margin: 0 10px;
+            }
+          }
         }
       }
 
       .legends {
         position: absolute;
-        right: 0;
-        top: 0;
+        right: 20px;
+        top: 40px;
         font-size: $f-small;
 
         svg {
@@ -371,6 +381,7 @@ export default {
           justify-content: space-evenly;
           margin: 10px 0;
           height: 35px;
+          background: #fff;
         }
       }
     }
@@ -394,6 +405,14 @@ export default {
         background: #3365ba;
         color: #fff;
       }
+    }
+
+    .s-tip {
+      width: 140px;
+      height: 50px;
+      padding: 5px;
+      display: flex;
+      justify-content: center;
     }
   }
 </style>

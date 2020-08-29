@@ -15,12 +15,14 @@
       >
 
         <g class="grid-line">
-          <line y2="240" v-for="n in 11" :key="n"
+          <line :y2="chartHeight" v-for="n in 11" :key="n"
             :transform="`translate(${chartX[1](new Date(Date.UTC(2020, n, 1)))},0)`"
             :id="new Date(Date.UTC(2020, n, 0))"
            />
           <line :transform="`translate(${chartX[1](new Date(Date.UTC(2020, 12, 0)))},0)`"
-            y2="240" />
+            :y2="chartHeight"  />
+          <line :transform="`translate(${chartX[1](new Date(Date.UTC(2020, 0, 0)))},0)`"
+            :y2="chartHeight"  />
         </g>
 
         <g v-axis:x="{scale: chartX[1], tickFormat: timeParse}"
@@ -30,6 +32,7 @@
 
         <g v-axis:y="{scale: chartY}"
           class="yaxis"
+           :transform='`translate(-20, 0)`'
         />
       </g>
 
@@ -108,7 +111,23 @@ export default {
     chartX() {
       switch (this.type) {
         case 0:
+          return [
+            d3.scaleLinear()
+              .domain([0, 11])
+              .range([0, this.chartWidth]),
+            d3.scaleTime()
+              .domain([new Date(Date.UTC(2020, 0, 0)), new Date(Date.UTC(2020, 11, 31))])
+              .range([0, this.chartWidth]),
+          ];
         case 1:
+          return [
+            d3.scaleLinear()
+              .domain([0, 51])
+              .range([0, this.chartWidth]),
+            d3.scaleTime()
+              .domain([new Date(Date.UTC(2020, 0, 0)), new Date(Date.UTC(2020, 11, 31))])
+              .range([0, this.chartWidth]),
+          ];
         default:
           return [
             d3.scaleLinear()

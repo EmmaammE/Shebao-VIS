@@ -83,4 +83,46 @@ export default {
       padding: 1rem 0 !important;
     }
   }
+
+  // 地图的tooltip
+  .search-map {
+    .leaflet-popup{
+      opacity: 0!important;
+    }
+  }
+
+  #map-id {
+    // 修改style
+    .leaflet-popup-content-wrapper {
+      border-radius: 3px;
+    }
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: #636363;
+      color: #ffffff;
+      box-shadow: 0 1px 1px 1px rgba(#636363, 0.5);
+      opacity: 0.7;
+    }
+
+    .leaflet-popup-content {
+      margin: 2px 8px 2px 8px;
+    }
+
+    .leaflet-popup-tip {
+      box-shadow: initial;
+    }
+    .leaflet-popup-tip-container {
+      top: -17px;
+      transform: rotate(180deg) scale(0.7);
+    }
+
+    // .leaflet-container a.leaflet-popup-close-button {
+    //   color: #fff;
+    //   right: -2px;
+    //   font-size: 10px;
+    // }
+    .leaflet-marker-icon {
+      outline: none;
+    }
+  }
 </style>

@@ -53,7 +53,6 @@
             :datum="lineDatum"
           >
           </line-chart>
-
         </div>
 
         <v-divider></v-divider>
@@ -115,7 +114,7 @@ import * as d3 from 'd3';
 
 const chart1Size = {
   width: 1200,
-  height: 300,
+  height: 400,
   margin: {
     bottom: 50, left: 80, top: 10, right: 20,
   },
@@ -196,7 +195,7 @@ export default {
       { value: 1, title: '周' },
       { value: 2, title: '日' },
     ],
-    itemSelect: 0,
+    itemSelect: 1,
     lineDatum: [],
     xscale: d3.scaleLinear(),
     yscale: d3.scaleLinear(),
@@ -228,7 +227,6 @@ export default {
   },
 
   computed: {
-
     menuTitle() {
       return ROUTE_PARAM[this.routeType];
     },
@@ -239,10 +237,18 @@ export default {
       this.tabActive = 0;
       this.getData(newValue);
     },
-    tabActive(newValue) {
+    tabActive() {
       if (this.$route.params.routeType === 'liezhi'
         || this.$route.params.routeType === 'feiyong') {
-        this.getFeeTimeSeries(0, newValue);
+        this.getFeeTimeSeries(0);
+      } else {
+        this.getFeeTimeSeries(1);
+      }
+    },
+    itemSelect() {
+      if (this.$route.params.routeType === 'liezhi'
+        || this.$route.params.routeType === 'feiyong') {
+        this.getFeeTimeSeries(0);
       } else {
         this.getFeeTimeSeries(1);
       }
@@ -301,13 +307,14 @@ export default {
       this.menuSubtitle = Object.keys(funds[this.param_type]);
     },
 
-    async getFeeTimeSeries(type, granularity = 'day') {
+    async getFeeTimeSeries(type) {
+      const granularity = this.lidu[this.itemSelect];
       let datafetch;
       if (type === 1) {
         datafetch = await fetchFeeTimeSeries({
           fundType: this.routeType,
           feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
-          granularity,
+          granularity: 'day',
           startDay: this.dateStart,
           endDay: this.dateEnd,
         });
@@ -335,7 +342,6 @@ export default {
           item[d] = [datafetch[key][d].year_ratio, datafetch[key][d].chain_ratio];
           const { value } = datafetch[key][d];
 
-          // value /= 10000;
           maxValue = Math.max(maxValue, value);
 
           item2.push(value);

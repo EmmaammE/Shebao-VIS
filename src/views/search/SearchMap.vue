@@ -56,9 +56,11 @@
       <!-- 时间选择 end-->
 
       <!-- slot-->
-      <div v-if="$route.meta.type===1" class="s-legends">
+      <div v-if="$route.meta.type>0" class="s-legends">
         <div class="divider" />
-        <span :class="active?'checked':''">总店汇总</span>
+        <span :class="active?'checked':''"
+          @click="toggleZongdian"
+        >总店汇总</span>
 
         <div class="divider" />
         <p>地域类型</p>
@@ -104,29 +106,64 @@
       </div>
     </v-card>
 
-    <Map>
+    <Map
+      :zoomcb="zoomUpdated"
+      :class="openPopup?'':'search-map'"
+    >
       <!-- marker -->
-      <template
-        v-for="value in datum"
-      >
-        <l-marker
-          v-for="(d,key) in value"
-          :key="key"
-          :lat-lng="[d.LAT, d.LNG]"
-          :icon="icons[key]"
+      <template>
+        <template
+          v-for="value in datum"
+        >
+          <l-marker
+            v-for="(d,key) in value.value"
+            :key="key"
+            :lat-lng="[d.ji_ben_qing_kuang.LAT, d.ji_ben_qing_kuang.LNG]"
+            :icon="defaultIcons[value.type]"
+            @add="openPopupAction"
+            @click="onClickMarker($event, key)"
           >
-        </l-marker>
+            <l-popup
+              :options = "options"
+            >{{d.ji_ben_qing_kuang.ji_gou_ming_cheng}}</l-popup>
+            <!-- <l-popup
+              ref="popup"
+              :options = "{offset: offset, autoClose: false, closeOnClick: false, autoPan: false}"
+            >{{key}}</l-popup> -->
+          </l-marker>
+        </template>
+
       </template>
     </Map>
+
+    <div class="map-tip" v-if="latLng"
+      :style="{left: latLng.x+'px', top: latLng.y+'px'}"
+    >
+      <div class='inner'>
+        <h2><router-link :to="'/search/profile/'+tipId">{{tip.name}}</router-link></h2>
+        <p>机构编码：{{tip.ji_gou_dai_ma}}</p>
+        <p>法定代表人：{{tip.fa_ding_dai_biao_ren}}</p>
+        <p>地址：{{tip.di_zhi}}</p>
+        <p>盈利类型：{{tip.ying_li_lei_xing}}</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import Map from '@/components/charts/Map.vue';
-import { fetchOrgViolationInfo, fetchDetail } from '@/util/http';
-import { LMarker } from 'vue2-leaflet';
+import {
+  fetchOrgPortraitBasic, fetchOrgPortraitDetail, fetchDetail, fetchOrgInfo,
+} from '@/util/http';
+import { LMarker, LTooltip, LPopup } from 'vue2-leaflet';
 import L from 'leaflet';
-import image from '@/assets/search/下载.png';
+import image1 from '@/assets/search/map/1.png';
+import image2 from '@/assets/search/map/2.png';
+import image3 from '@/assets/search/map/3.png';
+import image4 from '@/assets/search/map/4.png';
+import image5 from '@/assets/search/map/5.png';
+import image6 from '@/assets/search/map/6.png';
+
 import * as d3 from 'd3';
 
 const HASH = {
@@ -142,7 +179,7 @@ const HASH = {
   口腔内门诊部: 'oral',
 };
 // TODO 切换图片
-const iconFactory = (num) => L.icon({
+const iconFactory = (image = image1, num = 0.5) => L.icon({
   iconUrl: image,
   iconSize: [60 * num, 100 * num],
   iconAnchor: [30 * num, 100 * num],
@@ -171,6 +208,7 @@ export default {
   components: {
     Map,
     LMarker,
+    LPopup,
   },
   props: {
     routeType: String,
@@ -183,7 +221,7 @@ export default {
       menu2: false,
 
       // 查询条件
-      condition: '',
+      condition: null,
 
       // 总店汇总: 选中为 1，否则为 0,
       active: 1,
@@ -200,25 +238,44 @@ export default {
         口腔内门诊部: false,
       },
 
-      datum: {
-        red: {},
-        green: {},
-        yellow: {},
-      },
+      datum: {},
 
       icons: {},
+
+      defaultIcons: {
+        public: iconFactory(image2),
+        private: iconFactory(image1),
+        community: iconFactory(image3),
+        oral: iconFactory(image4),
+        outpatient: iconFactory(image5),
+        drugstore: iconFactory(image6),
+      },
+      openPopup: false,
+
+      options: {
+        offset: new L.Point(1, 50),
+        autoClose: false,
+        closeOnClick: false,
+        autoPan: false,
+        closeButton: false,
+      },
+
+      latLng: null,
+      tip: {},
+      tipId: null,
     };
   },
 
   computed: {
     label() {
-      return ['医疗机构编码或名称', '药品/服务项目'][this.$route.meta.type];
+      return ['医疗机构编码或名称', '药品/服务项目', '医疗机构编码或名称'][this.$route.meta.type];
     },
   },
   created() {
     // 组件创建完后获取数据，
     this.getData();
   },
+
   watch: {
     $route: 'getData',
   },
@@ -238,47 +295,21 @@ export default {
           org.push(HASH[key]);
         }
       });
-      // TODO 确认这个参数
-      const data = await fetchOrgViolationInfo({
+
+      Promise.all(org.map((d) => fetchOrgInfo({
         startDay: this.dateStart,
         endDay: this.dateEnd,
         headquarters: this.active,
-        areaType: 'local',
-        orgType: 'public',
+        areaType: area,
+        orgType: d,
         searchItem: this.condition,
-        pageNum: 1,
+        pageNum: null,
+      }))).then((values) => {
+        this.datum = values.map((d, index) => ({
+          type: org[index],
+          value: d.org_page,
+        }));
       });
-
-      let minV = Number.MAX_VALUE;
-      let maxV = Number.MIN_VALUE;
-      const icons = {};
-      Object.keys(data).forEach((key) => {
-        Object.keys(data[key]).forEach((d) => {
-          // 按数量获得比例尺
-          minV = Math.min(minV,
-            data[key][d].duo_di_kai_yao.num,
-            data[key][d].qun_ti_jiu_yi.num,
-            data[key][d].shua_kong_ka.num,
-            data[key][d].xu_jia_zhu_yuan.num);
-
-          maxV = Math.max(maxV,
-            data[key][d].duo_di_kai_yao.num,
-            data[key][d].qun_ti_jiu_yi.num,
-            data[key][d].shua_kong_ka.num,
-            data[key][d].xu_jia_zhu_yuan.num);
-          // TODO 确认用什么数量
-          icons[d] = data[key][d].xu_jia_zhu_yuan.num;
-        });
-      });
-
-      const scale = d3.scaleLinear().domain([minV, maxV]).range([0.6, 1.5]);
-
-      Object.keys(icons).forEach((d) => {
-        icons[d] = iconFactory(scale(icons[d]));
-      });
-
-      this.datum = { ...data };
-      this.icons = { ...icons };
     },
 
     toggleArea(name) {
@@ -289,19 +320,32 @@ export default {
       this.orgType[name] = !this.orgType[name];
     },
 
+    toggleZongdian() {
+      this.active = (this.active + 1) % 2;
+    },
+
     async getDetail() {
       const data = await fetchDetail({
         startDay: this.dateStart,
         endDay: this.dateEnd,
         searchItem: this.condition,
-        pageNum: 1,
+        pageNum: null,
       });
     },
+
     getData() {
-      if (this.$route.meta.type === 1) {
-        this.getOrgInfo();
-      } else {
-        this.data = [];
+      switch (this.$route.meta.type) {
+        // 机构画像
+        case 2:
+        case 1:
+          // 机构汇总
+          this.getOrgInfo();
+          break;
+        case 0:
+          this.getDetail();
+          break;
+        default:
+          console.log(this.$route.meta);
       }
     },
 
@@ -312,6 +356,37 @@ export default {
       this.active = initSatus.active;
       this.orgType = { ...initSatus.orgType };
       this.condition = '';
+    },
+
+    openPopupAction(event) {
+      this.$nextTick(() => {
+        event.target.openPopup();
+      });
+    },
+
+    zoomUpdated(zoom) {
+      if (zoom > 14) {
+        this.openPopup = true;
+      } else {
+        this.openPopup = false;
+      }
+      this.tipId = null;
+      this.latLng = null;
+    },
+
+    async onClickMarker(e, id) {
+      if (id === this.tipId) {
+        this.latLng = null;
+        this.tipId = null;
+      } else {
+        const data = await fetchOrgPortraitBasic({
+          orgId: id,
+        });
+        // console.log(e);
+        this.latLng = e.containerPoint;
+        this.tip = data;
+        this.tipId = id;
+      }
     },
   },
 
@@ -335,6 +410,7 @@ export default {
 
   .filter-card {
     $check: #034ec3;
+    font-size: 0.8rem;
 
     border-radius: 10px;
     width: 11vw;
@@ -374,8 +450,13 @@ export default {
     .s-input {
       padding: 5px 7px;
       color: #9c9c9c;
-      :focus {
+      padding: 5px 0;
+      border: 1px solid;
+      text-indent: 4px;
+
+      &:focus {
         color: #000;
+        outline: none;
       }
     }
 
@@ -444,19 +525,66 @@ export default {
         border: 1px solid #c0c0c0;;
         position: absolute;
         left: -10px;
+        top: 5px;
       }
 
       span::after {
         content: '';
         width: 10px;
         height: 10px;
-        top: 2px;
+        top: 7px;
         border-radius: 50%;
         border: 1px solid #c0c0c0;
         position: absolute;
         left: -8px;
       }
     }
+}
 
+.map-tip {
+  z-index: 700;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: all 300ms ease-in-out;
+  text-align: center;
+  padding-top: 15px;
+
+  .inner {
+    margin-left: -50%;
+    margin-right: 50%;
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px -3px rgba($color: #000000, $alpha: .4);
+    opacity: 0.9;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left:  -7*1.414px;
+      width: 0;
+      height: 0;
+      border: transparent solid 14px;
+      border-bottom: 14px solid #fff;
+    }
+    p, h2 {
+      margin: 0;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    h2 {
+      font-size: 16px;
+    }
+
+    a {
+      color: #000;
+      text-decoration: none;
+    }
   }
+}
 </style>

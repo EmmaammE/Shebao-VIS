@@ -81,6 +81,10 @@
         @click:row="rowClick"
         single-select
         v-model="activeIndex"
+        :options.sync="options"
+        :server-items-length="totalItems"
+        :loading="loading"
+        :footer-props="{'disable-items-per-page':true}"
       >
         <template v-slot:[`item.xing_bie`]="{ item }">
           <div class="custom-avatar">
@@ -114,13 +118,12 @@ export default {
     SearchInfo,
   },
   data: () => ({
-    dateBegin: new Date().toISOString().substr(0, 10),
+    dateBegin: new Date('2019-01-01').toISOString().substr(0, 10),
     dateEnd: new Date().toISOString().substr(0, 10),
     menu: false,
     modal: false,
     menu2: false,
     id: null,
-    pageNum: 1,
     headersData: [
       [
         // 就诊信息
@@ -176,6 +179,11 @@ export default {
     // 原始数据
     datum: {},
     people: [],
+
+    // 表格分页设置
+    loading: true,
+    options: {},
+    totalItems: 0,
   }),
 
   mounted() {
@@ -184,6 +192,18 @@ export default {
 
   watch: {
     $route: 'getData',
+    options: {
+      handler() {
+        this.getData().then((data) => {
+          this.tableData = data.items;
+          this.totalItems = data.total;
+
+          // 更新选中行
+          this.activeIndex = [{ index: 1 }];
+        });
+      },
+      deep: true,
+    },
   },
 
   computed: {
@@ -264,23 +284,27 @@ export default {
 
     getData() {
       this.activeKey = '';
+      this.loading = true;
+
       switch (this.compType) {
         case 1:
-          this.getDoctorInfo();
-          break;
+          return this.getDoctorInfo();
         case 2:
-          this.getPeopleInfo();
-          break;
+          return this.getPeopleInfo();
         default:
+          return {};
       }
     },
 
     async getDoctorInfo() {
+      const {
+        page, itemsPerPage,
+      } = this.options;
       const data = await fetchDoctorInfo({
         startDay: this.dateBegin,
         endDay: this.dateEnd,
         searchItem: this.id,
-        pageNum: this.pageNum,
+        pageNum: page,
       });
 
       this.datum = data.patient_page;
@@ -296,16 +320,21 @@ export default {
     },
 
     async getPeopleInfo() {
+      const {
+        page, itemsPerPage,
+      } = this.options;
+
       const data = await fetchPatientInfo({
         startDay: this.dateBegin,
         endDay: this.dateEnd,
         searchItem: this.id,
-        pageNum: this.pageNum,
+        pageNum: page,
       });
+      const total = Object.keys(data.patient_page).length;
 
       const people = [];
       this.datum = data.patient_page;
-      this.tableData = Object.keys(data.patient_page).map((key, index) => {
+      const items = Object.keys(data.patient_page).map((key, index) => {
         if (index === 0) {
           this.activeKey = key;
         }
@@ -317,17 +346,34 @@ export default {
         return { ...data.patient_page[key].ji_ben_qing_kuang, ...{ index: index + 1, key } };
       });
 
-      this.people = people;
+      // if (itemsPerPage > 0) {
+      //   items = items.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+      // }
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          this.loading = false;
+          this.people = people;
+          // this.totalItems = this.datum.total_patient_num;
+
+          resolve({
+            items,
+            total: data.total_patient_num,
+          });
+        }, 1000);
+      });
+
       // this.datum = Object.keys1data.patient_page).map((key, index) => (
       //   {...data.}
       // ));
     },
+
     async getTreatmentInfo() {
       const data = await fetchInfo({
         startDay: this.dateBegin,
         endDay: this.dateEnd,
         searchItem: this.id,
-        pageNum: this.pageNum,
+        // pageNum: this.pageNum,
         //       orgType: 机构类型(列表)
 
         // treatmentType: 就诊类型

@@ -23,9 +23,6 @@ export default {
 
 <style scoped lang="scss">
   .tooltip-container {
-    padding: 2px 5px;
-    // width: 100px;
-    // height: 35px;
     background: #777;
     color: #fff;
     opacity: .78;

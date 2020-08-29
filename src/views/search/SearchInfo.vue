@@ -103,6 +103,11 @@ const partition = (data) => {
     .size([2 * Math.PI, root.height + 1])(root);
 };
 
+const HASH = {
+  cai_liao_fei: '材料费',
+  qi_ta: '其他',
+  yao_pin_fei: '药品费',
+};
 export default {
   props: {
     data: Object,

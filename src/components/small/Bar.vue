@@ -14,7 +14,7 @@
     </g>
 
     <line v-for="(d,index) in datum"
-      :key="index"
+      :key="index+'l'"
       :y1="3"
       :x1="scale(d)"
       :x2="scale(d)"

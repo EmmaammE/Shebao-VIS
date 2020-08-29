@@ -59,11 +59,9 @@
       <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
         <Tooltip v-show="isShowing" v-bind="tipPos"
         >
-          <div class="s-tip">
-            <p>{{tipData.date}}</p>
-            <p>{{tipData.number[0].toFixed(2)}}</p>
-            <p>{{tipData.number[1].toFixed(2)}}</p>
-          </div>
+          <p>{{tipData.date}}</p>
+          <p>{{tipData.number[0].toFixed(2)}}</p>
+          <p>{{tipData.number[1].toFixed(2)}}</p>
         </Tooltip>
       </foreignObject>
     </svg>
@@ -310,15 +308,20 @@ export default {
 
   .mask {
     pointer-events: none;
+    font-size: 8px;
+      p {
+        margin: 0;
+      }
   }
-  .s-tip {
-    margin: 0;
-    user-select: none;
+  // .s-tip {
+  //   margin: 0;
+  //   user-select: none;
+  //   transform: scale(0.8);
 
-    p {
-      margin: 0;
-    }
-  }
+  //   p {
+  //     margin: 0;
+  //   }
+  // }
 
   rect {
     cursor: pointer;

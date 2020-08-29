@@ -4,10 +4,16 @@
       <v-data-table
         class="s-table"
         :headers="headers"
-        :items-per-page="5"
+        :items-per-page="10"
         :options.sync="options"
         :server-items-length="10"
-        :items="pageData">
+        :items="pageData"
+        @click:row="rowClick"
+        v-model="pageIndex"
+        item-key="index"
+        disable-sort
+        single-select
+      >
 
         <template v-slot:[`item.key`]="{ item }">
           <div class="s-col">{{item.key}}</div>
@@ -39,32 +45,38 @@
           >{{tab}}</div>
         </v-card>
       </v-sheet>
-      <v-simple-table dense>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-center"
-                v-for="text in headers2"
-                :key="text"
-              >{{text}}</th>
-            </tr>
-          </thead>
-          <tbody v-if="pageData[pageIndex]">
-            <tr v-for="(item, value) in pageData[pageIndex][tabsKey[activeIndex]]"
-              :key="item.jiu_zhen_liu_shui">
-              <td>{{ value }}</td>
-              <td>{{item.ji_gou_dai_ma}}</td>
-              <td>{{item.ji_gou_ming_cheng}}</td>
-              <td>{{item.jie_suan_shi_jian}}</td>
-              <td>{{item.jiu_zhen_ren}}</td>
-              <td>{{item.jiu_zhen_liu_shui}}</td>
-              <td>{{item.yi_liao_fei_zong_e}}</td>
-              <td>{{item.bao_xiao_zong_e}}</td>
-              <!-- <td>{{item.yi_shi}}</td> -->
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
+      <div class="wrapper">
+        <v-simple-table dense>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-center"
+                  v-for="text in headers2"
+                  :key="text"
+                >{{text}}</th>
+              </tr>
+            </thead>
+            <tbody v-if="pageData[pageIndex[0].index-1] &&
+              Object.keys(pageData[pageIndex[0].index-1][tabsKey[activeIndex]]).length!== 0">
+              <tr v-for="(item, value) in pageData[pageIndex[0].index-1][tabsKey[activeIndex]]"
+                :key="item.jiu_zhen_liu_shui">
+                <td>{{ value }}</td>
+                <td>{{item.ji_gou_dai_ma}}</td>
+                <td>{{item.ji_gou_ming_cheng}}</td>
+                <td>{{item.jie_suan_shi_jian}}</td>
+                <td>{{item.jiu_zhen_ren}}</td>
+                <td>{{item.jiu_zhen_liu_shui}}</td>
+                <td>{{item.yi_liao_fei_zong_e}}</td>
+                <td>{{item.bao_xiao_zong_e}}</td>
+                <!-- <td>{{item.yi_shi}}</td> -->
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr class="v-data-table__empty-wrapper"><td colspan="8">没有数据</td></tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+      </div>
     </v-card>
   </div>
 </template>
@@ -139,7 +151,7 @@ export default {
       colorScale: d3.scaleLinear().range(['#8eaee1', '#02317a']),
 
       // 另一半的数据
-      pageIndex: 0,
+      pageIndex: [{ index: 1 }],
     };
   },
 
@@ -186,6 +198,12 @@ export default {
     changeTab(e) {
       this.activeIndex = e;
     },
+
+    rowClick(item, row) {
+      // 修改选中的人的序号
+      row.select(true);
+      this.pageIndex = [{ index: item.index }];
+    },
   },
 
 };
@@ -201,7 +219,8 @@ export default {
 
     .s-table,
     .v-data-table__wrapper {
-       height: calc(90vh - 20px);
+      height: calc(90vh - 20px);
+      overflow: auto;
     }
 
     .s-col {
