@@ -1,10 +1,12 @@
 <template>
-  <svg :viewBox="`0 0 ${width} ${height}`" class="dualchart" ref="chart">
+  <svg :viewBox="`0 0 ${width} ${height}`" class="dualchart">
     <defs>
       <clipPath id="clip">
         <rect x="0" :y="-yScalePadding" :width="chartWidth" :height="chartHeight" />
       </clipPath>
     </defs>
+
+    <rect ref="chart" opacity="0" x="0" :y="-yScalePadding" width="100%" height="100%" />
 
     <!-- 坐标轴 -->
     <g class="barchart-axis"
@@ -20,9 +22,9 @@
         class="yaxis"
       />
       <g v-axis:x="{
-            scale: scales.xTopScale,
-            inner: chartHeight,
-            tickFormat: ''}"
+          scale: scales.xTopScale,
+          inner: chartHeight,
+          tickFormat: ''}"
         class="gridline"
       />
       <text :transform='`translate(${chartWidth+20}, -10)`'>金额（万元）</text>
@@ -170,7 +172,6 @@ export default {
   },
 
   mounted() {
-    this.setBBox();
     this.setTooltip();
   },
 
@@ -182,27 +183,22 @@ export default {
         const pos = d3.mouse(this);
         // eslint-disable-next-line
         that.tipX = pos[0];
-        const { x, y } = that.bbox;
+        // const { x, y } = that.bbox;
 
         const { xBottomScale, xTopScale } = that.scales;
 
         that.$emit('tooltip', true, {
-          left: d3.event.pageX - x - 70,
-          top: d3.event.pageY - y - 45,
+          left: d3.event.pageX - 85,
+          top: d3.event.pageY - 70,
         }, {
           num: xBottomScale.invert(pos[0]).toFixed(2),
           money: xTopScale.invert(pos[0]).toFixed(2),
         });
-      }).on('mouseout', () => {
+      });
+      d3.select(this.$refs.chart).on('mouseout', () => {
         that.tipX = 0;
         that.$emit('tooltip', false, { left: 0, top: 0 }, { money: 0, num: 0 });
       });
-    },
-
-    setBBox() {
-      const bbox = d3.select(this.$refs.chart)
-        .node().getBoundingClientRect();
-      this.bbox = bbox;
     },
   },
 };

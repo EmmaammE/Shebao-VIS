@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const prefix = '/api/';
-const prefix = '/mock/'; // 代理接口
+const prefix = '/api/';
+// const prefix = '/mock/'; // 代理接口
 
 function fire(method, URL, data) {
   if (method === 'POST') {

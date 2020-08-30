@@ -391,6 +391,10 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
+
+        .c-header .img-wrapper {
+          margin-right: -10px;
+        }
       }
 
       .c-header {
@@ -401,12 +405,13 @@ export default {
         line-height: 40px;
 
         .img-wrapper {
-          height: 40px;
+          height: 30px;
           width: 8vw;
 
           img {
             object-fit: cover;
-            height: 40px;
+            height: 30px;
+            margin-right: -20px;
           }
         }
       }

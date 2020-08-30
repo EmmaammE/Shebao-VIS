@@ -111,7 +111,7 @@
       :class="openPopup?'':'search-map'"
     >
       <!-- marker -->
-      <template>
+      <template v-if="$route.meta.type > 0">
         <template
           v-for="value in datum"
         >
@@ -132,7 +132,21 @@
             >{{key}}</l-popup> -->
           </l-marker>
         </template>
+      </template>
 
+      <!-- 就诊信息 markers -->
+      <template v-else>
+        <l-marker
+          v-for="(d,key) in datum"
+          :key="key"
+          :lat-lng="[d.lat, d.lng]"
+          :icon="d.icon"
+          @add="openPopupAction"
+        >
+          <l-popup
+            :options = "options"
+          >{{d.ji_gou_ming_cheng}}</l-popup>
+        </l-marker>
       </template>
     </Map>
 
@@ -153,7 +167,7 @@
 <script>
 import Map from '@/components/charts/Map.vue';
 import {
-  fetchOrgPortraitBasic, fetchOrgPortraitDetail, fetchDetail, fetchOrgInfo,
+  fetchOrgPortraitBasic, fetchDetail, fetchOrgInfo,
 } from '@/util/http';
 import { LMarker, LTooltip, LPopup } from 'vue2-leaflet';
 import L from 'leaflet';
@@ -331,6 +345,22 @@ export default {
         searchItem: this.condition,
         pageNum: null,
       });
+
+      let minValue = Number.MAX_VALUE;
+      let maxValue = Number.MIN_VALUE;
+      const d = data.fee_detail_page;
+      Object.keys(d).forEach((key) => {
+        minValue = Math.min(+d[key].zong_fei_yong_zhi_chu);
+        maxValue = Math.max(+d[key].zong_fei_yong_zhi_chu);
+      });
+
+      const scale = d3.scaleLinear().domain([minValue, maxValue]).range([0.1, 0.8]);
+
+      Object.keys(d).forEach((key) => {
+        d[key].icon = iconFactory(image2, scale(+d[key].zong_fei_yong_zhi_chu));
+      });
+
+      this.datum = d;
     },
 
     getData() {

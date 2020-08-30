@@ -59,7 +59,7 @@
         </v-menu>
       </v-sheet>
 
-      <v-sheet class="custom-input">
+      <v-sheet v-if="compType!==0" class="custom-input">
         <v-text-field
           outlined
           dense
@@ -67,6 +67,77 @@
           v-model="id"
           label="身份证号、社保卡号或姓名"
         ></v-text-field>
+      </v-sheet>
+
+      <v-sheet v-else class="info-inputs">
+        <!-- 两个多选 -->
+        <div v-for="n in 2" :key="n" class="wrapper type-container">
+          <p class="text-lg-body-2">{{n === 1 ? '机构类型': '就诊类型'}}</p>
+          <v-list dense>
+            <v-list-item-group
+              v-model="infoModel[n-1]"
+              multiple
+            >
+              <template v-for="(item, i) in infoItems[n-1]">
+                <v-divider
+                  v-if="!item"
+                  :key="`divider-${i}`"
+                ></v-divider>
+
+                <v-list-item
+                  v-else
+                  dense
+                  :key="`item-${i}`"
+                  :value="item"
+                  active-class="primary--text text--accent-4"
+                >
+                  <template v-slot:default="{ active, toggle }">
+                    <v-list-item-content>
+                      <v-list-item-title v-text="item"></v-list-item-title>
+                    </v-list-item-content>
+
+                    <v-list-item-action>
+                      <v-checkbox
+                        dense
+                        :input-value="active"
+                        :true-value="item"
+                        color="primary accent-4"
+                        @click="toggle"
+                      ></v-checkbox>
+                    </v-list-item-action>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-list-item-group>
+          </v-list>
+        </div>
+
+        <div class="wrapper">
+          <v-text-field
+            dense
+            outlined
+            v-model="infoid"
+            label="就诊人编码"
+            hide-details
+          ></v-text-field>
+
+          <v-text-field
+            dense
+            outlined
+            flat
+            hide-details
+            v-model="yishi"
+            label="处方医师"
+          ></v-text-field>
+
+          <v-text-field
+            dense
+            outlined
+            hide-details
+            v-model="orgName"
+            label="机构名称"
+          ></v-text-field>
+        </div>
       </v-sheet>
 
       <p class="sub-title">数据结果</p>
@@ -111,6 +182,17 @@ import GirlIcon from '@/assets/search/icon_1.svg';
 import BoyIcon from '@/assets/search/icon_2.svg';
 import { fetchDoctorInfo, fetchPatientInfo, fetchInfo } from '@/util/http';
 import SearchInfo from './SearchInfo.vue';
+
+// 就诊信息查询参数中文转英文
+const HASH = {
+  公立医院: 'public',
+  民营医院: 'private',
+  零售药店: 'drugstore',
+  门诊: 'men_zhen',
+  住院: 'zhu_yuan',
+  规定病种: 'gui_ding_bing_chuang',
+  家庭病床: 'jia_ting_bing_chuang',
+};
 
 export default {
   name: 'Search',
@@ -184,6 +266,35 @@ export default {
     loading: true,
     options: {},
     totalItems: 0,
+
+    // 就诊信息查询条件
+    // 就诊人编码 处方医师 机构名称
+    infoid: null,
+    yishi: null,
+    orgName: null,
+    infoItems: [
+      ['公立医院',
+        '民营医院',
+        '零售药店'],
+      [
+        '门诊',
+        '住院',
+        '规定病种',
+        '家庭病床',
+      ],
+    ],
+    //  当前选中的机构类型
+    infoModel: [
+      ['公立医院',
+        '民营医院',
+        '零售药店'],
+      [
+        '门诊',
+        '住院',
+        '规定病种',
+        '家庭病床',
+      ],
+    ],
   }),
 
   mounted() {
@@ -292,14 +403,13 @@ export default {
         case 2:
           return this.getPeopleInfo();
         default:
-          return {};
+          // 3
+          return this.getTreatmentInfo();
       }
     },
 
     async getDoctorInfo() {
-      const {
-        page, itemsPerPage,
-      } = this.options;
+      const { page } = this.options;
       const data = await fetchDoctorInfo({
         startDay: this.dateBegin,
         endDay: this.dateEnd,
@@ -308,21 +418,39 @@ export default {
       });
 
       this.datum = data.patient_page;
+      const people = [];
 
-      this.tableData = Object.keys(data.doctor_page).map((key, index) => {
+      const items = Object.keys(data.doctor_page).map((key, index) => {
         if (index === 0) {
           this.activeKey = key;
         }
+
+        people.push({
+          text: data.doctor_page[key].ji_ben_qing_kuang.name,
+          value: key,
+          index: index + 1,
+        });
         return {
           ...data.doctor_page[key], ...{ key, index: index + 1 },
         };
       });
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          this.loading = false;
+          this.people = people;
+          // this.totalItems = this.datum.total_patient_num;
+
+          resolve({
+            items,
+            total: data.total_doctor_num,
+          });
+        }, 1000);
+      });
     },
 
     async getPeopleInfo() {
-      const {
-        page, itemsPerPage,
-      } = this.options;
+      const { page } = this.options;
 
       const data = await fetchPatientInfo({
         startDay: this.dateBegin,
@@ -362,30 +490,54 @@ export default {
           });
         }, 1000);
       });
-
-      // this.datum = Object.keys1data.patient_page).map((key, index) => (
-      //   {...data.}
-      // ));
     },
 
     async getTreatmentInfo() {
+      const { page } = this.options;
+
       const data = await fetchInfo({
         startDay: this.dateBegin,
         endDay: this.dateEnd,
         searchItem: this.id,
-        // pageNum: this.pageNum,
-        //       orgType: 机构类型(列表)
+        pageNum: page,
+        orgType: this.infoModel[0].map((d) => HASH[d]),
+        treatmentType: this.infoModel[1].map((d) => HASH[d]),
+        patientId: this.infoid,
+        doctorName: this.yishi,
+        orgName: this.orgName,
+      });
 
-        // treatmentType: 就诊类型
+      const people = [];
+      this.datum = data.treatment_page;
+      const items = Object.keys(data.treatment_page).map((key, index) => {
+        if (index === 0) {
+          this.activeKey = key;
+        }
+        people.push({
+          text: data.treatment_page[key].jiu_zhen_ren.name,
+          value: key,
+          index: index + 1,
+        });
+        return { ...data.treatment_page[key].ji_ben_qing_kuang, ...{ index: index + 1, key } };
+      });
 
-        // patientId: 就诊人编码
+      // if (itemsPerPage > 0) {
+      //   items = items.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+      // }
 
-        // doctorName: 处方医师
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          this.loading = false;
+          this.people = people;
 
-        // orgName: 机构名称,
-
+          resolve({
+            items,
+            total: data.treatment_num,
+          });
+        }, 1000);
       });
     },
+
     rowClick(item, row) {
       row.select(true);
       this.activeIndex = [{ index: item.index }];
@@ -426,7 +578,7 @@ export default {
 
   .date-container {
     display: flex;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid #ccc;
     border-radius: 0;
 
     p {
@@ -441,7 +593,7 @@ export default {
   }
 
   .custom-input {
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid #ccc;
   }
 
   .custom-avatar {
@@ -455,6 +607,29 @@ export default {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+  }
 
+  // 就诊信息查询的条件
+  .info-inputs {
+    .wrapper {
+      display: flex;
+      border-bottom: 2px solid #ccc;
+      align-items: center;
+
+      p {
+        margin: 0;
+      }
+
+      .v-list {
+        padding: 0;
+      }
+      .v-list-item-group {
+        display: flex;
+      }
+
+      .v-text-field {
+        margin-right: 10px;
+      }
+    }
   }
 </style>

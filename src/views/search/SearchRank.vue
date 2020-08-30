@@ -101,7 +101,7 @@
     </div>
 
     <p class="text-lg-h6">数据结果</p>
-    <div class="s-chart-container text-lg-body-2">
+    <div class="s-chart-container text-lg-body-2" ref="chart">
       <div class="charts">
         <div v-for="(value, name) in datum"
           :key="name"
@@ -216,6 +216,7 @@ export default {
         left: 0,
         top: 0,
       },
+      bbox: {},
     };
   },
 
@@ -226,6 +227,10 @@ export default {
     DuraChart,
     TimePicker,
     Tooltip,
+  },
+
+  mounted() {
+    this.bbox = this.$refs.chart.getBoundingClientRect();
   },
 
   methods: {
@@ -267,7 +272,10 @@ export default {
 
     updateTooltip(isShowing, tipPos, tipData) {
       this.isShowing = isShowing;
-      this.tipPos = tipPos;
+      this.tipPos = {
+        left: tipPos.left - this.bbox.x,
+        top: tipPos.top - this.bbox.y,
+      };
       this.tipData = tipData;
     },
   },
@@ -408,11 +416,12 @@ export default {
     }
 
     .s-tip {
-      width: 140px;
+      width: 170px;
       height: 50px;
       padding: 5px;
       display: flex;
       justify-content: center;
+      align-items: center;
     }
   }
 </style>

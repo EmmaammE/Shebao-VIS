@@ -86,10 +86,10 @@ export default {
       return Math.min(this.xScale.bandwidth(), 10);
     },
     rx() {
-      return this.w / 2;
+      return 2;
     },
     ry() {
-      return this.w / 2;
+      return 2;
     },
   },
   directives: {

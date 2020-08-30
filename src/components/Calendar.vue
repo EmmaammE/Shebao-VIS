@@ -14,10 +14,10 @@
       <text x="5" y="50%">{{year}}</text>
 
       <g :transform="`translate(${width-marginRight-marginLeft}, ${marginTop})`">
-          <text>{{-100*handledDatum.extent[dataType].toFixed(4)}}</text>
+          <text>{{-(100*handledDatum.extent[dataType]).toFixed(2)}}%</text>
           <rect x="10" y="12" class="legend"
             width="5" :height="height/2" />
-          <text  y="75%">{{100 * handledDatum.extent[dataType].toFixed(4)}}</text>
+          <text  y="75%">{{(100 * handledDatum.extent[dataType]).toFixed(2)}}%</text>
         </g>
       <g :transform="`translate(${marginLeft}, ${marginTop})`">
         <!-- <text v-for="(day,index) in daysLabel" :key="index"
@@ -308,7 +308,8 @@ export default {
 
   .mask {
     pointer-events: none;
-    font-size: 8px;
+    transform: scale(0.6);
+
       p {
         margin: 0;
       }

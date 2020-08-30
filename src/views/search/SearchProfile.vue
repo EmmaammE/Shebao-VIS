@@ -1,9 +1,11 @@
 <template>
-  <v-overlay v-if="loading" :value="loading" :opacity="1" color="#fff">
-    <v-progress-circular indeterminate size="64"></v-progress-circular>
+ <v-card flat >
+   <v-overlay v-if="loading" :value="loading" color="#fff" >
+    <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
   </v-overlay>
- <v-card flat class="profile-container" v-else>
-   <v-card class="header">
+
+   <div class="profile-container" v-else>
+     <v-card class="header">
      <div class="icon-wrapper">
        <HosIcon />
      </div>
@@ -100,6 +102,7 @@
       </v-card>
     </div>
 
+   </div>
    </div>
  </v-card>
 </template>

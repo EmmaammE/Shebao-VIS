@@ -177,7 +177,7 @@ export default {
         p {
           font-family:STHeitiSC-Light;
           font-size:1.5rem;
-          color:#ffffff;
+          color:$she-primary;
           letter-spacing:1.87px;
           text-align:center;
         }
