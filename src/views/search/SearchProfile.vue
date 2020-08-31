@@ -1,6 +1,6 @@
 <template>
  <v-card flat >
-   <v-overlay v-if="loading" :value="loading" color="#fff" >
+  <v-overlay v-if="loading" :value="loading" color="#fff" >
     <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
   </v-overlay>
 
@@ -71,6 +71,7 @@
       :menu="menus[n-1]"
       :radioLabels="radioLabelsArr[n-1]"
       :header="'同期列支费用分布比较'"
+      :datum="pieDatum[n-1]"
     />
 
     <div class="box">
@@ -114,6 +115,15 @@ import { fetchOrgPortraitDetail } from '@/util/http';
 import HosIcon from '@/assets/search/hospital.svg';
 import RoundBarchart from '@/components/charts/RoundBarchart.vue';
 
+const HASH = {
+  就诊类别分析: 'jiu_zhen_lei_bie_fen_xi',
+  费用结构分析: 'fei_yong_jie_gou_fen_xi',
+  总医药费用: 'zong_yi_yao_fei_yong',
+  住院: 'zhu_yuan',
+  门诊: 'men_zhen',
+  规定病种: 'gui_ding_bing_zhong',
+  家庭病床: 'jia_ting_bing_chuang',
+};
 export default {
   components: {
     LineContainer,
@@ -164,6 +174,7 @@ export default {
         ['化验', '检查', '手术', '中医治疗', '物理治疗', '药品', '材料', '其他费用'],
         ['本年账户', '历年账户', '统筹账户', '大病保险', '救助基金'],
       ],
+      pieDatum: [],
 
       // 服务人群结构分析
       menuIndex: 0,
@@ -205,6 +216,8 @@ export default {
       this.loading = false;
       this.charts = data.zong_ti_qing_kuang;
       this.fuwuData = data.fu_wu_ren_qun_jie_gou_fen_xi;
+
+      this.pieDatum = this.titles.map((d) => data[HASH[d]]);
     },
     changeTab(index) {
       this.menuIndex = index;

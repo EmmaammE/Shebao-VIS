@@ -87,13 +87,13 @@
             </div>
 
             <!-- 图表一 -->
-            <!-- <barchart
+            <barchart
               :type="0"
               :width="200"
               :height="100"
-              :datum = "tipData"
+              :datum = "downData"
               :yDomain="downX"
-            /> -->
+            />
           </div>
         </div>
       </v-card>
@@ -183,7 +183,7 @@ export default {
       id: ' 5026',
       tipData: [],
       // 底部的数据
-      downData: [],
+      downData: [[], []],
 
       // x轴
       upX: [
@@ -481,6 +481,10 @@ export default {
 
   .down-chart {
     border-top: 1px solid #c7c7c7;
+
+    .c-header {
+      margin-bottom: -15px;
+    }
 
     .c-header img {
       height: 30px!important;

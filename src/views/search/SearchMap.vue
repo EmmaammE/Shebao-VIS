@@ -405,6 +405,10 @@ export default {
     },
 
     async onClickMarker(e, id) {
+      if (this.$route.meta.type !== 2) {
+        return;
+      }
+
       if (id === this.tipId) {
         this.latLng = null;
         this.tipId = null;

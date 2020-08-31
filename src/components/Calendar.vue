@@ -140,8 +140,8 @@ export default {
       const { extent } = this.handledDatum;
       const { dataType } = this;
       return d3.scaleLinear()
-        .range(['#ff5f43', '#5bd7c2'])
-        .domain([-extent[dataType], extent[dataType]]);
+        .range(['#ff5f43', '#eee', '#5bd7c2'])
+        .domain([-extent[dataType], 0, extent[dataType]]);
     },
 
     handledDatum() {
@@ -274,9 +274,6 @@ export default {
     cellColor(d) {
       const key = d.toISOString().substr(0, 10);
       if (this.actualData[key]) {
-        if (this.actualData[key][this.dataType] === 0) {
-          return '#fff';
-        }
         return this.colorSchema(this.actualData[key][this.dataType]);
       }
       return '#eee';

@@ -60,13 +60,14 @@
         <div class="calendar-view">
           <div class="chart-legends text-lg-body-2">
             <span
-              :class="type === 0 ? 'active': ''"
-              @click="type = 0"
-            >同比</span>
-            <span
               :class="type === 1 ? 'active': ''"
               @click="type = 1"
             >环比</span>
+            <span
+              :class="type === 0 ? 'active': ''"
+              @click="type = 0"
+            >同比</span>
+
             <v-select
               :items="items2"
               v-model="itemSelect2"

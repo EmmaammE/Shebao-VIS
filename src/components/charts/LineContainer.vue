@@ -1,7 +1,7 @@
 <template>
   <v-card class="line-card">
     <h4>{{title}}</h4>
-    <!-- <p>￥{{amount}}</p> -->
+    <p>￥{{amount.toLocaleString()}}</p>
     <h1>{{rank}}</h1>
     <!-- line -->
 
@@ -64,7 +64,6 @@ import { axisDirective } from '@/directives/axis';
 export default {
   props: {
     title: String,
-    amount: Number,
     rank: Number,
     data: {
       type: Object,
@@ -117,6 +116,11 @@ export default {
         .line()
         .x((d, index) => this.xScale(index))
         .y((d) => this.yScale(d));
+    },
+    amount() {
+      // 2020年的总和
+      return Object.values(this.data['2020'])
+        .reduce((a, b) => a + b, 0).toFixed(2);
     },
   },
   directives: {
