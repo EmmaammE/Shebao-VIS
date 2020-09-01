@@ -3,6 +3,8 @@
     <svg
       v-if ="datum.length!==0"
       :viewBox="`0 0 ${width} ${height}`"
+        ref="paths"
+
     >
       <defs>
         <clipPath id="clip">
@@ -38,7 +40,6 @@
 
       <g clip-path ="url(#clip)"
         :transform='`translate(${margin.left}, ${margin.top})`'
-        ref="paths"
       >
         <path
           :d="line(datum[0])"
@@ -162,20 +163,32 @@ export default {
     const that = this;
     $paths.on('mousemove', function mousemoveAction() {
       const { id } = d3.event.path[0];
-      that.focusMousemove(d3.mouse(this), id, {
-        left: d3.event.pageX,
-        top: d3.event.pageY,
+      // that.focusMousemove(d3.mouse(this), id, {
+      //   left: d3.event.pageX,
+      //   top: d3.event.pageY,
+      // });\
+      // console.log('fuc');
+      const mouse = d3.mouse(this);
+      const date = that.chartX[1].invert(mouse[0]);
+
+      that.$emit('tooltip', true, {
+        left: d3.event.offsetX - 10,
+        top: d3.event.offsetY + 150,
+        x: mouse[0],
+      }, {
+        date: date.toISOString().substr(0, 10),
+        type: 0,
       });
     });
   },
 
   methods: {
-    focusMousemove(mouse, id, coord) {
-      const xOnMouse = this.chartX.invert(mouse[0]);
-      const yOnMouse = this.chartY.invert(mouse[1]);
-      // 返回鼠标映射的数值
-      this.$emit('d3-mousemove', coord, { xOnMouse, yOnMouse });
-    },
+    // focusMousemove(mouse, id, coord) {
+    //   const xOnMouse = this.chartX.invert(mouse[0]);
+    //   const yOnMouse = this.chartY.invert(mouse[1]);
+    //   // 返回鼠标映射的数值
+    //   this.$emit('d3-mousemove', coord, { xOnMouse, yOnMouse });
+    // },
   },
 };
 </script>

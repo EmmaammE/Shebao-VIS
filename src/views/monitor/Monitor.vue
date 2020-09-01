@@ -65,7 +65,7 @@
             :yScale="yscale"
             :type="itemSelect"
             :datum="lineDatum"
-            @d3-mousemove="updateTooltip"
+            @tooltip="updateTooltip"
           >
             <line
               stroke="#babec7"
@@ -74,11 +74,13 @@
               :y2="chart1Size.height-chart1Size.margin.bottom-chart1Size.margin.top" />
           </line-chart>
 
-          <Tooltip v-show="isShowing" v-bind="tipPos">
+          <Tooltip v-show="isShowing && datum['2019'][tipData.date]
+          && tipData.type === 0" v-bind="tipPos">
             <div class="s-tip">
               <div>
-                <p>金额：{{tipData.money}}万元</p>
-                <p>数量：{{tipData.num}}例</p>
+                <p>{{tipData.date}}</p>
+                <p>2019：{{datum['2019'][tipData.date]}}万元</p>
+                <p>2020：{{datum['2020'][tipData.date]}}例</p>
               </div>
             </div>
           </Tooltip>
@@ -123,12 +125,14 @@
             @tooltip="updateTooltip"
           />
 
-          <Tooltip v-show="isShowing" v-bind="tipPos">
+          <Tooltip v-show="isShowing && tipData.type === 1" v-bind="tipPos">
             <div class="s-tip">
               <div>
                 <p>{{tipData.date}}</p>
-                <p>同比：{{tipData.num}}例</p>
-                <p>环比：{{tipData.num}}例</p>
+                <p>同比：{{tipData.number > 0 ?
+                   '↑'+tipData.number.toFixed(2):'↓'+(-tipData.number).toFixed(2)}}</p>
+                <p>环比：{{tipData.number2 > 0 ?
+                   '↑'+tipData.number2.toFixed(2):'↓'+(-tipData.number2).toFixed(2)}}</p>
               </div>
             </div>
           </Tooltip>
@@ -254,25 +258,28 @@ export default {
     // type为0： 同比， 1：环比
     type: 1,
     // 获得的数据原始值
-    datum: {},
+    datum: {
+      2019: {},
+      2020: {},
+    },
 
     // 0就是默认的， 1是liezhi, 2fee_structure
     param_type: '',
     lidu: ['month', 'week', 'day'],
 
     // tooltip
-    // isShowing: false,
-    // tipData: {},
-    // tipPos: {
-    //   left: 0,
-    //   top: 0,
-    //   x: 0,
-    // },
+    isShowing: false,
+    tipData: {},
+    tipPos: {
+      left: 0,
+      top: 0,
+      x: 0,
+    },
 
     colorScale: [null, null],
   }),
 
-  mixins: [tooltip],
+  // mixins: [tooltip],
 
   mounted() {
     // fetch 总医疗的四个值
@@ -309,6 +316,19 @@ export default {
   },
 
   methods: {
+    // updateTooltip(showing, tipData, tipPos) {
+    // },
+    updateTooltip(isShowing, tipPos, tipData) {
+      console.log(isShowing, tipPos, tipData);
+
+      this.isShowing = isShowing;
+      this.tipPos = {
+        left: tipPos.left,
+        top: tipPos.top,
+        x: tipPos.x,
+      };
+      this.tipData = tipData;
+    },
     getData(value) {
       let type = 0;
       if (value === 'liezhi') {
@@ -541,7 +561,9 @@ export default {
       }
       p {
         margin: 0;
+        font-size: 14px;
       }
+      pointer-events: none;
     }
   }
 </style>

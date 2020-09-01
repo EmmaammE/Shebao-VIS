@@ -2,7 +2,7 @@
   <div class="calendar-container">
     <!-- <svg width='100%' height='100%'> -->
     <svg  height='100%' :viewBox="`0 0 ${width} ${height}`"
-      @mouseleave="isShowing=false"
+      @mouseleave="hideTooltip"
     >
       <defs>
         <linearGradient id="gradient" x1="0" x2="0" y1="100%" y2="0%">
@@ -34,7 +34,7 @@
             :x="cellX(d)"
             :y="cellY(d)"
             :fill="cellColor(d)"
-            @mousemove="showTooltip(d)"
+            @mousemove="showTooltip($event, d)"
           >
             <!-- <title>{{d}}</title> -->
           </rect>
@@ -200,29 +200,36 @@ export default {
       return '#eee';
     },
 
-    showTooltip(d) {
+    showTooltip(e, d) {
+      // console.log(e);
       const key = d[2].toISOString().substr(0, 10);
+      let valueKey;
+      if (this.type === 2) {
+        valueKey = key;
+      } else {
+        valueKey = d[this.type];
+      }
 
-      // this.tipData = {
-      //   number: this.datum[key],
-      //   date: key,
-      // };
       const x = this.cellX(d);
 
-      // this.tipPos = {
-      //   left: this.cellX(d),
-      //   top: this.cellY(d) - 20,
-      // };
-
-      // this.isShowing = true;
-
       this.$emit('tooltip', true, {
-        left: x,
-        top: this.cellY(d) - 20,
+        left: e.offsetX - 50,
+        top: e.offsetY - 15 + (+this.year - 2019) * 155,
         x,
       }, {
-        number: this.datum[key],
+        number: this.datum[valueKey][0],
+        number2: this.datum[valueKey][1],
         date: key,
+        type: 1,
+      });
+    },
+
+    hideTooltip() {
+      this.$emit('tooltip', false, {
+        left: 0,
+        top: 0,
+        x: 0,
+      }, {
       });
     },
   },

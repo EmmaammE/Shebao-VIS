@@ -7,11 +7,10 @@
             <p>{{data.ji_ben_qing_kuang.name}}</p>
           </div>
           <div class="left-box">
-            <div>
-              <span class="number">189</span>
+            <!-- <div>
+              <span class="number">{{amount}}</span>
               <span class="text">总费用</span>
-              <!-- 总额 -->
-            </div>
+            </div> -->
             <div class="info-box">
               <span v-for="d in info"
                 :key="d.value"
@@ -60,23 +59,60 @@
 
             <div class="radio-group">
               <div
-                v-for="(d,index) in menu"
+                v-for="(d,index) in Object.values(dataHandle).filter((d) => d.value !== null)"
                 :key="index"
                 class="radio"
               >
-                <input type="radio" class="radio-btn" :name="d.value"/>
+                <input type="radio" class="radio-btn" :name="d.text"/>
                 <label class="label">
-                  <span :style="{background: color(index)}"></span>
+                  <span :style="{background: colorScale(index)}"></span>
+                  {{d.text}}</label>
+              </div>
+              <div
+                v-for="(d,index) in Object.values(dataHandle).filter((d) => d.value === null)"
+                :key="index"
+                class="radio"
+              >
+                <input type="radio" class="radio-btn" :name="d.text"/>
+                <label class="label">
+                  <span :style="{background: '#eee'}"></span>
                   {{d.text}}</label>
               </div>
             </div>
 
             <!-- 图 -->
-            <sunburst
-              v-bind="sunburstSetting"
-              :root="data2"
-              :colorSchema="color"
-            />
+            <svg viewBox="-375 -250 750 500">
+              <defs>
+                <marker id="circle" markerWidth="4" markerHeight="4" refX="2" refY="2">
+                  <circle cx="2" cy="2" r="2" fill="#707176"></circle>
+                </marker>
+              </defs>
+
+              <g
+                v-for="(d,index) in dataReady"
+                :key="index"
+                :class="d.cx < d.ox?'':'svg-end'"
+              >
+                <path
+                  :d="arc(d)"
+                  :fill="colorScale(index)"
+                ></path>
+                <g class="tip">
+                  <path
+                    marker-end="url(#circle)"
+                    :d="textPath(d)"
+                    class="line"
+                  />
+                  <text
+                    :x="d.x"
+                    :y="d.y -10"
+                  >
+                     {{d.value.toLocaleString()}}
+                  </text>
+                </g>
+              </g>
+
+            </svg>
           </div>
         </div>
       </template>
@@ -103,10 +139,22 @@ const partition = (data) => {
     .size([2 * Math.PI, root.height + 1])(root);
 };
 
-const HASH = {
+const FEI_YONG = {
   cai_liao_fei: '材料费',
   qi_ta: '其他',
-  yao_pin_fei: '药品费',
+  yao_pin_fei: {
+    xi_yao_fei: '西药费',
+    zhong_cao_yao_fei: '中草药费',
+    zhong_cheng_yao_fei: '中成药费',
+  },
+  zhen_liao_xiang_mu: {
+    hua_yan_fei: '化验费',
+    jian_cha_fei: '检查费',
+    shou_shu_fei: '手术费',
+    wu_li_zhi_liao_fei: '物理治疗费',
+    zhong_yi_zhi_liao_fei: '中医治疗费',
+  },
+
 };
 export default {
   props: {
@@ -124,7 +172,7 @@ export default {
   },
   data() {
     return {
-      menuIndex: 0,
+      menuIndex: 1,
 
       dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
       dateEnd: new Date().toISOString().substr(0, 10),
@@ -136,29 +184,87 @@ export default {
   },
 
   computed: {
-    data2() {
-      const data = this.data[this.menu[this.menuIndex].value];
-      const sundata = {};
-      Object.keys(data).forEach((key) => {
-        if (typeof data[key] === 'number') {
-          sundata.name = key;
-          sundata.value = data[key];
-        } else {
-          sundata.name = key;
-          sundata.children = Object.keys(data[key]).map((ikey) => ({
-            name: ikey,
-            value: data[key][ikey],
-          }));
-        }
-      });
-      // eslint-disable-next-line
-      return partition(sundata).each((d) => d.current = d);
-    },
+    // data2() {
+    //   const data = this.data[this.menu[this.menuIndex].value];
+    //   const sundata = {};
+    //   Object.keys(data).forEach((key) => {
+    //     if (typeof data[key] === 'number') {
+    //       sundata.name = key;
+    //       sundata.value = data[key];
+    //     } else {
+    //       sundata.name = key;
+    //       sundata.children = Object.keys(data[key]).map((ikey) => ({
+    //         name: ikey,
+    //         value: data[key][ikey],
+    //       }));
+    //     }
+    //   });
+    //   // eslint-disable-next-line
+    //   return partition(sundata).each((d) => d.current = d);
+    // },
 
-    color() {
+    colorScale() {
       return d3.scaleLinear()
         .range(['#5d77ff', '#889aff', '#a7b5ff', '#c8d0ff', '#d1d7f9'])
-        .domain(d3.ticks(0, this.menu.length, 5));
+        .domain(d3.ticks(0,
+          Object.values(this.dataHandle).filter((d) => d.value !== null).length, 5));
+    },
+
+    dataReady() {
+      const radius = 170;
+      // 处理后的piechart数据
+      return d3.pie()
+        .padAngle(0.005)
+        .sort(null)
+        .value((d) => d.value)(Object.values(this.dataHandle).filter((d) => d.value !== null))
+        .map((d) => {
+          const tmp = { ...d };
+
+          const a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
+          tmp.cx = Math.cos(a) * (radius - 85);
+          tmp.x = Math.cos(a) * (radius + 5);
+
+          tmp.cy = Math.sin(a) * (radius - 85);
+          tmp.y = Math.sin(a) * (radius + 5);
+
+          // var bbox = this.getBBox();
+          // TODO 为了方便暂时假设文字宽度为40
+          const bbox = { width: 10 };
+          tmp.sx = tmp.x - bbox.width / 2 - 2;
+          tmp.ox = tmp.x + bbox.width / 2 + 2;
+          tmp.oy = tmp.y + 5;
+          tmp.sy = tmp.oy;
+
+          // console.log(tmp);
+          return tmp;
+        });
+    },
+
+    arc() {
+      return d3.arc().innerRadius(0)
+        .outerRadius(125)
+        .cornerRadius(2);
+    },
+
+    dataHandle() {
+      const data = this.data[this.menu[this.menuIndex].value];
+      const tmp = {};
+      Object.keys(FEI_YONG).forEach((key) => {
+        if (typeof FEI_YONG[key] === 'string') {
+          tmp[key] = { text: FEI_YONG[key], value: data[key].value };
+        } else {
+          Object.keys(FEI_YONG[key]).forEach((inner) => {
+            tmp[inner] = { text: FEI_YONG[key][inner], value: data[key][inner].value };
+          });
+        }
+      });
+
+      return tmp;
+    },
+
+    amount() {
+      return Object.values(this.dataHandle).filter((d) => d.value !== null)
+        .reduce((a, b) => a.value + (b.value), 0);
     },
   },
 
@@ -170,12 +276,25 @@ export default {
     changeMenu(index) {
       this.menuIndex = index;
     },
+
+    // 求文字路径
+    textPath(d) {
+      if (d.cx > d.ox) {
+        return `M${d.sx},${d.sy}L${d.ox},${d.oy} ${d.cx},${d.cy}`;
+      }
+      return `M${d.ox},${d.oy}L${d.sx},${d.sy} ${d.cx},${d.cy}`;
+    },
   },
 };
 </script>
 
 <style scoped lang="scss">
   .content-card {
+    .line {
+      fill: none;
+      stroke: #707176;
+    }
+
     display: flex;
     flex-direction: column;
     padding: 30px 15px;
@@ -277,6 +396,7 @@ export default {
 
       .radio-group {
         display: flex;
+        flex-wrap: wrap;
         $accent-color:#5d77ff;
         $primary-color: #fff;
 
@@ -293,7 +413,7 @@ export default {
         .label {
             display: flex;
             align-items: center;
-            padding: 0.75rem 0;
+            padding: 0.15rem 0;
             font-size: $f-small;
             text-transform: uppercase;
             cursor: pointer;
