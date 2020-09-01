@@ -140,7 +140,7 @@ export default {
       pageData: [],
       scale: d3.scaleLinear().range([0, 100]),
       activeIndex: 0,
-      tabs: ['5分钟', '10分钟', '20分钟', '1天'],
+      tabs: ['5分钟', '10分钟', '60分钟', '1天'],
       tabsKey: ['five_min', 'ten_min', 'sixty_min', 'day'],
 
       // 分页

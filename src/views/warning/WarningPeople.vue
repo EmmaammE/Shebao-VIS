@@ -5,6 +5,14 @@
         v-for="orgData in org"
         :key="orgData.name"
         :lat-lng="[orgData.LAT, orgData.LNG]">
+        <!-- <l-popup
+          :options = "options"
+        >
+          <div>
+            ({{orgData.sum}})
+            {{orgData.name}}
+          </div>
+        </l-popup> -->
         <l-icon class-name="ring-icon" :iconSize="[rScale(orgData.sum), rScale(orgData.sum)]">
           <ring-mark
             :data="[orgData.qun_ti_jiu_yi,
@@ -47,14 +55,17 @@
 <script>
 import Map from '@/components/charts/Map.vue';
 import { fetchPatientViolationInfo } from '@/util/http';
-import { LMarker, LIcon } from 'vue2-leaflet';
+import { LMarker, LPopup, LIcon } from 'vue2-leaflet';
+import L from 'leaflet';
 import RingMark from '@/components/small/RingMark.vue';
+
 import * as d3 from 'd3';
 
 export default {
   components: {
     Map,
     LMarker,
+    // LPopup,
     LIcon,
     RingMark,
   },
@@ -64,6 +75,13 @@ export default {
       activeIndex: 0,
       radius: 200,
       rScale: d3.scaleLinear().range([200, 350]),
+      options: {
+        offset: new L.Point(1, 50),
+        autoClose: false,
+        closeOnClick: false,
+        autoPan: false,
+        closeButton: false,
+      },
     };
   },
   mounted() {
@@ -79,53 +97,61 @@ export default {
   },
   methods: {
     async getPatientViolationInfo() {
-      const data = await fetchPatientViolationInfo({
-        // TODO 这个参数
-        pageNum: null,
-      });
-      // console.log(data);
+      // const data = await fetchPatientViolationInfo({
+      //   // TODO 这个参数
+      //   pageNum: 1,
+      // });
 
-      let minV = Number.MAX_VALUE;
-      let maxV = Number.MIN_VALUE;
+      Promise.all([fetchPatientViolationInfo({
+        pageNum: 1,
+      }), fetchPatientViolationInfo({
+        pageNum: 2,
+      })]).then((res) => {
+        // console.log(res);
+        const data = { ...res[0] };
+        data.patient_page = { ...res[0].patient_page, ...res[1].patient_page };
+        let minV = Number.MAX_VALUE;
+        let maxV = Number.MIN_VALUE;
 
-      this.$store.commit({
-        type: 'updatemenu',
-        data: [
-          data.wei_gui_ji_gou_shu,
-          data.wei_gui_ren_shu,
-          data.wei_gui_lie_zhi_fei_yong,
-        ],
-      });
-
-      this.datum = Object.keys(data.patient_page)
-        .map((key, index) => {
-          const chart = Object.values(data.patient_page[key].yi_chang_ji_gou).map((orgData) => {
-            const a = orgData.qun_ti_jiu_yi.all;
-            const b = orgData.shua_kong_ka.all;
-            const c = orgData.shua_xiao_ka.all;
-            const d = orgData.xu_jia_zhu_yuan.all;
-
-            minV = Math.min(a, b, c, d, minV);
-            maxV = Math.max(a, b, c, d, maxV);
-
-            return { ...orgData, ...{ sum: a + b + c + d } };
-          });
-
-          // 获得最大值和最小值
-          return {
-            tableData: [index + 1,
-              key,
-              data.patient_page[key].name,
-              Object.keys(data.patient_page[key].yi_chang_ji_gou).length,
-              data.patient_page[key].qun_ti_jiu_yi,
-              data.patient_page[key].shua_kong_ka,
-              data.patient_page[key].shua_xiao_ka,
-              data.patient_page[key].xu_jia_zhu_yuan],
-            chart,
-          };
+        this.$store.commit({
+          type: 'updatemenu',
+          data: [
+            data.wei_gui_ji_gou_shu,
+            data.wei_gui_ren_shu,
+            data.wei_gui_lie_zhi_fei_yong,
+          ],
         });
 
-      this.rScale = this.rScale.domain([minV, maxV]);
+        this.datum = Object.keys(data.patient_page)
+          .map((key, index) => {
+            const chart = Object.values(data.patient_page[key].yi_chang_ji_gou).map((orgData) => {
+              const a = orgData.qun_ti_jiu_yi.all;
+              const b = orgData.shua_kong_ka.all;
+              const c = orgData.shua_xiao_ka.all;
+              const d = orgData.xu_jia_zhu_yuan.all;
+
+              minV = Math.min(a, b, c, d, minV);
+              maxV = Math.max(a, b, c, d, maxV);
+
+              return { ...orgData, ...{ sum: a + b + c + d } };
+            });
+
+            // 获得最大值和最小值
+            return {
+              tableData: [index + 1,
+                key,
+                data.patient_page[key].name,
+                Object.keys(data.patient_page[key].yi_chang_ji_gou).length,
+                data.patient_page[key].qun_ti_jiu_yi,
+                data.patient_page[key].shua_kong_ka,
+                data.patient_page[key].shua_xiao_ka,
+                data.patient_page[key].xu_jia_zhu_yuan],
+              chart,
+            };
+          });
+
+        this.rScale = this.rScale.domain([minV, maxV]);
+      });
     },
 
     onClick(index) {
@@ -147,7 +173,7 @@ export default {
     top: 0;
     z-index: 1000;
     width: 23vw;
-    height: 90vh;
+    height: 80vh;
     margin: 15px;
     padding: 10px;
     opacity: .8;
@@ -163,7 +189,7 @@ export default {
     line-height: 26px;
     align-items: center;
     text-align: center;
-    font-size: 14px;
+    font-size: 0.95rem;
 
     .type-icon {
       display: block;
@@ -206,6 +232,7 @@ export default {
 
   .content {
     margin: 10px 0;
+    font-size: 0.8rem;
   }
   .content::-webkit-scrollbar {
     width: 4px;

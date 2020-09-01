@@ -162,17 +162,19 @@ export default {
     const that = this;
     $paths.on('mousemove', function mousemoveAction() {
       const { id } = d3.event.path[0];
-      that.focusMousemove(d3.mouse(this), id);
+      that.focusMousemove(d3.mouse(this), id, {
+        left: d3.event.pageX,
+        top: d3.event.pageY,
+      });
     });
   },
 
   methods: {
-    focusMousemove(mouse, id) {
-      const coord = [mouse[0] + this.margin.left, mouse[1] + this.margin.left - 35];
+    focusMousemove(mouse, id, coord) {
       const xOnMouse = this.chartX.invert(mouse[0]);
       const yOnMouse = this.chartY.invert(mouse[1]);
       // 返回鼠标映射的数值
-      this.$emit('d3-mousemove', [xOnMouse, yOnMouse], id, coord);
+      this.$emit('d3-mousemove', coord, { xOnMouse, yOnMouse });
     },
   },
 };

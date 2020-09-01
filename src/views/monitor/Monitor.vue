@@ -3,11 +3,11 @@
     <v-card class="s-charts">
       <div class="s-tab-lists">
         <badge v-for="(item, index) in tabTitle" :key="item"
-        :active="index === tabActive"
-        :data="tabNumber[index]"
-        :type="item"
-        @click.native="changeTab(index)"
-      />
+          :active="index === tabActive"
+          :data="tabNumber[index]"
+          :type="item"
+          @click.native="changeTab(index)"
+        />
       </div>
       <!-- menu -->
       <div class="s-header">
@@ -16,14 +16,28 @@
           <span>{{menuSubtitle[tabActive]}}</span>
         </div>
 
-        <!-- 时间选择 -->
-        <time-picker
-          :dateEnd="dateEnd"
-          :dateStart="dateStart"
-          :menu1="menu1"
-          :menu2="menu2"
-        />
-        <!-- 时间选择 end-->
+        <div class="select-area">
+          <!-- 时间选择 -->
+          <time-picker
+            :dateEnd="dateEnd"
+            :dateStart="dateStart"
+            :menu1="menu1"
+            :menu2="menu2"
+          />
+          <!-- 时间选择 end-->
+
+          <v-select
+            :items="items"
+            v-model="itemSelect"
+            item-text="title"
+            item-value="value"
+            height= "5"
+            solo
+            dense
+            hide-details
+            flat
+          ></v-select>
+        </div>
       </div>
 
       <div class="s-charts-list">
@@ -32,7 +46,7 @@
           <div class="chart-legends text-lg-body-2">
             <span class="legend"> <i></i> 2019</span>
             <span class="legend"> <i></i>2020</span>
-            <v-select
+            <!-- <v-select
               :items="items"
               v-model="itemSelect"
               item-text="title"
@@ -42,7 +56,7 @@
               dense
               hide-details
               flat
-            ></v-select>
+            ></v-select> -->
           </div>
 
           <line-chart
@@ -51,8 +65,23 @@
             :yScale="yscale"
             :type="itemSelect"
             :datum="lineDatum"
+            @d3-mousemove="updateTooltip"
           >
+            <line
+              stroke="#babec7"
+              stroke-dasharray="4 2"
+              :x1="tipPos.x" :y1="chart1Size.margin.top" :x2="tipPos.x"
+              :y2="chart1Size.height-chart1Size.margin.bottom-chart1Size.margin.top" />
           </line-chart>
+
+          <Tooltip v-show="isShowing" v-bind="tipPos">
+            <div class="s-tip">
+              <div>
+                <p>金额：{{tipData.money}}万元</p>
+                <p>数量：{{tipData.num}}例</p>
+              </div>
+            </div>
+          </Tooltip>
         </div>
 
         <v-divider></v-divider>
@@ -68,7 +97,7 @@
               @click="type = 0"
             >同比</span>
 
-            <v-select
+            <!-- <v-select
               :items="items2"
               v-model="itemSelect2"
               item-text="title"
@@ -78,24 +107,31 @@
               dense
               hide-details
               flat
-            ></v-select>
+            ></v-select> -->
           </div>
 
           <!-- 日历图 -->
           <calendar
+            v-for='n in 2'
+            :key="n+'c'"
             v-bind="setting"
-            :datum="calendarDatum[0]"
-            :year="years[0]"
-            :type="itemSelect2"
+            :datum="calendarDatum[n-1]"
+            :year="years[n-1]"
+            :type="itemSelect"
             :dataType="type"
+            :colorSchema="colorScale[type]"
+            @tooltip="updateTooltip"
           />
-          <calendar
-            v-bind="setting"
-            :datum="calendarDatum[1]"
-            :year="years[1]"
-            :type="itemSelect2"
-            :dataType="type"
-          />
+
+          <Tooltip v-show="isShowing" v-bind="tipPos">
+            <div class="s-tip">
+              <div>
+                <p>{{tipData.date}}</p>
+                <p>同比：{{tipData.num}}例</p>
+                <p>环比：{{tipData.num}}例</p>
+              </div>
+            </div>
+          </Tooltip>
         </div>
       </div>
     </v-card>
@@ -112,6 +148,8 @@ import { FUND_TYPE, ROUTE_PARAM } from '@/util/type';
 import TimePicker from '@/components/small/TimePicker.vue';
 import LineChart from '@/components/LineChart.vue';
 import * as d3 from 'd3';
+import tooltip from '@/mixins/tooltip';
+import Tooltip from '@/components/Tooltip.vue';
 
 const chart1Size = {
   width: 1200,
@@ -171,6 +209,7 @@ export default {
     Calendar,
     TimePicker,
     LineChart,
+    Tooltip,
   },
 
   props: {
@@ -192,9 +231,9 @@ export default {
 
     chart1Size,
     items: [
-      { value: 0, title: '月' },
-      { value: 1, title: '周' },
-      { value: 2, title: '日' },
+      { value: 0, title: '月', key: 'month' },
+      { value: 1, title: '周', key: 'week' },
+      { value: 2, title: '日', key: 'day' },
     ],
     itemSelect: 1,
     lineDatum: [],
@@ -202,25 +241,38 @@ export default {
     yscale: d3.scaleLinear(),
 
     // 日历图
-    itemSelect2: 0,
-    items2: [
-      { value: 0, title: '月', key: 'month' },
-      { value: 1, title: '周', key: 'week' },
-      { value: 2, title: '日', key: 'day' },
-    ],
+    // itemSelect2: 0,
+    // items2: [
+    //   { value: 0, title: '月', key: 'month' },
+    //   { value: 1, title: '周', key: 'week' },
+    //   { value: 2, title: '日', key: 'day' },
+    // ],
     setting,
     years: [2019, 2020],
     calendarDatum: [{}, {}],
 
     // type为0： 同比， 1：环比
-    type: 0,
+    type: 1,
     // 获得的数据原始值
     datum: {},
 
     // 0就是默认的， 1是liezhi, 2fee_structure
     param_type: '',
     lidu: ['month', 'week', 'day'],
+
+    // tooltip
+    // isShowing: false,
+    // tipData: {},
+    // tipPos: {
+    //   left: 0,
+    //   top: 0,
+    //   x: 0,
+    // },
+
+    colorScale: [null, null],
   }),
+
+  mixins: [tooltip],
 
   mounted() {
     // fetch 总医疗的四个值
@@ -315,17 +367,18 @@ export default {
         datafetch = await fetchFeeTimeSeries({
           fundType: this.routeType,
           feeType: FEE_TYPE[this.menuSubtitle[this.tabActive]],
-          granularity: 'day',
+          granularity,
           startDay: this.dateStart,
           endDay: this.dateEnd,
         });
       } else {
         datafetch = await fetchFundDetailTimeSeries({
-          type: this.param_type,
-          subtype: Object.keys(funds[this.param_type])[this.tabActive],
+          mainType: this.param_type,
+          secondType: Object.keys(funds[this.param_type])[this.tabActive],
           granularity,
           startDay: this.dateStart,
           endDay: this.dateEnd,
+          // TODO thirdType
         });
       }
 
@@ -336,6 +389,9 @@ export default {
       const data2 = [{}, {}];
       let maxValue = Number.MIN_VALUE;
 
+      const minV = [Number.MAX_VALUE, Number.MAX_VALUE];
+      const maxV = [Number.MIN_VALUE, Number.MIN_VALUE];
+
       Object.keys(datafetch).forEach((key) => {
         const item = {};
         const item2 = [];
@@ -344,6 +400,10 @@ export default {
           const { value } = datafetch[key][d];
 
           maxValue = Math.max(maxValue, value);
+          minV[0] = Math.min(minV[0], datafetch[key][d].year_ratio);
+          maxV[0] = Math.max(maxV[0], datafetch[key][d].year_ratio);
+          minV[1] = Math.min(minV[1], datafetch[key][d].chain_ratio);
+          maxV[1] = Math.max(maxV[1], datafetch[key][d].chain_ratio);
 
           item2.push(value);
           if (d === '2019-02-28') {
@@ -359,9 +419,14 @@ export default {
         }
       });
 
+      const extent = minV.map((min, index) => Math.max(Math.abs(min), Math.abs(maxV[index])));
+
       this.calendarDatum = data;
       this.lineDatum = data2;
-      this.yscale = this.yscale.domain([0, maxValue]);
+      this.yscale = this.yscale.domain([0, maxValue]).nice();
+      this.colorScale = extent.map((e) => d3.scaleLinear()
+        .range(['#73cdbb', '#eee', '#eb745f'])
+        .domain([-e, 0, e]));
     },
   },
 
@@ -402,6 +467,16 @@ export default {
         padding-bottom: 2rem;
       }
 
+      .select-area {
+        display: flex;
+
+        .v-input {
+          border: 1px solid #cfcfcf;
+          width: 100px;
+        }
+
+      }
+
       .chart-legends {
         display: flex;
         width: 20%;
@@ -411,6 +486,7 @@ export default {
         .zhexian-c {
           display: flex;
           flex-direction: column;
+          position: relative;
         }
 
         .v-input {
@@ -456,6 +532,16 @@ export default {
 
     .calendar-view {
       flex: 1 0 45%;
+      position: relative;
+    }
+
+    .s-tip {
+      div {
+        margin: 5px 7px;
+      }
+      p {
+        margin: 0;
+      }
     }
   }
 </style>

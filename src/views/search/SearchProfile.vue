@@ -22,9 +22,9 @@
     <div class="box">
       <p>医保费用发生总体情况</p>
       <div class="box-header">
-        <div>
-          <span>2019年</span>
-          <span>2020年</span>
+        <div class="legends">
+          <span><i> </i>2019年</span>
+          <span><i> </i>2020年</span>
         </div>
 
         <div>
@@ -285,7 +285,7 @@ export default {
         display: flex;
         flex-direction: column;
         padding: 20px 2px;
-        min-height: 20vh;
+        min-height: 14vh;
 
         p {
           font-size: $sub-title;
@@ -302,6 +302,42 @@ export default {
 
       div {
         display: flex;
+      }
+
+      .legends {
+        span {
+          display: flex;
+          align-items: center;
+          position: relative;
+          padding: 4px 10px;
+          border: 1px solid #cfcfcf;
+          border-radius: 4px;
+          margin-right: 15px;
+          cursor: pointer;
+
+          i {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            margin: 0 0.5rem 0 0;
+          }
+        }
+
+        span:nth-child(1) {
+          i {
+            background: #6672fb;
+          }
+        }
+
+        span:nth-child(2) {
+          i {
+            background: #d8adf2;
+          }
+        }
+
+        span.active {
+          color: #1976d2;
+        }
       }
     }
 

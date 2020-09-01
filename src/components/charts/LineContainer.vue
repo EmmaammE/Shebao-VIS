@@ -8,12 +8,12 @@
     <svg
       :viewBox="`0 0 ${width} ${height}`"
     >
-      <linearGradient id="2019" gradientUnits="userSpaceOnUse"
+      <linearGradient id="2020" gradientUnits="userSpaceOnUse"
         x1="0" y1="0" x2="0" y2="100%">
         <stop offset="0%" stop-color="#9d60fb" stop-opacity="0.2"></stop>
         <stop offset="100%" stop-color="#fff" stop-opacity="0"></stop>
       </linearGradient>
-      <linearGradient id="2020" gradientUnits="userSpaceOnUse"
+      <linearGradient id="2019" gradientUnits="userSpaceOnUse"
         x1="0" y1="0" x2="0" y2="100%">
         <stop offset="0%" stop-color="#3a96fd" stop-opacity="0.2"></stop>
         <stop offset="80%" stop-color="#fff" stop-opacity="0"></stop>
@@ -49,8 +49,8 @@
       <g class="lines" :transform='`translate(${margin.left}, ${margin.top})`'>
         <path fill="url(#2019)" :d="area(Object.values(data['2019']))" />
         <path fill="url(#2020)" :d="area(Object.values(data['2020']))" />
-        <path fill="none" stroke="#9d60fb" :d="line(Object.values(data['2019']))" />
-        <path fill="none" stroke="#3a96fd" :d="line(Object.values(data['2020']))" />
+        <path fill="none" stroke="#3a96fd" :d="line(Object.values(data['2019']))" />
+        <path fill="none" stroke="#9d60fb" :d="line(Object.values(data['2020']))" />
       </g>
     </svg>
 

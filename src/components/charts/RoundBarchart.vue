@@ -110,14 +110,14 @@ export default {
         }
       }
 
-      .gridline {
-        line {
-          stroke-dasharray: 2 2;
-          stroke: #e4e9ec;
-        }
-        path {
-          display: none;
-        }
+    .gridline {
+      line {
+        stroke-dasharray: 2 2;
+        stroke: #e4e9ec;
       }
+      path {
+        display: none;
+      }
+    }
   }
 </style>

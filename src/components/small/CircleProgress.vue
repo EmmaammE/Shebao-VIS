@@ -15,7 +15,7 @@
     <text x="50%" y="50%"
       dominant-baseline="middle"
       text-anchor="middle"
-    >{{ratio*100 + '%'}}</text>
+    >{{(ratio*100).toFixed(2) + '%'}}</text>
     <text x="50%" y="80%"
       class="label"
       dominant-baseline="middle"
@@ -32,7 +32,7 @@ export default {
   },
 
 };
-</script>
+</script>''
 
 <style scoped>
 
@@ -47,6 +47,6 @@ export default {
     }
 
     text.label {
-      font-size: 14px;
+      font-size: 30px;
     }
 </style>

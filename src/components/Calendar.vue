@@ -5,19 +5,19 @@
       @mouseleave="isShowing=false"
     >
       <defs>
-        <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="100%">
-          <stop offset="0%" stop-color="#ff5f43" />
+        <linearGradient id="gradient" x1="0" x2="0" y1="100%" y2="0%">
+          <stop offset="0%" stop-color="#73cdbb" />
           <stop offset="50%" stop-color="#eee" />
-          <stop offset="100%" stop-color="#5bd7c2" />
+          <stop offset="100%" stop-color="#eb745f" />
         </linearGradient>
       </defs>
       <text x="5" y="50%">{{year}}</text>
 
       <g :transform="`translate(${width-marginRight-marginLeft}, ${marginTop})`">
-          <text>{{-(100*handledDatum.extent[dataType]).toFixed(2)}}%</text>
+          <text>{{colorSchema && colorSchema.domain()[0].toFixed(2)}}</text>
           <rect x="10" y="12" class="legend"
             width="5" :height="height/2" />
-          <text  y="75%">{{(100 * handledDatum.extent[dataType]).toFixed(2)}}%</text>
+          <text y="75%">{{colorSchema && colorSchema.domain()[1].toFixed(2)}}</text>
         </g>
       <g :transform="`translate(${marginLeft}, ${marginTop})`">
         <!-- <text v-for="(day,index) in daysLabel" :key="index"
@@ -28,7 +28,7 @@
         <template v-for="(data,j) in cellData">
           <rect v-for="(d,i) in data" :key="i+'r'+j"
             :width="i>=data.length-7 && !type ? cellLength-3 : cellLength-1"
-            :height="i===data.length-1 && !type && d.getDay()!==0
+            :height="i===data.length-1 && !type && d[2].getDay()!==0
               ? cellLength-3
               : (type === 1 ? cellLength + 3:cellLength-1 )"
             :x="cellX(d)"
@@ -36,7 +36,7 @@
             :fill="cellColor(d)"
             @mousemove="showTooltip(d)"
           >
-            <title>{{d}}</title>
+            <!-- <title>{{d}}</title> -->
           </rect>
           <rect
             v-show="type===0"
@@ -54,35 +54,19 @@
           >{{j+1}}</text>
         </template>
       </g>
-
-      <!-- tooltip -->
-      <foreignObject x="0" y="0" width="100%" height="100%" class="mask">
-        <Tooltip v-show="isShowing" v-bind="tipPos"
-        >
-          <p>{{tipData.date}}</p>
-          <p>{{tipData.number[0].toFixed(2)}}</p>
-          <p>{{tipData.number[1].toFixed(2)}}</p>
-        </Tooltip>
-      </foreignObject>
     </svg>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3';
-import Tooltip from '@/components/Tooltip.vue';
 
-const format = d3.timeFormat('%Y%m%d');
-/** d: Date */
-const getWeekday = (d) => d.getUTCDay();
-// 默认0表示星期天
+// // 默认0表示星期天
 const daysLabel = Array.from({ length: 7 }, (d, i) => `星期${'一二三四五六日'[i]}`);
 
 export default {
   name: 'Calendar',
-  components: {
-    Tooltip,
-  },
+
   props: {
     width: Number,
     height: Number,
@@ -115,6 +99,7 @@ export default {
     type: Number,
     // 按同比（0）还是环比（1）
     dataType: Number,
+    colorSchema: Function,
   },
 
   data() {
@@ -136,117 +121,47 @@ export default {
   },
 
   computed: {
-    colorSchema() {
-      const { extent } = this.handledDatum;
-      const { dataType } = this;
-      return d3.scaleLinear()
-        .range(['#ff5f43', '#eee', '#5bd7c2'])
-        .domain([-extent[dataType], 0, extent[dataType]]);
-    },
-
-    handledDatum() {
-      const data = {};
-      let minV = [Number.MAX_VALUE, Number.MAX_VALUE];
-      let maxV = [Number.MIN_VALUE, Number.MIN_VALUE];
-
-      let month = 1; let
-        week = 0;
-      let sum = [0, 0];
-      let tmp = [];
-
-      const datumArr = Object.keys(this.datum);
-
-      switch (this.type) {
-        case 0:
-          // 按月平均
-          datumArr.forEach((key, index) => {
-            if (+key.substr(5, 2) !== month || index === datumArr.length - 1) {
-              if (index === datumArr.length - 1) {
-                tmp.push(key);
-                sum[0] += this.datum[key][0];
-                sum[1] += this.datum[key][1];
-              }
-
-              const value = sum.map((d) => d / tmp.length);
-              tmp.forEach((day) => {
-                data[day] = value;
-              });
-
-              minV = value.map((d, i) => Math.min(minV[i], d));
-              maxV = value.map((d, i) => Math.max(maxV[i], d));
-
-              sum = [0, 0];
-              month += 1;
-              tmp = [];
-            }
-            tmp.push(key);
-
-            sum[0] += this.datum[key][0];
-            sum[1] += this.datum[key][1];
-          });
-          break;
-
-        case 1:
-          sum = [0, 0];
-          tmp = [];
-          datumArr.forEach((key, index) => {
-            const d = new Date(key);
-            const currentWeek = d3.utcMonday.count(d3.utcYear(d), d);
-            if (currentWeek !== week || index === datumArr.length - 1) {
-              if (index === datumArr.length - 1) {
-                tmp.push(key);
-                sum[0] += this.datum[key][0];
-                sum[1] += this.datum[key][1];
-              }
-
-              const value = sum.map((da) => da / tmp.length);
-              tmp.forEach((day) => {
-                data[day] = value;
-              });
-
-              minV = value.map((da, i) => Math.min(minV[i], da));
-              maxV = value.map((da, i) => Math.max(maxV[i], da));
-
-              sum = [0, 0];
-              week += 1;
-              tmp = [];
-            }
-            tmp.push(key);
-            sum[0] += this.datum[key][0];
-            sum[1] += this.datum[key][1];
-          });
-          break;
-
-        case 2:
-          // 按日计算
-          datumArr.forEach((key) => {
-            const value = this.datum[key];
-            data[key] = value;
-            minV = value.map((d, i) => Math.min(minV[i], d));
-            maxV = value.map((d, i) => Math.max(maxV[i], d));
-          });
-          break;
-        default:
-      }
-
-      const extent = Array(2).fill(null)
-        .map((e, i) => Math.max(Math.abs(minV[i]), Math.abs(maxV[i])));
-
-      return { data, extent };
-    },
-
-    actualData() {
-      return this.handledDatum.data;
-    },
-
     cellData() {
+      const hash = {
+        2019: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+        2020: [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+      };
       // 按年份计算日期
       const cellData = Array.from({ length: 12 }, () => []);
       const dt = new Date(Date.UTC(this.year, 0, 1));
+      let index = 0;
+      if (this.year === 2019) {
+        index = 7;
+      } else {
+        index = 6;
+      }
+
+      let count = 0;
+      let indexMonth = 0;
       while (dt <= new Date(Date.UTC(this.year, 11, 31))) {
         const month = dt.getMonth();
-        cellData[month].push(new Date(dt));
+
+        if (count === 7) {
+          index += 7;
+          count = 0;
+
+          if (index > hash[this.year][indexMonth]) {
+            index -= hash[this.year][indexMonth];
+            indexMonth += 1;
+          }
+        }
+
+        cellData[month].push(
+          [
+            `${this.year}-${String(`0${month + 1}`).slice(-2)}-01`,
+
+            `${this.year}-${String(`0${indexMonth + 1}`).slice(-2)}-${String(`0${index}`).slice(-2)}`,
+
+            new Date(dt),
+          ],
+        );
         dt.setDate(dt.getDate() + 1);
+        count += 1;
       }
 
       return cellData;
@@ -261,38 +176,54 @@ export default {
 
   methods: {
     cellX(d) {
-      return d3.utcMonday.count(d3.utcYear(d), d)
+      return d3.utcMonday.count(d3.utcYear(d[2]), d[2])
          * this.cellSize + this.cellPadding;
     },
 
     cellY(d) {
       // 0代表星期天
-      const index = d.getUTCDay() % 7;
+      const index = d[2].getUTCDay() % 7;
       return ((index + 6) % 7) * this.cellSize + this.cellPadding;
     },
 
     cellColor(d) {
-      const key = d.toISOString().substr(0, 10);
-      if (this.actualData[key]) {
-        return this.colorSchema(this.actualData[key][this.dataType]);
+      let key;
+      if (typeof d[this.type] !== 'string') {
+        key = d[this.type].toISOString().substr(0, 10);
+      } else {
+        key = d[this.type];
       }
+      if (this.datum[key]) {
+        return this.colorSchema(this.datum[key][this.dataType]);
+      }
+      // console.log(key);
       return '#eee';
     },
 
     showTooltip(d) {
-      const key = d.toISOString().substr(0, 10);
+      const key = d[2].toISOString().substr(0, 10);
 
-      this.tipData = {
-        number: this.actualData[key],
-        date: key,
-      };
+      // this.tipData = {
+      //   number: this.datum[key],
+      //   date: key,
+      // };
+      const x = this.cellX(d);
 
-      this.tipPos = {
-        left: this.cellX(d),
+      // this.tipPos = {
+      //   left: this.cellX(d),
+      //   top: this.cellY(d) - 20,
+      // };
+
+      // this.isShowing = true;
+
+      this.$emit('tooltip', true, {
+        left: x,
         top: this.cellY(d) - 20,
-      };
-
-      this.isShowing = true;
+        x,
+      }, {
+        number: this.datum[key],
+        date: key,
+      });
     },
   },
 };
