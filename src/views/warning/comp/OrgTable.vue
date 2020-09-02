@@ -50,6 +50,7 @@
               :scale="scale"
               :datum="item.jine"
               :data="item.zong_jin_e"
+              :type="1"
             />
             <p>{{item.zong_jin_e}}</p>
           </div>
@@ -73,19 +74,27 @@
         </template>
       </v-data-table>
       <v-sheet v-if="tabIndex === 4 && datum.length > 0" class="chart">
-       <radial
-        :scales="scales"
-        :data="[
-            datum[activeIndex].zhu_yuan_ci_shu,
-            datum[activeIndex].yao_zhan_bi,
-            datum[activeIndex].zhu_yuan_zong_fei_yong
-          ]"
-        :standard="standard"
-       />
-       <div class="legends">
-         <span><i />实际数据</span>
-         <span> <i />标准指标</span>
-       </div>
+        <div class="legends">
+          <!-- TODO 插入图例 -->
+          <!-- <span><i />实际数据</span>
+          <span> <i />标准指标</span> -->
+        </div>
+
+        <!-- 六个折线图 -->
+        <div class="container">
+          <div
+            v-for="(d,index) in falseKeys"
+            :key="d.value"
+            class="bar-wrapper"
+          >
+            <span>{{d.text}}</span>
+            <bar-line
+              :data="falseData[index]"
+              :standard="standard[index]"
+              :scale="widthScale[index]"
+            />
+          </div>
+        </div>
       </v-sheet>
     </v-card>
   </v-sheet>
@@ -99,7 +108,7 @@ import {
 } from '@/util/http';
 import Bar from '@/components/small/Bar.vue';
 import * as d3 from 'd3';
-import Radial from '@/components/charts/Radial.vue';
+import BarLine from './BarLine.vue';
 
 const RANGE = [0, 100];
 export default {
@@ -113,7 +122,7 @@ export default {
   components: {
     CircleProgress,
     Bar,
-    Radial,
+    BarLine,
   },
 
   data() {
@@ -195,12 +204,37 @@ export default {
       scales: Array.from({ length: 3 }, () => d3.scaleLinear().range([0, 90])),
       activeIndex: 0,
       standard: [],
+
+      // 虚假住院的六个指标
+      falseKeys: [
+        { text: '住院天数（天）', value: 'zhu_yuan_tian_shu' },
+        { text: '总住院次数（次）', value: 'zhu_yuan_ci_shu' },
+        { text: '药占比（百分比）', value: 'yao_zhan_bi' },
+        { text: '检查比率（百分比）', value: 'jian_cha_bi_lv' },
+        { text: '住院总列支费用（元）', value: 'zhu_yuan_zong_fei_yong:' },
+        { text: '住院日均次费用（元）', value: 'zhu_yuan_ri_jun_ci_fei_yong' },
+      ],
     };
   },
 
   watch: {
     tabIndex() {
       this.getData();
+    },
+  },
+
+  computed: {
+    falseData() {
+      // 虚假住院的数据
+      return this.falseKeys.map((key) => this.datum[this.activeIndex][key.value]);
+    },
+    widthScale() {
+      const values = Object.values(this.datum);
+      // 虚假住院的宽度比例尺
+      return Array.from({ length: 6 }, (_, index) => d3.scaleLinear()
+        // 求指标和value的最大值
+        .domain([0, d3.max(values, (d) => d[this.falseKeys[index].value])])
+        .range([0, 100]));
     },
   },
 
@@ -300,11 +334,7 @@ export default {
       });
 
       this.scales = this.scales.map((scale, index) => scale.domain([0, maxArr[index]]));
-      this.standard = [
-        data.standard.zhu_yuan_ci_shu,
-        data.standard.yao_zhan_bi,
-        data.standard.zhu_yuan_zong_fei_yong,
-      ];
+      this.standard = this.falseKeys.map((key) => data.standard[key.value]);
 
       setTimeout(() => {
         document.querySelector('tbody tr')
@@ -460,43 +490,23 @@ export default {
     height: calc(100% - 84px);
     display: flex;
 
-    svg {
-      flex: 1;
-      // border: 1px solid #f00;
+    .container {
+      width: 100%;
     }
 
-    .legends {
+    .bar-wrapper {
       display: flex;
-      flex-direction: column;
-      position: absolute;
-      right: 5px;
-      top: 5px;
-      font-size: $f-small;
 
       span {
-        position: relative;
-        line-height: 20px;
-        display: flex;
-        align-items: center;
+        font-size: 0.75rem;
+        text-align: right;
+        font-weight: bold;
+        width: 120px;
+        display: inline-block;
+      }
 
-        i {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          margin-right: 4px;
-        }
-
-        &:nth-child(1)  {
-          i {
-            background:#137601;
-          }
-        }
-
-        &:nth-child(2) {
-          i {
-            background:#024ec4;
-          }
-        }
+      svg {
+        flex-grow: 1;
       }
     }
   }

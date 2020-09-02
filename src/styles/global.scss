@@ -84,3 +84,14 @@ body {
 html {
   font-size: 1vw!important;
 }
+
+.s-container {
+  // 表格
+  tr {
+    font-size: 0.75rem;
+  }
+
+  th {
+    font-size: 0.875rem;
+  }
+}

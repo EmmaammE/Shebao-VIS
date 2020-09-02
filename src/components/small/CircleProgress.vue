@@ -13,6 +13,7 @@
       :stroke-dasharray="`${350*ratio} ${350-350*ratio}`"
       stroke-dashoffset="350"/>
     <text x="50%" y="50%"
+      v-if="ratio"
       dominant-baseline="middle"
       text-anchor="middle"
     >{{(ratio*100).toFixed(2) + '%'}}</text>

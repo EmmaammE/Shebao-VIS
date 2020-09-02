@@ -319,7 +319,7 @@ export default {
     // updateTooltip(showing, tipData, tipPos) {
     // },
     updateTooltip(isShowing, tipPos, tipData) {
-      console.log(isShowing, tipPos, tipData);
+      // console.log(isShowing, tipPos, tipData);
 
       this.isShowing = isShowing;
       this.tipPos = {
@@ -399,6 +399,7 @@ export default {
           startDay: this.dateStart,
           endDay: this.dateEnd,
           // TODO thirdType
+          thirdType: null,
         });
       }
 

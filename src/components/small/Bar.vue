@@ -1,26 +1,46 @@
 <template>
   <svg :viewBox="`0 0 100 20`">
-    <g v-for="(d,index) in res"
-      :key="index"
-    >
+    <template v-if="type===1">
       <rect
-        :x="index===0?0:scale(datum[index-1])"
+        x="2"
         y="3"
-        :width="scale(d)"
-        :fill="colorScale(d)"
+        :width="scale(data)"
         height="14"
         @mouseout="showTip"
       />
-    </g>
 
-    <line v-for="(d,index) in datum"
-      :key="index+'l'"
-      :y1="3"
-      :x1="scale(d)"
-      :x2="scale(d)"
-      :y2="17"
-    >
-    </line>
+      <line v-for="(d,index) in datum"
+        :key="index"
+        :y1="3"
+        :x1="scale(d)"
+        :x2="scale(d)"
+        :y2="17"
+      >
+      </line>
+    </template>
+    <template v-else>
+      <g v-for="(d,index) in res"
+        :key="index"
+      >
+        <rect
+          :x="index===0?0:scale(datum[index-1])"
+          y="3"
+          :width="scale(d)"
+          :fill="colorScale(d)"
+          height="14"
+          @mouseout="showTip"
+        />
+      </g>
+
+      <line v-for="(d,index) in datum"
+        :key="index+'l'"
+        :y1="3"
+        :x1="scale(d)"
+        :x2="scale(d)"
+        :y2="17"
+      >
+      </line>
+    </template>
   </svg>
 </template>
 
@@ -31,6 +51,7 @@ export default {
     datum: Array,
     data: Number,
     colorScale: Function,
+    type: Number,
   },
 
   computed: {
@@ -63,6 +84,6 @@ export default {
 
   line {
     stroke: #ffffff;
-    stroke-width: 2;
+    stroke-width: 1;
   }
 </style>

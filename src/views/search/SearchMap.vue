@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="search-map">
     <v-card flat class="filter-card">
       <p class="sub-title">筛选条件</p>
       <div class="divider" />
@@ -108,7 +108,7 @@
 
     <Map
       :zoomcb="zoomUpdated"
-      :class="openPopup?'':'search-map'"
+      :class="openPopup?'':'hide-popup'"
     >
       <!-- marker -->
       <template v-if="$route.meta.type > 0">

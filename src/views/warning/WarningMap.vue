@@ -4,6 +4,7 @@
       <v-card v-for="(d,index) in info" :key="index"
         outlined
         width="13vw"
+        @click="clickBadge(index)"
       >
         <span class="badge-icon">
           <component :is= "d.icon"></component>
@@ -24,13 +25,15 @@
         @clusterclick="click()"
         @ready="ready"
       >
-        <l-marker v-for="(value, name) in d"
-          :key="name" :lat-lng="[value.LAT, value.LNG]"
-          :icon="icons[index]"
-          @click="onClick($event,name,index,clickMarker)"
-        >
-          <!-- <l-popup :content="value.ji_gou_ming_cheng"></l-popup> -->
-        </l-marker>
+        <template v-if="indexArr[index] === true">
+          <l-marker v-for="(value, name) in d"
+            :key="name" :lat-lng="[value.LAT, value.LNG]"
+            :icon="icons[index]"
+            @click="onClick($event,name,index,clickMarker)"
+          >
+            <!-- <l-popup :content="value.ji_gou_ming_cheng"></l-popup> -->
+          </l-marker>
+        </template>
       </v-marker-cluster>
      </template>
     </Map>
@@ -153,6 +156,8 @@ export default {
       datum: [0, 0, 0],
       icons: [defaulticon('red'), defaulticon('yellow'), defaulticon('green')],
 
+      // 显示index
+      indexArr: [true, true, true],
       // 地图的设置
       clusterOptions: [
         {
@@ -269,6 +274,23 @@ export default {
       // 计算展示的属性
       this.getOrgShowData(name, index);
       cb(e);
+    },
+
+    clickBadge(index) {
+      if (this.indexArr.filter((d) => d).length > 1 || !this.indexArr[index]) {
+        // 如果任意两个是true, 只显示被点击的
+        this.indexArr = Array(3).fill(null).map((e, i) => {
+          if (i === index) {
+            return true;
+          }
+          return false;
+        });
+      } else {
+        // 只有一个为true，恢复为都显示
+        this.indexArr = [true, true, true];
+      }
+
+      console.log(index);
     },
 
     getOrgShowData(name, index) {

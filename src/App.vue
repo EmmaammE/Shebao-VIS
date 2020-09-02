@@ -60,18 +60,16 @@ export default {
   .s-table {
     .v-data-table__wrapper {
       overflow: auto;
-      flex: 1 0 80%;
-      // height: 100%;
 
       td {
-        font-size: 12px!important;
+        font-size: 0.5rem;
         color: $she-grey;
       }
 
       td:nth-child(2),
       td:nth-child(3) {
         color: black;
-        font-size: 16px!important;
+        font-size: 0.875rem;
       }
 
     }
@@ -84,14 +82,32 @@ export default {
     }
   }
 
-  // 地图的tooltip
-  .search-map {
+  #map-id {
+    .leaflet-marker-icon {
+      outline: none;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 4%;
+    }
+
+    .leaflet-popup-content {
+      margin: 2px 8px 2px 8px;
+    }
+
+    .leaflet-popup-tip {
+      box-shadow: initial;
+    }
+
+  }
+
+  .hide-popup {
     .leaflet-popup{
       opacity: 0!important;
     }
   }
 
-  #map-id {
+  .search-map {
     // 修改style
     .leaflet-popup-content-wrapper {
       border-radius: 3px;
@@ -104,13 +120,6 @@ export default {
       opacity: 0.7;
     }
 
-    .leaflet-popup-content {
-      margin: 2px 8px 2px 8px;
-    }
-
-    .leaflet-popup-tip {
-      box-shadow: initial;
-    }
     .leaflet-popup-tip-container {
       top: -17px;
       transform: rotate(180deg) scale(0.7);
@@ -121,8 +130,22 @@ export default {
     //   right: -2px;
     //   font-size: 10px;
     // }
-    .leaflet-marker-icon {
-      outline: none;
+  }
+
+  // 参保人预警的popup样式
+  .map-container {
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: #fff;
+      color: #000;
+      opacity: 0.9;
+      box-shadow: 0 1px 1px 1px rgba(#636363, 0.5);
     }
+
+    .leaflet-popup-tip-container {
+      top: -16px;
+      transform: rotate(180deg) scale(0.7);
+    }
+
   }
 </style>
