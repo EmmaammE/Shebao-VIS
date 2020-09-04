@@ -71,6 +71,14 @@ const routes = [
         },
       },
       {
+        path: 'search/info',
+        component: () => import('../views/search/SearchTreatment'),
+        name: '智能搜索引擎-就诊信息',
+        meta: {
+          linkIndex: 1,
+        },
+      },
+      {
         path: 'search/:routeType',
         component: () => import('../views/search/SearchPanel'),
         name: '智能搜索引擎',

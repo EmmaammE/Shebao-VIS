@@ -95,3 +95,51 @@ html {
     font-size: 0.875rem;
   }
 }
+
+
+// 饼图的图例
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  $accent-color:#5d77ff;
+  $primary-color: #fff;
+
+  .radio {
+    flex: 0 0 33%;
+  }
+
+  .radio-btn {
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+  }
+
+  .label {
+      display: flex;
+      align-items: center;
+      padding: 0.125rem 0;
+      font-size: $f-small;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s linear;
+  }
+
+  .label span {
+      display: inline-block;
+      content: "";
+      height: 0.9rem;
+      width: 0.9rem;
+      margin-right: 0.625rem;
+      border: 0.2rem solid $primary-color;
+      border-radius: 50%;
+      transition: all 0.25s linear;
+      background: $accent-color;
+      box-shadow: 0 0 5px 3px lighten($color: #d7ddff, $amount: 0.7);
+  }
+}
+
+.expand-content {
+  .label span {
+    box-shadow: 0 0 2px 1px lighten($color: #d7ddff, $amount: 0.7);
+  }
+}

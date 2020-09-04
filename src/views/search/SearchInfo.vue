@@ -7,10 +7,14 @@
             <p>{{data.ji_ben_qing_kuang.name}}</p>
           </div>
           <div class="left-box">
-            <!-- <div>
-              <span class="number">{{amount}}</span>
-              <span class="text">总费用</span>
-            </div> -->
+            <div class="left-header">
+              <div v-for="d in header"
+                :key="d.value"
+              >
+                <span class="number">{{headerData[d.value]}}</span>
+                <span class="text">{{d.text}}</span>
+              </div>
+            </div>
             <div class="info-box">
               <span v-for="d in info"
                 :key="d.value"
@@ -36,10 +40,11 @@
                 :items="people"
                 item-text="text"
                 item-value="value"
-                :label="data.ji_ben_qing_kuang.name"
+                :label="data.ji_ben_qing_kuang.name || data.ji_ben_qing_kuang.xing_ming"
                 solo
                 flat
                 hide-details
+                @change="changeKey"
               ></v-select>
             </div>
           </div>
@@ -47,7 +52,7 @@
           <!-- 下方的内容 -->
           <div class="down-content">
             <div class="down-header">
-              <p>费用构成及占比</p>
+              <p>{{menu[menuIndex].text}}</p>
 
               <time-picker
                 :dateEnd="dateEnd"
@@ -57,9 +62,15 @@
               />
             </div>
 
-            <div class="radio-group">
+            <template v-if="dataHasValue[0].length === 0">
+              暂无数据
+            </template>
+
+            <template v-else>
+              <div class="radio-group">
+              <!-- 有值的label -->
               <div
-                v-for="(d,index) in Object.values(dataHandle).filter((d) => d.value !== null)"
+                v-for="(d,index) in dataHasValue[0]"
                 :key="index"
                 class="radio"
               >
@@ -68,9 +79,11 @@
                   <span :style="{background: colorScale(index)}"></span>
                   {{d.text}}</label>
               </div>
+              <!-- 没值的label -->
               <div
-                v-for="(d,index) in Object.values(dataHandle).filter((d) => d.value === null)"
-                :key="index"
+                v-for="(d,index) in Object.values(dataHandle[0])
+                  .filter((d) => d.value === null || d.value === 0)"
+                :key="index+'n'"
                 class="radio"
               >
                 <input type="radio" class="radio-btn" :name="d.text"/>
@@ -78,43 +91,41 @@
                   <span :style="{background: '#eee'}"></span>
                   {{d.text}}</label>
               </div>
+              <!-- 子label -->
+              <template v-if="type === 1">
+                <template
+                  v-for="d in Object.values(dataHandle[0])
+                    .filter((d) => d.child !== undefined)"
+                >
+                <div v-for="(child,i) in d.child" :key="child.text"  class="radio">
+                    <input type="radio" class="radio-btn" :name="d.text"/>
+                    <label class="label">
+                      <span :style="{background: child.value > 0&& child.value !== null?
+                          colorScale(dataHasValue[0].length + i): '#eee'}">
+                      </span>
+                    {{child.text}}</label>
+                </div>
+                </template>
+              </template>
             </div>
 
             <!-- 图 -->
-            <svg viewBox="-375 -250 750 500">
-              <defs>
-                <marker id="circle" markerWidth="4" markerHeight="4" refX="2" refY="2">
-                  <circle cx="2" cy="2" r="2" fill="#707176"></circle>
-                </marker>
-              </defs>
+            <div :class="[dataHandle.length > 1?'small':'', 'pie-wrapper'].join(' ')">
+              <pie-chart
+                v-for="(d,i) in dataHasValue"
+                :key="i"
+                :colorScale="colorScale"
+                :data="d"
+                :type="type"
+                :active="activePie"
+                @hoverPie="hoverPie"
+              />
+            </div>
+            </template>
 
-              <g
-                v-for="(d,index) in dataReady"
-                :key="index"
-                :class="d.cx < d.ox?'':'svg-end'"
-              >
-                <path
-                  :d="arc(d)"
-                  :fill="colorScale(index)"
-                ></path>
-                <g class="tip">
-                  <path
-                    marker-end="url(#circle)"
-                    :d="textPath(d)"
-                    class="line"
-                  />
-                  <text
-                    :x="d.x"
-                    :y="d.y -10"
-                  >
-                     {{d.value.toLocaleString()}}
-                  </text>
-                </g>
-              </g>
-
-            </svg>
           </div>
         </div>
+
       </template>
     </v-card>
 </template>
@@ -123,39 +134,100 @@
 import GirlIcon from '@/assets/search/icon_3.svg';
 import BoyIcon from '@/assets/search/icon_4.svg';
 import TimePicker from '@/components/small/TimePicker.vue';
-import Sunburst from '@/components/Sunburst.vue';
 import * as d3 from 'd3';
-
-const sunburstSetting = {
-  width: 500,
-};
-sunburstSetting.radius = sunburstSetting.width / 7;
-const partition = (data) => {
-  const root = d3.hierarchy(data)
-    .sum((d) => d.value)
-    .sort((a, b) => b.value - a.value);
-
-  return d3.partition()
-    .size([2 * Math.PI, root.height + 1])(root);
+import PieChart from './PieChart.vue';
+// 医疗费用
+const YiLiaoFeiYong = {
+  gui_ding_bing_zhong_qing_kuang: {
+    text: '规定病种',
+    subItem: ['lei_ji_lie_zhi_fei_yong', 'lei_ji_jiu_zhen_ci_shu'],
+  },
+  jia_ting_bing_chuang_qing_kuang: {
+    text: '家庭病床',
+    subItem: ['lie_ji_lie_zhi_fei_yong', 'lei_ji_ci_shu'],
+  },
+  men_zhen_qing_kuang: {
+    text: '门诊',
+    subItem: ['lei_ji_lie_zhi_fei_yong', 'lei_ji_men_zhen_ci_shu'],
+    children: [
+      {
+        text: '零售药店',
+        subItem: ['ling_shou_yao_dian_lei_ji_lie_zhi_fei_yong',
+          'ling_shou_yao_dian_lei_ji_men_zhen_ci_shu'],
+      },
+      {
+        text: '医疗机构',
+        subItem: [
+          'yi_liao_ji_gou_lei_ji_lie_zhi_fei_yong',
+          'yi_liao_ji_gou_lei_ji_men_zhen_ci_shu',
+        ],
+      },
+    ],
+  },
+  qi_ta: {
+    text: '其他',
+    subItem: [
+      'lei_ji_lie_zhi_fei_yong', 'lie_ji_ci_shu',
+    ],
+  },
+  zhu_yuan_qing_kuang: {
+    text: '住院',
+    subItem: [
+      'lei_ji_lie_zhi_fei_yong', 'lei_ji_zhu_yuan_ci_shu',
+    ],
+  },
 };
 
 const FEI_YONG = {
-  cai_liao_fei: '材料费',
-  qi_ta: '其他',
-  yao_pin_fei: {
-    xi_yao_fei: '西药费',
-    zhong_cao_yao_fei: '中草药费',
-    zhong_cheng_yao_fei: '中成药费',
+  fei_yong_gou_cheng_qing_kuang: {
+    cai_liao_fei: '材料费',
+    qi_ta: '其他',
+    yao_pin_fei: {
+      xi_yao_fei: '西药费',
+      zhong_cao_yao_fei: '中草药费',
+      zhong_cheng_yao_fei: '中成药费',
+    },
+    zhen_liao_xiang_mu: {
+      hua_yan_fei: '化验费',
+      jian_cha_fei: '检查费',
+      shou_shu_fei: '手术费',
+      wu_li_zhi_liao_fei: '物理治疗费',
+      zhong_yi_zhi_liao_fei: '中医治疗费',
+    },
   },
-  zhen_liao_xiang_mu: {
-    hua_yan_fei: '化验费',
-    jian_cha_fei: '检查费',
-    shou_shu_fei: '手术费',
-    wu_li_zhi_liao_fei: '物理治疗费',
-    zhong_yi_zhi_liao_fei: '中医治疗费',
+  yi_liao_fei_yong: YiLiaoFeiYong,
+  ji_jin_lie_zhi_qing_kuang: {
+    da_bing_bao_xian: '大病保险',
+    ge_ren_zhuang_hu_shi_yong_qing_kuang: {
+      dang_nian_zhang_hu: '当年账户',
+      li_nian_zhang_hu: '历年账户',
+    },
+    jiu_zhu_ji_jin: '救助基金',
+    tong_chou_zhi_fu: '统筹支付',
+    xian_jin_zhi_fu: '现金支付',
+    xian_jin_zhi_fu_zhan_bi: '现金支付占比',
+  },
+
+  yi_bao_fen_lei_fu_wu_qing_kuang: {
+    gui_ding_bing_zhong: {
+      zong_lie_zhi_fei_yong: '规定病种',
+    },
+    jia_ting_bing_chuang: {
+      zong_lie_zhi_fei_yong: '家庭病床',
+    },
+    men_zhen: {
+      zong_lie_zhi_fei_yong: '门诊',
+    },
+    qi_ta: {
+      zong_lie_zhi_fei_yong: '其他',
+    },
+    zhu_yuan: {
+      zong_lie_zhi_fei_yong: '住院',
+    },
   },
 
 };
+
 export default {
   props: {
     data: Object,
@@ -164,11 +236,12 @@ export default {
     menu: Array,
     info: Array,
     people: Array,
+    compType: Number,
   },
 
   components: {
     TimePicker,
-    Sunburst,
+    PieChart,
   },
   data() {
     return {
@@ -179,92 +252,116 @@ export default {
       menu1: false,
       menu2: false,
 
-      sunburstSetting,
+      // 被选中的Pie
+      activePie: 0,
+
     };
   },
 
   computed: {
-    // data2() {
-    //   const data = this.data[this.menu[this.menuIndex].value];
-    //   const sundata = {};
-    //   Object.keys(data).forEach((key) => {
-    //     if (typeof data[key] === 'number') {
-    //       sundata.name = key;
-    //       sundata.value = data[key];
-    //     } else {
-    //       sundata.name = key;
-    //       sundata.children = Object.keys(data[key]).map((ikey) => ({
-    //         name: ikey,
-    //         value: data[key][ikey],
-    //       }));
-    //     }
-    //   });
-    //   // eslint-disable-next-line
-    //   return partition(sundata).each((d) => d.current = d);
-    // },
 
     colorScale() {
+      if (this.type === 1) {
+        return d3.scaleLinear()
+          .range(['#5d77ff', '#889aff', '#a7b5ff', '#c8d0ff', '#d1d7f9'])
+          .domain(d3.ticks(0, this.dataHasValue[0].length + 2, 5));
+      }
       return d3.scaleLinear()
         .range(['#5d77ff', '#889aff', '#a7b5ff', '#c8d0ff', '#d1d7f9'])
-        .domain(d3.ticks(0,
-          Object.values(this.dataHandle).filter((d) => d.value !== null).length, 5));
-    },
-
-    dataReady() {
-      const radius = 170;
-      // 处理后的piechart数据
-      return d3.pie()
-        .padAngle(0.005)
-        .sort(null)
-        .value((d) => d.value)(Object.values(this.dataHandle).filter((d) => d.value !== null))
-        .map((d) => {
-          const tmp = { ...d };
-
-          const a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
-          tmp.cx = Math.cos(a) * (radius - 85);
-          tmp.x = Math.cos(a) * (radius + 5);
-
-          tmp.cy = Math.sin(a) * (radius - 85);
-          tmp.y = Math.sin(a) * (radius + 5);
-
-          // var bbox = this.getBBox();
-          // TODO 为了方便暂时假设文字宽度为40
-          const bbox = { width: 10 };
-          tmp.sx = tmp.x - bbox.width / 2 - 2;
-          tmp.ox = tmp.x + bbox.width / 2 + 2;
-          tmp.oy = tmp.y + 5;
-          tmp.sy = tmp.oy;
-
-          // console.log(tmp);
-          return tmp;
-        });
-    },
-
-    arc() {
-      return d3.arc().innerRadius(0)
-        .outerRadius(125)
-        .cornerRadius(2);
+        .domain(d3.ticks(0, this.dataHasValue[0].length, 5));
     },
 
     dataHandle() {
-      const data = this.data[this.menu[this.menuIndex].value];
+      const dKey = this.menu[this.menuIndex].value;
+      const data = this.data[dKey];
+      const hash = FEI_YONG[dKey];
+
+      if (dKey === 'yi_liao_fei_yong') {
+        // 列支费用和列支次数
+        const tmp = [{}, {}];
+        Object.keys(hash).forEach((key) => {
+          for (let i = 0; i < 2; i += 1) {
+            tmp[i][key] = {
+              text: hash[key].text,
+              value: data[key][hash[key].subItem[i]],
+            };
+          }
+
+          if (hash[key].children) {
+            tmp[0][key].child = [];
+            tmp[1][key].child = [];
+
+            // 有子项目
+            hash[key].children.forEach((child) => {
+              for (let i = 0; i < 2; i += 1) {
+                tmp[i][key].child.push({
+                  text: child.text,
+                  value: data[key][child.subItem[i]],
+                });
+              }
+            });
+          }
+        });
+
+        return tmp;
+      }
+
       const tmp = {};
-      Object.keys(FEI_YONG).forEach((key) => {
-        if (typeof FEI_YONG[key] === 'string') {
-          tmp[key] = { text: FEI_YONG[key], value: data[key].value };
+      Object.keys(hash).forEach((key) => {
+        if (typeof hash[key] === 'string') {
+          // 有的是返回的一个{}对象，包含值和比率， 有的是返回的一个值
+          if (typeof data[key] === 'object') {
+            tmp[key] = { text: hash[key], value: data[key].value };
+          } else {
+            tmp[key] = { text: hash[key], value: data[key] };
+          }
         } else {
-          Object.keys(FEI_YONG[key]).forEach((inner) => {
-            tmp[inner] = { text: FEI_YONG[key][inner], value: data[key][inner].value };
+          Object.keys(hash[key]).forEach((inner) => {
+            if (inner === 'zong_lie_zhi_fei_yong') {
+              // 药师医师汇总的医保服务
+              tmp[key] = {
+                text: hash[key][inner],
+                value: data[key][inner],
+              };
+            } else {
+              tmp[inner] = {
+                text: hash[key][inner],
+                value: data[key][inner].value,
+              };
+            }
           });
         }
       });
 
-      return tmp;
+      return [tmp];
     },
 
-    amount() {
-      return Object.values(this.dataHandle).filter((d) => d.value !== null)
-        .reduce((a, b) => a.value + (b.value), 0);
+    dataHasValue() {
+      // 返回确实有值的数据
+      return this.dataHandle
+        .map((data) => Object.values(data)
+          .filter((d) => d.value && d.value > 0));
+    },
+
+    type() {
+      if (this.menu[this.menuIndex].value === 'yi_liao_fei_yong') {
+        return 1;
+      }
+      return 0;
+    },
+
+    headerData() {
+      // 和header匹配的信息， 每个页面不一样
+      switch (this.compType) {
+        case 1:
+          // 药师医师汇总
+          return this.data.yi_bao_fu_wu_zong_ti_qing_kuang;
+        case 2:
+          return this.data.yi_liao_fei_yong;
+        default:
+          // 3
+          return {};
+      }
     },
   },
 
@@ -277,24 +374,20 @@ export default {
       this.menuIndex = index;
     },
 
-    // 求文字路径
-    textPath(d) {
-      if (d.cx > d.ox) {
-        return `M${d.sx},${d.sy}L${d.ox},${d.oy} ${d.cx},${d.cy}`;
-      }
-      return `M${d.ox},${d.oy}L${d.sx},${d.sy} ${d.cx},${d.cy}`;
+    hoverPie(index) {
+      this.activePie = index;
     },
+
+    changeKey(e) {
+      this.$emit('changeKey', e);
+    },
+
   },
 };
 </script>
 
 <style scoped lang="scss">
   .content-card {
-    .line {
-      fill: none;
-      stroke: #707176;
-    }
-
     display: flex;
     flex-direction: column;
     padding: 30px 15px;
@@ -302,6 +395,12 @@ export default {
     .s-header {
       display: flex;
       align-items: center;
+      width: 100%;
+
+      .left-header {
+        display: flex;
+        justify-content: space-between;
+      }
 
       p {
         margin: 0;
@@ -344,7 +443,7 @@ export default {
         margin: 7px 0;
 
         span {
-          flex: 1 0 35%;
+          flex: 1 0 55%;
         }
       }
     }
@@ -389,48 +488,20 @@ export default {
         p {
           font-family:PingFangSC-Semibold;
           color:#282d32;
-          font-size: 20px;
+          font-size: 1rem;
           line-height:19.2px;
         }
       }
 
-      .radio-group {
+      .pie-wrapper {
         display: flex;
-        flex-wrap: wrap;
-        $accent-color:#5d77ff;
-        $primary-color: #fff;
+        flex-direction: column;
+        align-items: center;
 
-        .radio {
-          flex: 0 0 33%;
-        }
-
-        .radio-btn {
-            position: absolute;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .label {
-            display: flex;
-            align-items: center;
-            padding: 0.15rem 0;
-            font-size: $f-small;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.25s linear;
-        }
-
-        .label span {
-            display: inline-block;
-            content: "";
-            height: 1.125rem;
-            width: 1.125rem;
-            margin-right: 0.625rem;
-            border: 0.25rem solid $primary-color;
-            border-radius: 50%;
-            transition: all 0.25s linear;
-            background: $accent-color;
-            box-shadow: 0 0 5px 3px lighten($color: #d7ddff, $amount: 0.7);
+        &.small {
+          svg {
+            width: 50%;
+          }
         }
       }
     }

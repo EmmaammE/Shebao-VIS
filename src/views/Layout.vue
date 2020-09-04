@@ -113,9 +113,11 @@
             <SearchIconIcon />
           </template>
         </v-text-field>
-        <div></div>
-        <div class="tool-btn"><BackIcon/></div>
-        <div class="tool-btn"><NextIcon/></div>
+        <div class="icons">
+          <div class="tool-btn"><img src="@/assets/bingtu.png"/></div>
+          <div class="tool-btn"><BackIcon/></div>
+          <div class="tool-btn"><NextIcon/></div>
+        </div>
       </div>
     </v-app-bar>
 
@@ -381,12 +383,21 @@ export default {
 
      .s-bar-content {
         width: 100%;
-        display: grid;
-        grid-template-columns: 45% auto 64px 64px;
+        display: flex;
+        justify-content: space-between;
+
+        .icons {
+          display: flex;
+          .tool-btn img {
+            margin: 10px;
+            height: 40px;
+          }
+        }
      }
 
      .v-input {
        align-items: center;
+       margin-right: 50%;
      }
 
       .tool-btn {

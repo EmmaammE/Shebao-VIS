@@ -173,6 +173,8 @@
       :data="datum?datum[activeKey]:{}"
       v-bind="panel"
       :people="people"
+      :compType="compType"
+      @changeKey="changeKey"
     />
   </div>
 </template>
@@ -194,6 +196,55 @@ const HASH = {
   家庭病床: 'jia_ting_bing_chuang',
 };
 
+const headersData = [
+  [
+    // 就诊信息
+    {
+      align: 'center', text: '性别', value: 'xing_bie',
+    }, {
+      align: 'center', text: '序号', value: 'index',
+    }, {
+      align: 'center', text: '姓名', value: 'name',
+    }, {
+      align: 'center', text: '社保编号', value: 'she_bao_bian_hao', width: 55,
+    }, {
+      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao', width: 55,
+    }, {
+      align: 'center', text: '参保类别', value: 'can_bao_lei_xing', width: 55,
+    }, {
+      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai', width: 55,
+    },
+  ], [
+    // 药师医师汇总
+    {
+      align: 'center', text: '性别', value: 'xing_bie',
+    }, {
+      align: 'center', text: '序号', value: 'index',
+    }, {
+      align: 'center', text: '姓名', value: 'xing_ming',
+    }, {
+      align: 'center', text: '社保编号', value: 'key',
+    }, {
+      align: 'center', text: '服务机构名称', value: 'fu_wu_ji_gou_ming_cheng',
+    },
+  ], [
+    {
+      align: 'center', text: '性别', value: 'xing_bie',
+    }, {
+      align: 'center', text: '序号', value: 'index',
+    }, {
+      align: 'center', text: '姓名', value: 'name',
+    }, {
+      align: 'center', text: '社保编号', value: 'she_bao_bian_hao', width: 55,
+    }, {
+      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao', width: 55,
+    }, {
+      align: 'center', text: '参保类别', value: 'can_bao_lei_xing', width: 55,
+    }, {
+      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai', width: 55,
+    },
+  ]];
+
 export default {
   name: 'Search',
   components: {
@@ -206,53 +257,7 @@ export default {
     modal: false,
     menu2: false,
     id: null,
-    headersData: [
-      [
-        // 就诊信息
-        {
-          align: 'center', text: '性别', value: 'xing_bie',
-        }, {
-          align: 'center', text: '序号', value: 'index',
-        }, {
-          align: 'center', text: '姓名', value: 'name',
-        }, {
-          align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
-        }, {
-          align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
-        }, {
-          align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
-        }, {
-          align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
-        },
-      ], [
-        {
-          align: 'center', text: '性别', value: 'xing_bie',
-        }, {
-          align: 'center', text: '序号', value: 'index',
-        }, {
-          align: 'center', text: '姓名', value: 'xing_ming',
-        }, {
-          align: 'center', text: '社保编号', value: 'key',
-        }, {
-          align: 'center', text: '服务机构名称', value: 'fu_wu_ji_gou_ming_cheng',
-        },
-      ], [
-        {
-          align: 'center', text: '性别', value: 'xing_bie',
-        }, {
-          align: 'center', text: '序号', value: 'index',
-        }, {
-          align: 'center', text: '姓名', value: 'name',
-        }, {
-          align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
-        }, {
-          align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
-        }, {
-          align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
-        }, {
-          align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
-        },
-      ]],
+
     // 表格数据
     tableData: [
     ],
@@ -297,12 +302,8 @@ export default {
     ],
   }),
 
-  mounted() {
-    this.getData();
-  },
-
   watch: {
-    $route: 'getData',
+    $route: 'initData',
     options: {
       handler() {
         this.getData().then((data) => {
@@ -331,37 +332,27 @@ export default {
           return 3;
       }
     },
-    // header() {
-    //   switch (this.compType) {
-    //     case 1:
-    //       return ['医疗费用']
-    //     case 2:
-    //     default:
-    //       return
-    //   }
-    // },
-    headers() {
-      return this.headersData[this.compType];
-    },
+
     panel() {
       // 返回不同组件panel的信息
       switch (this.compType) {
         case 1:
           // 药师医师汇总
           return {
+            // 饼图的tab栏
             menu: [
-              { value: 'yi_bao_fen_lei', text: '医保分类' },
+              { value: 'yi_bao_fen_lei_fu_wu_qing_kuang', text: '医保服务总列支费用' },
               { value: 'fei_yong_gou_cheng_qing_kuang', text: '费用构成' },
             ],
+            // 头像旁边的小字
             info: [
-              { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
-              { text: '参保类别', value: 'can_bao_lei_xing' },
-              { text: '身份证号', value: 'shen_fen_zheng_hao' },
-              { text: '社保编号', value: 'she_bao_bian_hao' },
+              { text: '医保医师号', value: 'key' },
+              { text: '服务机构', value: 'fu_wu_ji_gou_ming_cheng' },
             ],
+            // 上方的数字
             header: [
-              { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
-              { text: '医保服务人次数', value: 'shen_fen_zheng_hao' },
+              { text: '医保服务总列支费用', value: 'yi_bao_fu_wu_zong_lie_zhi_fei_yong' },
+              { text: '医保服务人次数', value: 'yi_bao_fu_wu_ren_ci' },
               { text: '医保服务人数', value: 'yi_bao_fu_wu_ren_shu' },
             ],
           };
@@ -369,9 +360,14 @@ export default {
           // 参保人员汇总
           return {
             menu: [
-              { value: 'yi_liao_fei_yong', text: '医疗费用' },
-              { value: 'fei_yong_gou_cheng_qing_kuang', text: '费用构成' },
-              { value: 'ji_jin_lie_zhi_qing_kuang', text: '基金列支' },
+              { value: 'ji_jin_lie_zhi_qing_kuang', text: '累计总医药费用' },
+              { value: 'yi_liao_fei_yong', text: '累计列支费用及次数' },
+              { value: 'fei_yong_gou_cheng_qing_kuang', text: '费用构成及占比' },
+            ],
+            header: [
+              { value: 'lei_ji_zong_yi_yao_fei_yong', text: '累计总医药费用' },
+              { value: 'lei_ji_lie_zhi_yi_yao_fei_yong', text: '累计列支费用' },
+              { value: 'lei_ji_shua_ka_pin_ci_shu', text: '费用刷卡次数' },
             ],
             info: [
               { text: '就职状态', value: 'jiu_zhi_zhuang_tai' },
@@ -385,6 +381,10 @@ export default {
 
           };
       }
+    },
+
+    headers() {
+      return headersData[this.compType];
     },
   },
 
@@ -408,7 +408,19 @@ export default {
       }
     },
 
+    initData() {
+      this.tableData = [];
+      this.getData().then((data) => {
+        this.tableData = data.items;
+        this.totalItems = data.total;
+
+        // 更新选中行
+        this.activeIndex = [{ index: 1 }];
+      });
+    },
+
     async getDoctorInfo() {
+      // 药师医师汇总
       const { page } = this.options;
       const data = await fetchDoctorInfo({
         startDay: this.dateBegin,
@@ -417,7 +429,6 @@ export default {
         pageNum: page,
       });
 
-      this.datum = data.patient_page;
       const people = [];
 
       const items = Object.keys(data.doctor_page).map((key, index) => {
@@ -425,13 +436,18 @@ export default {
           this.activeKey = key;
         }
 
+        data.doctor_page[key].ji_ben_qing_kuang.key = key;
+
         people.push({
-          text: data.doctor_page[key].ji_ben_qing_kuang.name,
-          value: key,
-          index: index + 1,
+          text: data.doctor_page[key].ji_ben_qing_kuang.xing_ming,
+          value: {
+            key,
+            index: index + 1,
+          },
+
         });
         return {
-          ...data.doctor_page[key], ...{ key, index: index + 1 },
+          ...data.doctor_page[key].ji_ben_qing_kuang, ...{ key, index: index + 1 },
         };
       });
 
@@ -439,7 +455,7 @@ export default {
         setTimeout(() => {
           this.loading = false;
           this.people = people;
-          // this.totalItems = this.datum.total_patient_num;
+          this.datum = data.doctor_page;
 
           resolve({
             items,
@@ -458,31 +474,28 @@ export default {
         searchItem: this.id,
         pageNum: page,
       });
-      const total = Object.keys(data.patient_page).length;
 
-      const people = [];
       this.datum = data.patient_page;
+      const people = [];
+
       const items = Object.keys(data.patient_page).map((key, index) => {
         if (index === 0) {
           this.activeKey = key;
         }
         people.push({
           text: data.patient_page[key].ji_ben_qing_kuang.name,
-          value: key,
-          index: index + 1,
+          value: {
+            key,
+            index: index + 1,
+          },
         });
         return { ...data.patient_page[key].ji_ben_qing_kuang, ...{ index: index + 1, key } };
       });
-
-      // if (itemsPerPage > 0) {
-      //   items = items.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-      // }
 
       return new Promise((resolve) => {
         setTimeout(() => {
           this.loading = false;
           this.people = people;
-          // this.totalItems = this.datum.total_patient_num;
 
           resolve({
             items,
@@ -542,6 +555,11 @@ export default {
       row.select(true);
       this.activeIndex = [{ index: item.index }];
       this.activeKey = item.key;
+    },
+
+    changeKey(e) {
+      this.activeKey = e.key;
+      this.activeIndex = [{ index: e.index }];
     },
   },
 };

@@ -178,7 +178,7 @@ export default {
       ],
 
       selectItems: [
-        { value: '按结构排序', key: 'organization' },
+        { value: '按机构排序', key: 'organization' },
         { value: '按药品排序', key: 'drug' },
         { value: '按医师排序', key: 'doctor' },
       ],
@@ -193,7 +193,7 @@ export default {
       menu2: false,
 
       // 排序类型
-      selected: { value: '按结构排序', key: 'organization' },
+      selected: { value: '按机构排序', key: 'organization' },
 
       datum: {},
       chart1Size,

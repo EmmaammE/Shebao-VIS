@@ -194,6 +194,9 @@ export default {
         key = d[this.type];
       }
       if (this.datum[key]) {
+        if (this.datum[key].value === 0) {
+          return '#eee';
+        }
         return this.colorSchema(this.datum[key][this.dataType]);
       }
       // console.log(key);

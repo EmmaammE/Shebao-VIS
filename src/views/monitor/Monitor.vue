@@ -68,6 +68,7 @@
             @tooltip="updateTooltip"
           >
             <line
+              v-if="isShowing"
               stroke="#babec7"
               stroke-dasharray="4 2"
               :x1="tipPos.x" :y1="chart1Size.margin.top" :x2="tipPos.x"
@@ -75,7 +76,7 @@
           </line-chart>
 
           <Tooltip v-show="isShowing && datum['2019'][tipData.date]
-          && tipData.type === 0" v-bind="tipPos">
+            && tipData.type === 0" v-bind="tipPos">
             <div class="s-tip">
               <div>
                 <p>{{tipData.date}}</p>
@@ -446,7 +447,7 @@ export default {
       this.lineDatum = data2;
       this.yscale = this.yscale.domain([0, maxValue]).nice();
       this.colorScale = extent.map((e) => d3.scaleLinear()
-        .range(['#73cdbb', '#eee', '#eb745f'])
+        .range(['#73cdbb', '#efefef', '#eb745f'])
         .domain([-e, 0, e]));
     },
   },
