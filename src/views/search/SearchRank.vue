@@ -100,7 +100,7 @@
 
     </div>
 
-    <p class="text-lg-h6">数据结果</p>
+    <p class="text-lg-h6 text-margin">数据结果</p>
     <div class="s-chart-container text-lg-body-2" ref="chart">
       <div class="charts">
         <div v-for="(value, name) in datum"

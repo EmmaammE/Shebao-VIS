@@ -200,7 +200,7 @@ const iconFactory = (image = image1, num = 0.5) => L.icon({
 });
 
 const initSatus = {
-  dateStart: new Date('2020-01-01').toISOString().substr(0, 10),
+  dateStart: new Date('2020-03-01').toISOString().substr(0, 10),
   dateEnd: new Date().toISOString().substr(0, 10),
   active: 1,
   // 地域类型

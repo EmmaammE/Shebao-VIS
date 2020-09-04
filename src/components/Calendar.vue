@@ -2,7 +2,7 @@
   <div class="calendar-container">
     <!-- <svg width='100%' height='100%'> -->
     <svg  height='100%' :viewBox="`0 0 ${width} ${height}`"
-      @mouseleave="hideTooltip"
+      @mouseout="hideTooltip"
     >
       <defs>
         <linearGradient id="gradient" x1="0" x2="0" y1="100%" y2="0%">
@@ -13,7 +13,8 @@
       </defs>
       <text x="5" y="50%">{{year}}</text>
 
-      <g :transform="`translate(${width-marginRight-marginLeft}, ${marginTop})`">
+      <g :transform="`translate(${width-marginRight-marginLeft}, ${marginTop})`"
+        v-if="year===2019">
           <text>{{colorSchema && colorSchema.domain()[0].toFixed(2)}}</text>
           <rect x="10" y="12" class="legend"
             width="5" :height="height/2" />
@@ -213,10 +214,14 @@ export default {
         valueKey = d[this.type];
       }
 
+      if (this.datum[valueKey] === undefined) {
+        return;
+      }
+
       const x = this.cellX(d);
 
       this.$emit('tooltip', true, {
-        left: e.offsetX - 50,
+        left: e.offsetX,
         top: e.offsetY - 15 + (+this.year - 2019) * 155,
         x,
       }, {
@@ -252,15 +257,6 @@ export default {
         margin: 0;
       }
   }
-  // .s-tip {
-  //   margin: 0;
-  //   user-select: none;
-  //   transform: scale(0.8);
-
-  //   p {
-  //     margin: 0;
-  //   }
-  // }
 
   rect {
     cursor: pointer;

@@ -210,6 +210,10 @@ export default {
     stroke: #707176;
   }
 
+  path {
+    cursor: pointer;
+  }
+
   path.active {
     filter: url(#dropshadow);
   }

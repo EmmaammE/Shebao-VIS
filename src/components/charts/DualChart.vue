@@ -188,7 +188,7 @@ export default {
         const { xBottomScale, xTopScale } = that.scales;
 
         that.$emit('tooltip', true, {
-          left: d3.event.pageX - 85,
+          left: d3.event.pageX,
           top: d3.event.pageY - 70,
         }, {
           num: xBottomScale.invert(pos[0]).toFixed(2),

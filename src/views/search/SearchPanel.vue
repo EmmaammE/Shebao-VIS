@@ -140,7 +140,7 @@
         </div>
       </v-sheet>
 
-      <p class="sub-title">数据结果</p>
+      <p class="sub-title text-margin">数据结果</p>
 
       <v-data-table
         class="s-table"
@@ -148,7 +148,6 @@
         :items="tableData"
         item-key="index"
         disable-sort
-        hide-default-header
         @click:row="rowClick"
         single-select
         v-model="activeIndex"
@@ -156,6 +155,7 @@
         :server-items-length="totalItems"
         :loading="loading"
         :footer-props="{'disable-items-per-page':true}"
+        calculate-widths
       >
         <template v-slot:[`item.xing_bie`]="{ item }">
           <div class="custom-avatar">
@@ -200,24 +200,24 @@ const headersData = [
   [
     // 就诊信息
     {
-      align: 'center', text: '性别', value: 'xing_bie',
+      align: 'center', text: '性别', value: 'xing_bie', width: 45,
     }, {
       align: 'center', text: '序号', value: 'index',
     }, {
       align: 'center', text: '姓名', value: 'name',
     }, {
-      align: 'center', text: '社保编号', value: 'she_bao_bian_hao', width: 55,
+      align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
     }, {
-      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao', width: 55,
+      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
     }, {
-      align: 'center', text: '参保类别', value: 'can_bao_lei_xing', width: 55,
+      align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
     }, {
-      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai', width: 55,
+      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
     },
   ], [
     // 药师医师汇总
     {
-      align: 'center', text: '性别', value: 'xing_bie',
+      align: 'center', text: '性别', value: 'xing_bie', width: 55,
     }, {
       align: 'center', text: '序号', value: 'index',
     }, {
@@ -229,19 +229,19 @@ const headersData = [
     },
   ], [
     {
-      align: 'center', text: '性别', value: 'xing_bie',
+      align: 'center', text: '性别', value: 'xing_bie', width: 55,
     }, {
       align: 'center', text: '序号', value: 'index',
     }, {
       align: 'center', text: '姓名', value: 'name',
     }, {
-      align: 'center', text: '社保编号', value: 'she_bao_bian_hao', width: 55,
+      align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
     }, {
-      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao', width: 55,
+      align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
     }, {
-      align: 'center', text: '参保类别', value: 'can_bao_lei_xing', width: 55,
+      align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
     }, {
-      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai', width: 55,
+      align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
     },
   ]];
 
@@ -616,6 +616,8 @@ export default {
 
   .custom-avatar {
     display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .v-data-table {

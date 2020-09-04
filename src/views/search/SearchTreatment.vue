@@ -131,7 +131,7 @@
           </div>
         </v-sheet>
 
-        <p class="sub-title">数据结果</p>
+        <p class="sub-title text-margin">数据结果</p>
       </div>
 
       <v-data-table
@@ -150,6 +150,7 @@
         :footer-props="{'disable-items-per-page':true}"
         show-expand
         dense
+        calculate-widths
       >
         <template v-slot:[`item.xing_bie`]="{ item }">
           <div class="custom-avatar">
@@ -502,6 +503,7 @@ export default {
 
   .v-input {
     margin: 10px 0;
+    font-size: 0.8rem;
   }
 
   .date-container {
@@ -516,7 +518,7 @@ export default {
     }
 
     .v-input {
-      margin: 0 10px;
+      margin: 4px 10px;
     }
   }
 
@@ -553,7 +555,7 @@ export default {
   }
 
   .treatment {
-    height: calc(100vh - 90px);
+    height: calc(100vh - 100px);
     overflow-y: auto;
     overflow-x: hidden;
 

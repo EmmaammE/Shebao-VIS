@@ -54,12 +54,12 @@
             <div class="down-header">
               <p>{{menu[menuIndex].text}}</p>
 
-              <time-picker
+              <!-- <time-picker
                 :dateEnd="dateEnd"
                 :dateStart="dateStart"
                 :menu1="menu1"
                 :menu2="menu2"
-              />
+              /> -->
             </div>
 
             <template v-if="dataHasValue[0].length === 0">
@@ -117,7 +117,7 @@
                 :colorScale="colorScale"
                 :data="d"
                 :type="type"
-                :active="activePie"
+                :activePie="activePie"
                 @hoverPie="hoverPie"
               />
             </div>
@@ -245,9 +245,9 @@ export default {
   },
   data() {
     return {
-      menuIndex: 1,
+      menuIndex: 0,
 
-      dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
+      dateStart: new Date('2020-01-01').toISOString().substr(0, 10),
       dateEnd: new Date().toISOString().substr(0, 10),
       menu1: false,
       menu2: false,

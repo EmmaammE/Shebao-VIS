@@ -3,8 +3,7 @@
     <svg
       v-if ="datum.length!==0"
       :viewBox="`0 0 ${width} ${height}`"
-        ref="paths"
-
+      ref="paths"
     >
       <defs>
         <clipPath id="clip">
@@ -162,22 +161,25 @@ export default {
     const $paths = d3.select(this.$refs.paths);
     const that = this;
     $paths.on('mousemove', function mousemoveAction() {
-      const { id } = d3.event.path[0];
-      // that.focusMousemove(d3.mouse(this), id, {
-      //   left: d3.event.pageX,
-      //   top: d3.event.pageY,
-      // });\
-      // console.log('fuc');
       const mouse = d3.mouse(this);
-      const date = that.chartX[1].invert(mouse[0]);
+      if (mouse[0] >= that.margin.left) {
+        const date = that.chartX[1].invert(mouse[0] - that.margin.left);
 
-      that.$emit('tooltip', true, {
-        left: d3.event.offsetX - 10,
-        top: d3.event.offsetY + 150,
-        x: mouse[0],
+        that.$emit('tooltip', true, {
+          left: d3.event.offsetX,
+          top: d3.event.offsetY + 150,
+          x: mouse[0],
+        }, {
+          date: date.toISOString().substr(0, 10),
+          type: 0,
+        });
+      }
+    }).on('mouseout', () => {
+      this.$emit('tooltip', false, {
+        left: 0,
+        top: 0,
+        x: 0,
       }, {
-        date: date.toISOString().substr(0, 10),
-        type: 0,
       });
     });
   },

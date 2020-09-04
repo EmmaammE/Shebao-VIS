@@ -149,6 +149,7 @@ export default {
 
   }
 
+  .search-container,
   .treatment {
     th, td {
       font-size: 0.5rem!important;
@@ -169,6 +170,17 @@ export default {
 
     .v-data-table__expanded v-data-table__expanded__content {
       display: flex;
+    }
+
+    .s-table .v-data-table__wrapper {
+      overflow: hidden;
+    }
+  }
+
+  .m-container .select-area {
+    .v-text-field.v-text-field--solo.v-input--dense > .v-input__control {
+      min-height: 22px!important;
+      line-height: 20px;
     }
   }
 </style>

@@ -3,7 +3,9 @@
     :style="{'left': left+'px', 'top': top+'px'}"
   >
     <!-- <p>{{title}}</p> -->
-    <slot></slot>
+    <div class="inner">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -23,14 +25,21 @@ export default {
 
 <style scoped lang="scss">
   .tooltip-container {
-    background: #777;
     color: #fff;
-    opacity: .78;
     z-index: 100;
     position: absolute;
   }
+
+  .s-tip {
+    background: #777;
+    opacity: .78;
+    position: relative;
+    margin-left: -50%;
+    margin-right: 50%;
+  }
+
 // TODO 修改三角形的朝向
-  .tooltip-container::before {
+  .s-tip::before {
     content: '';
     position: absolute;
     bottom: -12px;
