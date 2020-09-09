@@ -1,7 +1,7 @@
 <template>
   <v-card class="line-card">
     <h4>{{title}}</h4>
-    <p>￥{{amount.toLocaleString()}}</p>
+    <p>{{amount.toLocaleString()}}{{tick}}</p>
     <h1>{{rank}}</h1>
     <!-- line -->
 
@@ -65,6 +65,7 @@ export default {
   props: {
     title: String,
     rank: Number,
+    tick: String,
     data: {
       type: Object,
       default: () => ({

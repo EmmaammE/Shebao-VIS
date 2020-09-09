@@ -6,10 +6,12 @@
 
    <div class="profile-container" v-else>
      <v-card class="header">
-     <div class="icon-wrapper">
-       <HosIcon />
+     <div class="org-info">
+        <div class="icon-wrapper">
+          <HosIcon />
+        </div>
+        <p>{{title}}</p>
      </div>
-     <p>{{title}}</p>
      <div class="s-info">
        <span>机构编码：{{id}}</span>
        <span>盈利类型：{{type}}</span>
@@ -20,7 +22,7 @@
    <div class="content">
 
     <div class="box">
-      <p>医保费用发生总体情况</p>
+      <p class="profile-title">医保费用发生总体情况</p>
       <div class="box-header">
         <div class="legends">
           <span><i> </i>2019年</span>
@@ -50,6 +52,7 @@
           :amount="189"
           :rank="charts[d.value].rank[radioValues[radioGroup]]"
           :data="charts[d.value].time_series"
+          :tick="d.tick"
         />
       </div>
       <div class="second-row">
@@ -60,6 +63,7 @@
           :amount="189"
           :rank="charts[d.value].rank[radioValues[radioGroup]]"
           :data="charts[d.value].time_series"
+          :tick="d.tick"
         />
       </div>
     </div>
@@ -72,10 +76,11 @@
       :radioLabels="radioLabelsArr[n-1]"
       :header="'同期列支费用分布比较'"
       :datum="pieDatum[n-1]"
+      :tabs="tabs[n-1]"
     />
 
     <div class="box">
-      <p>服务人群结构分析</p>
+      <p class="profile-title">服务人群结构分析</p>
       <v-card class="card">
         <div class="btn-container">
           <v-btn
@@ -98,6 +103,7 @@
           <!--svg -->
           <round-barchart
             :data="fuwuData[menuValue[menuIndex]][submenuValue[submenuIndex]]"
+            :unit="submenuIndex===1?'元':'次'"
           />
         </div>
       </v-card>
@@ -144,15 +150,15 @@ export default {
 
       // 第一排的linechart
       charts1: [
-        { text: '次均列支费用', value: 'ci_jun_lie_zhi_fei_yong' },
-        { text: '人次人头比', value: 'ren_ci_ren_tou_bi' },
-        { text: '人均列支费用', value: 'ren_jun_lie_zhi_fei_yong' },
+        { text: '次均列支费用', value: 'ci_jun_lie_zhi_fei_yong', tick: '（元)' },
+        { text: '人次人头比', value: 'ren_ci_ren_tou_bi', tick: '' },
+        { text: '人均列支费用', value: 'ren_jun_lie_zhi_fei_yong', tick: '（元）' },
       ],
       charts2: [
-        { text: '总列支费用', value: 'zong_lie_zhi_fei_yong' },
-        { text: '总人次数', value: 'zong_ren_ci_shu' },
-        { text: '总人头数', value: 'zong_ren_tou_shu' },
-        { text: '总医药费用', value: 'zong_yi_yao_fei_yong' },
+        { text: '总列支费用', value: 'zong_lie_zhi_fei_yong', tick: '（元）' },
+        { text: '总人次数', value: 'zong_ren_ci_shu', tick: '（次）' },
+        { text: '总人头数', value: 'zong_ren_tou_shu', tick: '（头）' },
+        { text: '总医药费用', value: 'zong_yi_yao_fei_yong', tick: '（元）' },
       ],
       // 上面两派图的数据
       charts: {},
@@ -165,9 +171,18 @@ export default {
       // barchart + piechart
       titles: ['就诊类别分析', '费用结构分析', '总医药费用'],
       menus: [
-        ['列支费用', '人均列支费用', '就诊人数', '就诊人次', '人头人次比'],
+        ['列支费用'],
         ['列支费用分布', '药品费用分布'],
-        ['报销支出费用', '个人现金支付费用'],
+        ['报销支出费用'],
+      ],
+      // 只有数值的数据
+      tabs: [
+        [{ text: '人均列支费用', unit: '元' },
+          { text: '就诊人数', unit: '人' },
+          { text: '就诊人次', unit: '次' },
+          { text: '人头人次比', unit: '%' }],
+        [],
+        [{ text: '个人现金支付费用', unit: '元' }],
       ],
       radioLabelsArr: [
         ['住院', '门诊', '规定病种', '家庭病床'],
@@ -243,17 +258,23 @@ export default {
       align-items: center;
       justify-content: space-evenly;
 
+      .org-info {
+        display: flex;
+        align-items: center;
+      }
+
       .icon-wrapper {
         border: 1.5px solid #034ec4;
         border-radius: 50%;
-        width: 50px;
-        height: 50px;
+        width: 65px;
+        height: 65px;
         display: flex;
         justify-content: center;
         align-items: center;
+        margin: 10px;
 
         svg {
-          transform: scale(1.2);
+          transform: scale(1.5);
         }
       }
       // padding: 10px;
@@ -286,11 +307,6 @@ export default {
         flex-direction: column;
         padding: 20px 2px;
         min-height: 14vh;
-
-        p {
-          font-size: $sub-title;
-          font-weight: bold;
-        }
       }
     }
 

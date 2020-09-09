@@ -3,9 +3,9 @@
     <Map
       :class="openPopup?'':'hide-popup'"
     >
-      <template v-if="this.datum[this.activeIndex]">
+      <template v-if="datum[activeIndex]">
         <l-marker
-          v-for="orgData in this.datum[this.activeIndex].chart"
+          v-for="orgData in datum[activeIndex].chart"
           :key="orgData.name"
           :icon="defaultIcon"
           @add="openPopupAction"
@@ -46,7 +46,7 @@
         <span class="type-icon"></span>
         <span class="type-icon"></span>
       </div>
-      <div class="content">
+      <div class="content" @scroll="onScroll">
         <div
           v-for="(d,i) in datum"
           :key = "d.tableData[1]"
@@ -92,7 +92,7 @@ export default {
   data() {
     return {
       datum: [],
-      activeIndex: 0,
+      activeIndex: -1,
       radius: 200,
       rScale: d3.scaleLinear().range([200, 350]),
       options: {
@@ -120,28 +120,51 @@ export default {
 
       // 是否显示Popup
       openPopup: false,
+      pageNum: 1,
+
+      // 是否正在处理
+      busy: false,
     };
   },
   mounted() {
     this.getPatientViolationInfo();
   },
+
+  watch: {
+    activeIndex(newV) {
+      this.getAllDetail(newV);
+    },
+  },
+
   methods: {
+    onScroll(e) {
+      const { target } = e;
+      const bottomOff = target.getBoundingClientRect().height + target.scrollTop
+        >= target.scrollHeight - 10;
+      if (bottomOff && !this.busy) {
+        this.busy = true;
+        this.getPatientViolationInfo().then(() => {
+          this.busy = false;
+        });
+      }
+    },
+
     async getPatientViolationInfo() {
       // const data = await fetchPatientViolationInfo({
       //   // TODO 这个参数
       //   pageNum: 1,
       // });
+      const { pageNum } = this;
 
       Promise.all([fetchPatientViolationInfo({
-        pageNum: 1,
+        pageNum,
       }), fetchPatientViolationInfo({
-        pageNum: 2,
+        pageNum: pageNum + 1,
       })]).then((res) => {
         // console.log(res);
         const data = { ...res[0] };
         data.patient_page = { ...res[0].patient_page, ...res[1].patient_page };
-        let minV = Number.MAX_VALUE;
-        let maxV = Number.MIN_VALUE;
+        this.pageNum = pageNum + 2;
 
         this.$store.commit({
           type: 'updatemenu',
@@ -152,22 +175,21 @@ export default {
           ],
         });
 
-        this.datum = Object.keys(data.patient_page)
-          .map((key, index) => {
-            const chart = Object.values(data.patient_page[key].yi_chang_ji_gou).map((orgData) => {
-              const a = orgData.qun_ti_jiu_yi.all;
-              const b = orgData.shua_kong_ka.all;
-              const c = orgData.shua_xiao_ka.all;
-              const d = orgData.xu_jia_zhu_yuan.all;
+        const result = this.datum.slice();
+        let index = this.datum.length;
 
-              minV = Math.min(a, b, c, d, minV);
-              maxV = Math.max(a, b, c, d, maxV);
+        Object.keys(data.patient_page).forEach((key) => {
+          const chart = Object.values(data.patient_page[key].yi_chang_ji_gou).map((orgData) => {
+            const a = orgData.qun_ti_jiu_yi.all;
+            const b = orgData.shua_kong_ka.all;
+            const c = orgData.shua_xiao_ka.all;
+            const d = orgData.xu_jia_zhu_yuan.all;
 
-              return { ...orgData, ...{ sum: a + b + c + d, key } };
-            });
+            return { ...orgData, ...{ sum: a + b + c + d, key } };
+          });
 
-            // 获得最大值和最小值
-            return {
+          result.push(
+            {
               tableData: [index + 1,
                 key,
                 data.patient_page[key].name,
@@ -177,14 +199,20 @@ export default {
                 data.patient_page[key].shua_xiao_ka,
                 data.patient_page[key].xu_jia_zhu_yuan],
               chart,
-            };
-          });
+            },
+          );
 
-        this.rScale = this.rScale.domain([minV, maxV]);
-
-        this.$nextTick(() => {
-          this.getAllDetail();
+          index += 1;
         });
+
+        this.datum = result;
+
+        if (this.activeIndex === -1) {
+          this.activeIndex = 0;
+        }
+        // this.$nextTick(() => {
+        //   this.getAllDetail();
+        // });
       });
     },
 
@@ -223,10 +251,12 @@ export default {
       this.openPopup = true;
     },
 
-    getAllDetail() {
+    getAllDetail(activeIndex) {
       // 对现在加载的请求详细信息
-      const id = this.datum[this.activeIndex].tableData[1];
-      this.getPatientDetail(id);
+      if (activeIndex !== -1) {
+        const id = this.datum[activeIndex].tableData[1];
+        this.getPatientDetail(id);
+      }
     },
 
     onClick(index) {
@@ -260,7 +290,6 @@ export default {
     padding: 10px;
     opacity: .8;
     background: #f7f7f7;
-    overflow: auto;
   }
 
   .header {
@@ -276,27 +305,23 @@ export default {
 
     .type-icon {
       display: block;
-      $radius: 10px;
-      $space: 3px;
-
       border-radius: 50%;
       position: relative;
-      width: 2*$radius;
-      height: 2*$radius;
+      width: 17px;
+      height:17px;
       background: #fff;
       margin: 0;
       padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &::after  {
         content: '';
-        position: absolute;
         left: 0;
-        top: 0;
-        width: 2 * ($radius - $space);
-        height: 2 * ($radius - $space);
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        top: 2px;
-        left: 2px;
       }
 
     }
@@ -316,10 +341,10 @@ export default {
   .content {
     margin: 10px 0;
     font-size: 0.8rem;
+    overflow: auto;
   }
   .content::-webkit-scrollbar {
     width: 4px;
-    overflow: auto;
     max-height: calc(88vh - 40px);
   }
 

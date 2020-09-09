@@ -3,7 +3,7 @@
     <component :is="active?IconOn:Icon" class="svg-style" viewBox="0 0 59 59"/>
     <div :class="active?'s-info active':'s-info'">
       <p class="text-title">{{type}}</p>
-      <p class="text-number">{{data.toLocaleString()}}</p>
+      <p class="text-number">{{data?data.toLocaleString():0}}</p>
     </div>
   </v-sheet>
 </template>
@@ -47,9 +47,8 @@ export default {
     .s-info {
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
+      justify-content: center;
       color: #3365BB;
-      margin: 0 4px;
 
       p {
         margin: 0;
@@ -60,11 +59,12 @@ export default {
         font-family:LcdD;
         font-size:1.5rem;
         letter-spacing:0;
+        margin-bottom: 0px;
       }
 
       p.text-title {
         font-family:STHeitiSC-Medium;
-        font-size: 1rem;
+        font-size: 0.9rem;
         letter-spacing:-0.96px;
       }
 

@@ -2,7 +2,7 @@
   <div class="search-container treatment">
     <v-card outlined class="content-card">
       <div class="card-condition">
-        <p class="sub-title">筛选条件</p>
+        <p class="she-title">筛选条件</p>
         <v-sheet class="date-container">
           <p>时间区间</p>
           <v-menu
@@ -22,6 +22,8 @@
                 hide-details="true"
                 v-bind="attrs"
                 v-on="on"
+                :height="30"
+                class="min-height"
               ></v-text-field>
             </template>
             <v-date-picker v-model="dateBegin" no-title scrollable>
@@ -50,6 +52,8 @@
                 hide-details="true"
                 v-bind="attrs"
                 v-on="on"
+                :height="30"
+                class="min-height"
               ></v-text-field>
             </template>
             <v-date-picker v-model="dateEnd" no-title scrollable>
@@ -110,6 +114,8 @@
               v-model="infoid"
               label="就诊人编码"
               hide-details
+              :height="30"
+          class="min-height"
             ></v-text-field>
 
             <v-text-field
@@ -119,6 +125,8 @@
               hide-details
               v-model="yishi"
               label="处方医师"
+              :height="30"
+              class="min-height"
             ></v-text-field>
 
             <v-text-field
@@ -127,76 +135,81 @@
               hide-details
               v-model="orgName"
               label="机构名称"
+              :height="30"
+              class="min-height"
             ></v-text-field>
           </div>
         </v-sheet>
 
-        <p class="sub-title text-margin">数据结果</p>
+        <p class="she-title text-margin">数据结果</p>
       </div>
 
-      <v-data-table
-        class="s-table"
-        :headers="headersData"
-        :items="tableData"
-        item-key="index"
-        disable-sort
-        single-expand
-        @click:row="rowClick"
-        single-select
-        v-model="activeIndex"
-        :options.sync="options"
-        :server-items-length="totalItems"
-        :loading="loading"
-        :footer-props="{'disable-items-per-page':true}"
-        show-expand
-        dense
-        calculate-widths
-      >
-        <template v-slot:[`item.xing_bie`]="{ item }">
-          <div class="custom-avatar">
-            <component :is="avatar(item.xing_bie)"
-              width="45"
-              height="45"
-            >
-            </component>
-          </div>
-        </template>
-
-        <template v-slot:expanded-item="{ headers, item }"
+      <div class="table-wrapper">
+        <v-data-table
+          class="s-table"
+          :headers="headersData"
+          :items="tableData"
+          item-key="index"
+          disable-sort
+          single-expand
+          @click:row="rowClick"
+          single-select
+          v-model="activeIndex"
+          :options.sync="options"
+          :server-items-length="totalItems"
+          :loading="loading"
+          :footer-props="{'disable-items-per-page':true}"
+          show-expand
+          dense
         >
-          <td :colspan="headers.length" class="expand-content">
-            <div class="expand-content">
-              <div class="outer">
-                <div v-for="(d,i) in expandHeader"
-                class="pie-wrapper"
-                :key="i"
+          <template v-slot:[`item.xing_bie`]="{ item }">
+            <div class="custom-avatar">
+              <component :is="avatar(item.xing_bie)"
+                width="45"
+                height="45"
               >
-                <p>{{d.text}}:{{item[d.value]}}（元）</p>
-                <div class="radio-group">
-                  <div
-                    v-for="(inner,index) in d.values"
-                    :key="index"
-                    class="radio"
+              </component>
+            </div>
+          </template>
+
+          <template v-slot:expanded-item="{ item }">
+            <td :colspan="13" class="expand-content">
+              <div class="expand-content">
+                <div class="outer">
+                  <div v-for="(d,i) in expandHeader"
+                    class="pie-wrapper"
+                    :key="i"
                   >
-                    <input type="radio" class="radio-btn" :name="inner"/>
-                    <label class="label">
-                      <span :style="{background: colorScale(d.keys.length)(index)}"></span>
-                      {{inner}}</label>
+                    <p>{{d.text}}:{{item[d.value]}}（元）</p>
+                    <div class="radio-group">
+                      <div
+                        v-for="(inner,index) in d.values"
+                        :key="index"
+                        class="radio"
+                      >
+                        <input type="radio" class="radio-btn" :name="inner"/>
+                        <label class="label">
+                          <span :style="
+                            {background:
+                              colorScale(d.keys.length)
+                              (pieChartData(item, d).colorHash[d.keys[index]])
+                              || '#efefef'}"
+                            ></span>
+                          {{inner}}</label>
+                      </div>
+                    </div>
+
+                    <pie-chart
+                      v-bind="pieChartData(item, d)"
+                      :type="0"
+                    />
                   </div>
                 </div>
-
-                <pie-chart
-                  :colorScale="colorScale(d.keys.length)"
-                  :data="d.keys.map((key,j) => (
-                    {text:d.values[j], value:+item[key]}
-                  ))"
-                />
               </div>
-              </div>
-            </div>
-          </td>
-        </template>
-      </v-data-table>
+            </td>
+          </template>
+        </v-data-table>
+      </div>
     </v-card>
   </div>
 </template>
@@ -237,8 +250,11 @@ export default {
       {
         align: 'center', text: '性别', value: 'xing_bie',
       }, {
-        align: 'center', text: '序号', value: 'index',
+        align: 'center', text: '序号', value: 'index', width: 100,
       }, {
+        align: 'center', text: '费用情况', value: 'data-table-expand', width: 100,
+      },
+      {
         align: 'center', text: '就诊人编码', value: 'jiu_zhen_ren_bian_ma',
       }, {
         align: 'center', text: '就诊人名称', value: 'jiu_zhen_ren_ming_cheng',
@@ -272,9 +288,6 @@ export default {
         align: 'center', text: '机构类型', value: 'ji_gou_lei_xing',
       }, {
         align: 'center', text: '机构地域', value: 'ji_gou_di_yu',
-      },
-      {
-        align: 'center', text: '', value: 'data-table-expand', width: 20,
       },
 
     ],
@@ -409,6 +422,27 @@ export default {
           return this.getTreatmentInfo();
       }
     },
+
+    pieChartData(item, d) {
+      const values = [];
+      const colorHash = {};
+      d.keys.forEach((key, j) => {
+        if (item[key] && (+item[key]) > 0) {
+          values.push({
+            text: d.values[j],
+            value: +item[key],
+          });
+          colorHash[key] = values.length - 1;
+        }
+      });
+
+      console.log(colorHash);
+      return {
+        colorScale: this.colorScale(values.length),
+        data: values,
+        colorHash,
+      };
+    },
     async getTreatmentInfo() {
       const { page } = this.options;
 
@@ -476,9 +510,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.search-container {
+  .search-container {
     padding: 0;
     height: 100%;
+
+    p {
+      margin: 0;
+    }
   }
 
   .card-condition {
@@ -490,15 +528,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
-  }
-
-  p.sub-title {
-    font-family:PingFangSC-Semibold;
-    font-size: $chart-title;
-    color:#262626;
-    letter-spacing:0;
-    text-align:left;
-    font-weight: bold;
+    min-height: calc(100vh - 70px);
   }
 
   .v-input {
@@ -510,11 +540,14 @@ export default {
     display: flex;
     border-bottom: 2px solid #ccc;
     border-radius: 0;
+    align-items: center;
+    padding-bottom: 5px;
 
     p {
       font-size: $sub-title;
       line-height: 40px;
       color: $she-grey;
+      margin: 0;
     }
 
     .v-input {
@@ -555,14 +588,10 @@ export default {
   }
 
   .treatment {
-    height: calc(100vh - 100px);
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    * {
-      overflow: hidden;
+    .table-wrapper {
+      height: 50vh;
+      overflow: auto;
     }
-
     .expand-content {
       height: 45vh;
       padding: 10px;

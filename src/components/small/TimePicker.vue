@@ -57,7 +57,10 @@ export default {
     dateEnd: String,
     menu1: Boolean,
     menu2: Boolean,
-    type: Boolean,
+    type: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>

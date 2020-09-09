@@ -1,81 +1,95 @@
 <template>
-  <svg viewBox="-300 -200 600 400">
-    <defs>
-      <marker id="circle" markerWidth="4" markerHeight="4" refX="2" refY="2">
-        <circle cx="2" cy="2" r="2" fill="#707176"></circle>
-      </marker>
+  <div class="pie-container">
+    <p>单位：{{unit}}</p>
+    <p class="pie-title" v-if="title">{{title}}</p>
+    <svg viewBox="-320 -200 640 400">
+      <defs>
+        <marker id="circle" markerWidth="4" markerHeight="4" refX="2" refY="2">
+          <circle cx="2" cy="2" r="2" fill="#707176"></circle>
+        </marker>
 
-      <!-- 阴影 -->
-      <filter id="dropshadow" height="130%" width="130%">
-        <!-- stdDeviation is how much to blur -->
-        <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
-        <feOffset dx="0" dy="2" result="offsetblur"/>
-        <feComponentTransfer>
-          <!-- slope is the opacity of the shadow -->
-          <feFuncA type="linear" slope="0.5"/>
-        </feComponentTransfer>
-        <feMerge>
-          <!-- this contains the offset blurred image -->
-          <feMergeNode/>
-          <!-- this contains the element that the filter is applied to -->
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
+        <!-- 阴影 -->
+        <filter id="dropshadow" height="130%" width="130%">
+          <!-- stdDeviation is how much to blur -->
+          <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+          <feOffset dx="0" dy="2" result="offsetblur"/>
+          <feComponentTransfer>
+            <!-- slope is the opacity of the shadow -->
+            <feFuncA type="linear" slope="0.5"/>
+          </feComponentTransfer>
+          <feMerge>
+            <!-- this contains the offset blurred image -->
+            <feMergeNode/>
+            <!-- this contains the element that the filter is applied to -->
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
 
-    <g
-      v-for="(d,index) in dataReady"
-      :key="index"
-      :class="d.cx < d.ox?'':'svg-end'"
-    >
-      <g v-if="d.child">
-        <g v-for="(cd,j) in d.child" :key="j+'c'">
-          <template v-if="cd.value > 0">
-            <!-- NOTE 因为这里我知道只有一个分类有child, 所以直接用数据长度+child的index作为index的标记了 -->
-            <path
-              :d="arcOut(cd)"
-              :fill="colorScale(dataReady.length + j)"
-              :class="dataReady.length+j === activePie?'active':''"
-              @mousemove="hoverPie(dataReady.length+j)"
-            ></path>
-            <g class="tip">
+      <g
+        v-for="(d,index) in dataReady"
+        :key="index"
+        :class="d.cx < d.ox?'':'svg-end'"
+      >
+        <g v-if="d.child">
+          <g v-for="(cd,j) in d.child" :key="j+'c'">
+            <template v-if="cd.value > 0">
+              <!-- NOTE 因为这里我知道只有一个分类有child, 所以直接用数据长度+child的index作为index的标记了 -->
               <path
-                marker-end="url(#circle)"
-                :d="textPath(cd)"
-                class="line"
-              />
-              <text
-                :x="cd.x"
-                :y="cd.y"
-              >
-                {{cd.value.toLocaleString()}}
-              </text>
-            </g>
-          </template>
+                :d="arcOut(cd)"
+                :fill="colorScale(dataReady.length + j)"
+                :class="dataReady.length+j === activePie?'active':''"
+                @mousemove="hoverPie(dataReady.length+j)"
+              ></path>
+              <g class="tip">
+                <path
+                  marker-end="url(#circle)"
+                  :d="textPath(cd)"
+                  class="line"
+                />
+                <text :font-size="12 * (type + 1)">
+                  <tspan
+                    :x="cd.x"
+                    :y="cd.y+10"
+                  >{{cd.ratio}}%</tspan>
+                  <tspan
+                    :x="cd.x"
+                    :y="cd.y+40"
+                  >{{cd.text}} : {{cd.value.toLocaleString()}}</tspan>
+                </text>
+              </g>
+            </template>
+          </g>
+        </g>
+
+        <path
+          :d="arc(d)"
+          :fill="colorScale(index)"
+          :class="index === activePie && type === 1?'active':''"
+          @mousemove="hoverPie(index)"
+        ></path>
+        <g class="tip">
+          <path
+            marker-end="url(#circle)"
+            :d="textPath(d)"
+            class="line"
+          />
+          <text
+            :font-size="12 * (type + 1)"
+          >
+           <tspan
+              :x="d.x"
+              :y="d.y+5*(type+1)"
+            >{{d.ratio}}%</tspan>
+            <tspan
+              :x="d.x"
+              :y="d.y+20*(type+1)"
+            >{{d.value.toLocaleString()}}</tspan>
+          </text>
         </g>
       </g>
-
-      <path
-        :d="arc(d)"
-        :fill="colorScale(index)"
-        :class="index === activePie && type === 1?'active':''"
-        @mousemove="hoverPie(index)"
-      ></path>
-      <g class="tip">
-        <path
-          marker-end="url(#circle)"
-          :d="textPath(d)"
-          class="line"
-        />
-        <text
-          :x="d.x"
-          :y="d.y"
-        >
-          {{d.value.toLocaleString()}}
-        </text>
-      </g>
-    </g>
-  </svg>
+    </svg>
+  </div>
 </template>
 
 <script>
@@ -84,13 +98,25 @@ import * as d3 from 'd3';
 export default {
   props: {
     colorScale: Function,
-    data: Array || Object,
+    data: Array,
     activePie: Number,
     type: Number,
+    unit: {
+      type: String,
+      default: '元',
+    },
+    // piechart的标题
+    title: String,
   },
   computed: {
     dataReady() {
-      const radius = 150;
+      const radius = 130;
+      // 所有一级数据的和
+      let dataSum = 0;
+      this.data.forEach((e) => {
+        dataSum += (+e.value);
+      });
+
       // 处理后的piechart数据
       return d3.pie()
         .padAngle(0.005)
@@ -100,21 +126,28 @@ export default {
           const tmp = { ...d };
 
           const a = d.startAngle + (d.endAngle - d.startAngle) / 2 - Math.PI / 2;
-          tmp.cx = Math.cos(a) * (radius - 85);
-          tmp.x = Math.cos(a) * (radius + 5);
+          tmp.cx = Math.cos(a) * (radius - 85) * 1.6;
+          tmp.x = Math.cos(a) * (radius + 5) * 1.6;
 
           tmp.cy = Math.sin(a) * (radius - 85);
           tmp.y = Math.sin(a) * (radius + 5);
 
           // var bbox = this.getBBox();
           // TODO 为了方便暂时假设文字宽度为40
-          const bbox = { width: 20 };
+          const bbox = { width: 40 };
           tmp.sx = tmp.x - bbox.width / 2 - 2;
           tmp.ox = tmp.x + bbox.width / 2 + 2;
           tmp.oy = tmp.y + 5;
           tmp.sy = tmp.oy;
+          tmp.ratio = Number(100 * (+d.value / dataSum)).toFixed(2);
 
           // console.log(tmp);
+
+          if (tmp.cx > tmp.ox) {
+            tmp.x -= 50;
+          } else {
+            tmp.x += 50;
+          }
 
           if (d.data.child) {
             // 如果有子类型
@@ -140,16 +173,23 @@ export default {
 
               // 懒得提取函数了，复制粘贴吧
               const _a = startAngle + (endAngle - startAngle) / 2 - Math.PI / 1.5;
-              const cx = Math.cos(_a) * (radius - 75);
-              const x = Math.cos(_a) * (radius + 25);
+              const cx = Math.cos(_a) * (radius - 75) * 1.6;
+              let x = Math.cos(_a) * (radius + 25) * 1.6;
 
               const cy = Math.sin(_a) * (radius - 75);
               const y = Math.sin(_a) * (radius + 25);
 
-              const sx = x - bbox.width / 2 - 2;
-              const ox = x + bbox.width / 2 + 2;
+              const sx = x - 50 - 2;
+              const ox = x + 50 + 2;
               const oy = y + 5;
               const sy = oy;
+
+              if (cx > ox) {
+                // 朝向左边
+                x -= 120;
+              } else {
+                x += 120;
+              }
 
               tmp.child.push({
                 startAngle,
@@ -164,6 +204,7 @@ export default {
                 oy,
                 value: child.value,
                 text: child.text,
+                ratio: Number(100 * (+child.value / sum)).toFixed(2),
               });
             }
           }
@@ -196,7 +237,6 @@ export default {
     },
 
     hoverPie(index) {
-      // hover2020的数据，显示2019圆弧
       this.$emit('hoverPie', index);
     },
 
@@ -204,7 +244,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .line {
     fill: none;
     stroke: #707176;
@@ -220,5 +260,33 @@ export default {
 
   .expand-content text {
     font-size: 1rem;
+  }
+
+  .pie-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+
+    svg {
+      flex: 1;
+
+      text {
+        text-anchor: middle;
+      }
+    }
+
+    p {
+      position: absolute;
+      font-size: 1rem;
+      font-weight: 400;
+      right: 10px;
+      top: 20px;
+    }
+
+    p.pie-title {
+      left: 18px;
+    }
   }
 </style>

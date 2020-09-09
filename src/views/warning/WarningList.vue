@@ -28,7 +28,6 @@
                 Object.keys(item.ten_min).length,
                 Object.keys(item.sixty_min).length]"
               :data="item.type"
-              :colorScale="colorScale"
             />
             <p>{{item.type}}</p>
           </div>
@@ -120,12 +119,12 @@ export default {
           align: 'center',
         },
         {
-          text: '异常费用',
+          text: '异常费用（元）',
           value: 'yi_chang_fei_yong',
           align: 'center',
         },
         {
-          text: '多地开药次数',
+          text: '多地开药次数（次）',
           value: 'type',
           align: 'center',
           sortable: false,
@@ -134,21 +133,19 @@ export default {
 
       headers2: [
         '序号', '机构代码', '医疗机构名称', '结算时间', '就诊人',
-        '就诊流水号', '医疗费总额', '报销金额',
+        '就诊流水号', '医疗费总额（元）', '报销金额（元）',
       ],
 
       pageData: [],
       scale: d3.scaleLinear().range([0, 100]),
       activeIndex: 0,
-      tabs: ['5分钟', '10分钟', '60分钟', '1天'],
+      tabs: ['5分钟', '10分钟', '60分钟', '半天'],
       tabsKey: ['five_min', 'ten_min', 'sixty_min', 'day'],
 
       // 分页
       pageNum: 1,
       loading: true,
       options: {},
-
-      colorScale: d3.scaleLinear().range(['#8eaee1', '#02317a']),
 
       // 另一半的数据
       pageIndex: [{ index: 1 }],
@@ -192,7 +189,6 @@ export default {
         });
 
       this.scale = this.scale.domain([0, maxValue]);
-      this.colorScale = this.colorScale.domain([0, maxValue]);
     },
 
     changeTab(e) {

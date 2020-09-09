@@ -1,11 +1,11 @@
 <template>
   <v-app class="s-container">
-    <v-navigation-drawer app floating class="s-drawer"
+    <v-navigation-drawer app floating class="s-drawer" width="18vw"
       :mobile-breakpoint="0">
       <template v-slot:prepend>
         <v-sheet class="s-header">
           <v-img
-            height="2rem"
+            height="2.5rem"
             contain
             src="@/assets/common/header.png"
             @click="drawer = !drawer"
@@ -36,6 +36,10 @@
             :value="i===activeMenu"
           >
             <template v-slot:activator>
+              <v-list-item-icon>
+                <component :is="item.icon" viewBox="0 0 26 19" width="23" height="16" />
+              </v-list-item-icon>
+
               <v-list-item-content>
                 <v-list-item-title v-text="item.title" />
               </v-list-item-content>
@@ -54,7 +58,7 @@
 
                   <div class="info-box">
                     <div>违规劣质费用
-                    <div>{{$store.state.menudata[0].toLocaleString()}}</div>
+                    <div>{{$store.state.menudata[0].toLocaleString()}} 元</div>
                     </div>
                     <div>违规人数
                     <div>{{$store.state.menudata[1].toLocaleString()}}</div>
@@ -64,10 +68,18 @@
                     </div>
                   </div>
                    <ul>
-                      <li>群体就医</li>
-                      <li>虚假住院</li>
-                      <li>刷空卡</li>
-                      <li>刷小卡</li>
+                      <li>
+                        <span></span>
+                        群体就医</li>
+                      <li>
+                        <span></span>
+                        虚假住院</li>
+                      <li>
+                        <span></span>
+                        刷空卡</li>
+                      <li>
+                        <span></span>
+                        刷小卡</li>
                     </ul>
               </v-list-item-group>
 
@@ -90,6 +102,10 @@
             :to="item.href"
             active-class="custom-active"
           >
+            <v-list-item-icon>
+              <component :is="item.icon" />
+            </v-list-item-icon>
+
             <v-list-item-content>
               <v-list-item-title
                 v-text="item.title"
@@ -140,6 +156,10 @@ import HomeIcon from '@/assets/common/home.svg';
 import MonitorIcon from '@/assets/common/monitor.svg';
 import SearchIcon from '@/assets/common/search.svg';
 import WarningIcon from '@/assets/common/warning.svg';
+import icon5 from '@/assets/common/icon_5.svg';
+import icon6 from '@/assets/common/icon_6.svg';
+import icon7 from '@/assets/common/icon_7.svg';
+
 import { ROUTE_PARAM, FUND_TYPE } from '@/util/type';
 
 export default {
@@ -163,6 +183,7 @@ export default {
     mini: true,
     ROUTE_PARAM,
     insertMenu: ['违规列支费用', '违规人数', '违规机构数'],
+    expand: true,
   }),
 
   methods: {
@@ -198,6 +219,7 @@ export default {
               { title: '社区卫生服务中心', href: '/monitor/local/community' },
               { title: '其他社会办医', href: '/monitor/local/social' },
             ],
+            icon: icon5,
           },
           {
             title: '基金异地情况',
@@ -206,6 +228,7 @@ export default {
               { title: '省内异地', href: '/monitor/other/province' },
               { title: '跨省异地', href: '/monitor/other/trans_province' },
             ],
+            icon: icon6,
           },
           {
             title: '基金明细监测',
@@ -213,36 +236,44 @@ export default {
               { title: '按列支渠道', href: '/monitor/mingxi/liezhi' },
               { title: '按费用结构', href: '/monitor/mingxi/feiyong' },
             ],
+            icon: icon7,
           },
         ],
         [
           {
             title: '排名查看',
             href: '/search/rank',
+            icon: icon5,
           },
           {
             title: '机构汇总',
             href: '/search/jigou',
+            icon: icon5,
           },
           {
             title: '参保人员汇总',
             href: '/search/people',
+            icon: icon5,
 
           }, {
             title: '药师医师汇总',
             href: '/search/doctor',
+            icon: icon5,
 
           }, {
             title: '费用明细',
             href: '/search/mingxi',
+            icon: icon5,
 
           }, {
             title: '就诊信息',
             href: '/search/info',
+            icon: icon5,
           },
           {
             title: '机构画像',
             href: '/search/profile',
+            icon: icon5,
           },
         ],
         [
@@ -255,6 +286,7 @@ export default {
               { title: '社区卫生服务中心', href: '/warning/budget/community' },
               { title: '其他社会办医', href: '/warning/budget/social' },
             ],
+            icon: icon5,
           },
           {
             title: '违规行为预警',
@@ -263,6 +295,7 @@ export default {
               { title: '参保人违规预警', href: '/warning/action/people' },
               { title: '药师违规预警', href: '/warning/action/doctor' },
             ],
+            icon: icon5,
           },
         ],
       ];
@@ -282,19 +315,20 @@ export default {
     $nav-height: 9vh;
 
     .title {
-      font-size: 1rem!important;
+      font-family:PingFangSC-Semibold;
+      font-size:1.28rem!important;
+      color:#000000;
+      letter-spacing:3px!important;
+      line-height:2rem;
+      text-align:left;
     }
 
     .v-main {
-      padding: $nav-height 0px 0px 256px!important;
+      padding: $nav-height 0px 0px 18vw!important;
     }
 
     .v-toolbar {
       box-shadow: none;
-    }
-
-    .v-list-item__title {
-      cursor: pointer;
     }
 
     .v-list {
@@ -304,8 +338,13 @@ export default {
     }
 
     .v-list-group__items {
+
       .v-list-item {
-        text-indent: 2px;
+        text-indent: 36px;
+      }
+
+      .v-list-item__title {
+        cursor: pointer;
       }
     }
 
@@ -322,13 +361,27 @@ export default {
         }
       }
 
-      .v-divider {
-        border: 2px solid $she-bg;
+      .v-list-item {
+        border-left: 5px solid #fff;
+
+        .v-list-item__title {
+          font-family:STHeitiSC-Medium;
+          font-size: 0.9rem;
+          line-height: 0.9rem;
+          letter-spacing:0.9px;
+        }
       }
 
-      .v-list-item {
-        // border-bottom: 2px solid $she-border;
-        border-left: 5px solid #fff;
+      .v-list-item__icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 0;
+        margin-right: 8px!important;
+      }
+
+      .v-divider {
+        border: 2px solid $she-bg;
       }
 
       .active {
@@ -390,7 +443,7 @@ export default {
           display: flex;
           .tool-btn img {
             margin: 10px;
-            height: 40px;
+            height: 30px;
           }
         }
      }
@@ -450,34 +503,33 @@ export default {
           align-items: center;
           margin: 5px 0;
 
-          &::before,
-          &::after  {
-            content: '';
-            position: absolute;
+          span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            height: 17px;
             border-radius: 50%;
-            left: 1px;
+            margin: 0 5px 0 0;
           }
 
-          &::after {
-            width: 12px;
-            height: 12px;
-            top: 7px;
-            left: 4px;
+          span::before  {
+            content: '';
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            display: inline-block;
           }
 
-          &::before {
-            width: 18px;
-            height: 18px;
-          }
         }
 
         @each $c in $yujing {
           $i: index($yujing, $c);
-          li:nth-child(#{$i})::after {
+          li:nth-child(#{$i}) span::before {
             background: $c;
           }
 
-          li:nth-child(#{$i})::before {
+          li:nth-child(#{$i}) span {
             border: 1px solid $c;
           }
         }

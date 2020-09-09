@@ -3,6 +3,13 @@
     class="rounded-chart"
     :viewBox="`0 0 ${width} ${height}`"
   >
+    <text class="unit"
+      x="0"
+      y="10"
+      text-anchor="right"
+      v-if="unit"
+    >单位：{{unit}}</text>
+
     <g class="barchart-axis"
       :transform='`translate(${margin.left}, ${margin.top})`'
     >
@@ -21,21 +28,22 @@
         tickFormat: ''}"
         class="gridline"
       />
+
     </g>
 
     <g :transform='`translate(${margin.left}, ${margin.top})`'>
-     <path
+      <path
         v-for="(value, name) in data"
         :key="name"
         fill="#2798f8"
         :transform="`translate(${(xScale.bandwidth()-w)/2},0)`"
-        :d="`
+        :d="value>0?`
           M${xScale(name)},${yScale(value) + ry}
           a${rx},${ry} 0 0 1 ${rx},${-ry}
           h${w - 2 * rx}
           a${rx},${ry} 0 0 1 ${rx},${ry}
           v${chartHeight - yScale(value) - ry}
-          h${-(w)}Z`"
+          h${-(w)}Z`:''"
       />
     </g>
 
@@ -49,18 +57,19 @@ import { axisDirective } from '@/directives/axis';
 export default {
   props: {
     data: Object,
+    unit: String,
   },
   data() {
     return {
       // 基本设置
       margin: {
-        top: 20,
+        top: 30,
         right: 10,
         bottom: 20,
         left: 50,
       },
       width: 800,
-      height: 220,
+      height: 230,
     };
   },
   computed: {
@@ -118,6 +127,10 @@ export default {
       path {
         display: none;
       }
+    }
+
+    .unit {
+      font-size: 12px;
     }
   }
 </style>

@@ -23,7 +23,7 @@
           </div>
         </div>
 
-        <div>
+        <div :style="{height:'100%'}">
           <div class="c-header">
             <div class="btn-container border">
               <v-btn
@@ -53,13 +53,6 @@
           <div class="down-content">
             <div class="down-header">
               <p>{{menu[menuIndex].text}}</p>
-
-              <!-- <time-picker
-                :dateEnd="dateEnd"
-                :dateStart="dateStart"
-                :menu1="menu1"
-                :menu2="menu2"
-              /> -->
             </div>
 
             <template v-if="dataHasValue[0].length === 0">
@@ -91,35 +84,23 @@
                   <span :style="{background: '#eee'}"></span>
                   {{d.text}}</label>
               </div>
-              <!-- 子label -->
-              <template v-if="type === 1">
-                <template
-                  v-for="d in Object.values(dataHandle[0])
-                    .filter((d) => d.child !== undefined)"
-                >
-                <div v-for="(child,i) in d.child" :key="child.text"  class="radio">
-                    <input type="radio" class="radio-btn" :name="d.text"/>
-                    <label class="label">
-                      <span :style="{background: child.value > 0&& child.value !== null?
-                          colorScale(dataHasValue[0].length + i): '#eee'}">
-                      </span>
-                    {{child.text}}</label>
-                </div>
-                </template>
-              </template>
             </div>
 
             <!-- 图 -->
             <div :class="[dataHandle.length > 1?'small':'', 'pie-wrapper'].join(' ')">
-              <pie-chart
-                v-for="(d,i) in dataHasValue"
-                :key="i"
-                :colorScale="colorScale"
-                :data="d"
-                :type="type"
-                :activePie="activePie"
-                @hoverPie="hoverPie"
-              />
+
+              <template v-for="(d,i) in dataHasValue" >
+                <pie-chart
+                  :key="i"
+                  :colorScale="colorScale"
+                  :data="d"
+                  :type="type"
+                  :activePie="activePie"
+                  @hoverPie="hoverPie"
+                  :title="dataHandle.length>1?title[i]:''"
+                  :unit="i===1?'次':'元'"
+                />
+              </template>
             </div>
             </template>
 
@@ -254,6 +235,8 @@ export default {
 
       // 被选中的Pie
       activePie: 0,
+
+      title: ['累计列支费用', '累计列支次数'],
 
     };
   },
@@ -391,6 +374,7 @@ export default {
     display: flex;
     flex-direction: column;
     padding: 30px 15px;
+    height:90vh;
 
     .s-header {
       display: flex;
@@ -465,12 +449,14 @@ export default {
         }
       }
       .btn-container {
-
         display: flex;
         align-items: center;
 
         .v-btn {
           color: $she-c;
+          font-family:PingFangSC-Semibold;
+          font-size: 0.85rem;
+          letter-spacing:0;
         }
 
         .v-btn.active {
@@ -481,6 +467,9 @@ export default {
     }
 
     .down-content {
+      // height: 100%;
+      // max-height: 49vh;
+
       .down-header {
         display: flex;
         justify-content: space-between;
@@ -494,13 +483,19 @@ export default {
       }
 
       .pie-wrapper {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: 100%;
         align-items: center;
+        justify-items: center;
+        height: 50vh;
 
         &.small {
-          svg {
-            width: 50%;
+          grid-template-rows: 50% 50%;
+
+          .pie-container {
+            svg {
+              width:  50%;
+            }
           }
         }
       }

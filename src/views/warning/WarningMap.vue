@@ -28,10 +28,9 @@
         <template v-if="indexArr[index] === true">
           <l-marker v-for="(value, name) in d"
             :key="name" :lat-lng="[value.LAT, value.LNG]"
-            :icon="icons[index]"
+            :icon="isShowing===false||id!==name?iconsActive[index]:icons[index]"
             @click="onClick($event,name,index,clickMarker)"
           >
-            <!-- <l-popup :content="value.ji_gou_ming_cheng"></l-popup> -->
           </l-marker>
         </template>
       </v-marker-cluster>
@@ -56,7 +55,7 @@
           <h4>{{title}}</h4>
           <h4>{{type}} {{ id}}</h4>
         </div>
-        <div>
+        <div class="charts-wrapper">
           <div class="two-charts">
           <!-- 图例 -->
           <div class="c-header">
@@ -73,8 +72,8 @@
             </div>
             <barchart
               :type="1"
-              :width="200"
-              :height="100"
+              :width="250"
+              :height="120"
               :datum = "tipData"
               :yDomain="upX"
             />
@@ -92,8 +91,8 @@
             <!-- 图表一 -->
             <barchart
               :type="0"
-              :width="200"
-              :height="100"
+              :width="250"
+              :height="120"
               :datum = "downData"
               :yDomain="downX"
             />
@@ -126,8 +125,22 @@ import {
   LMarker, LPopup,
 } from 'vue2-leaflet';
 
+const defaulticon2 = (style, count) => divIcon({
+  html: `<div class="outer hide">
+    <div class="inner">
+      <span> ${count || ''}</span>
+    </div>
+  </div>`,
+  className: `marker-cluster cluster-${style}`,
+  iconSize: new Point(40, 40),
+});
+
 const defaulticon = (style, count) => divIcon({
-  html: `<div><span> ${count || ''}</span></div>`,
+  html: `<div class="outer ${count ? 'hide' : ''}">
+    <div class="inner">
+      <span> ${count || ''}</span>
+    </div>
+  </div>`,
   className: `marker-cluster cluster-${style}`,
   iconSize: new Point(40, 40),
 });
@@ -155,6 +168,7 @@ export default {
       ],
       datum: [0, 0, 0],
       icons: [defaulticon('red'), defaulticon('yellow'), defaulticon('green')],
+      iconsActive: [defaulticon2('red'), defaulticon2('yellow'), defaulticon2('green')],
 
       // 显示index
       indexArr: [true, true, true],
@@ -185,7 +199,7 @@ export default {
 
       title: '杭州市富阳区第一人民医院',
       type: '医疗机构',
-      id: ' 5026',
+      id: null,
       tipData: [],
       // 底部的数据
       downData: [[], []],
@@ -221,9 +235,9 @@ export default {
     },
     circlePos() {
       if (this.$route.meta.activeIndex === 1) {
-        return [110, 15];
+        return [110, 5];
       }
-      return [80, 1];
+      return [80, 0];
     },
   },
 
@@ -273,7 +287,9 @@ export default {
     onClick(e, name, index, cb) {
       // 计算展示的属性
       this.getOrgShowData(name, index);
-      cb(e);
+      setTimeout(() => {
+        cb(e);
+      }, 0);
     },
 
     clickBadge(index) {
@@ -290,7 +306,10 @@ export default {
         this.indexArr = [true, true, true];
       }
 
-      console.log(index);
+      // 隐藏tooltip
+      this.isShowing = false;
+
+      // console.log(index);
     },
 
     getOrgShowData(name, index) {
@@ -320,7 +339,6 @@ export default {
 
 <style scoped lang="scss">
   @import "~leaflet.markercluster/dist/MarkerCluster.css";
-  @import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
 
   .map-container {
     width: 99%;
@@ -370,7 +388,7 @@ export default {
     opacity: 0;
     position: absolute;
     // 地图容器高度的一半45vh - 一半的container高度30vh 还要看svg的比例
-    top: 20vh;
+    top: 18vh;
     left: 150px;
     // width: 25vw;
     // display: grid;
@@ -392,7 +410,7 @@ export default {
 
     .card-container {
       height: 99%;
-      width: 20vw;
+      width: 21vw;
       margin-left: -1vw;
       padding: 15px;
       // display: grid;
@@ -409,13 +427,21 @@ export default {
         height: 1px;
       }
 
+      .charts-wrapper {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
       .two-charts {
         display: flex;
         flex-direction: column;
         align-items: center;
+        flex: 0 0 53%;
 
         .c-header .img-wrapper {
-          margin-right: -10px;
+          margin-right: -18px;
+          margin-top: -10px;
         }
       }
 
@@ -424,16 +450,17 @@ export default {
         justify-content: space-between;
         width: 18vw;
         padding: 10px;
-        line-height: 40px;
+        line-height: 30px;
+        align-items: center;
 
         .img-wrapper {
           height: 30px;
           width: 8vw;
+          margin-right: 20px;
 
           img {
             object-fit: cover;
             height: 30px;
-            margin-right: -20px;
           }
         }
       }
@@ -497,7 +524,7 @@ export default {
   }
 
   .active {
-    height: 60vh;
+    height: 62vh;
     opacity: 1;
   }
 
@@ -510,6 +537,17 @@ export default {
 
     .c-header img {
       height: 30px!important;
+    }
+  }
+
+  .two-charts, .down-chart {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    height: 100%;
+
+    svg {
+      flex-grow: 1;
     }
   }
 </style>

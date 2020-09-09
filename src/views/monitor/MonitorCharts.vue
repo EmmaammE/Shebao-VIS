@@ -6,7 +6,7 @@
     </div>
 
     <!-- 折线图-->
-    <div class="zhexian-c" ref="zheWrapper">
+    <div class="zhexian-c" ref="zheWrapper" @mouseout="isShowing = false">
       <div class="chart-legends text-lg-body-2">
         <span class="legend"> <i></i> 2019</span>
         <span class="legend"> <i></i> 2020</span>
@@ -28,12 +28,12 @@
           :y2="chart1Size.height-chart1Size.margin.bottom-chart1Size.margin.top" />
       </line-chart>
 
-      <Tooltip v-show="isShowing" v-bind="lineTipPos">
-        <div class="s-tip">
+      <Tooltip v-bind="lineTipPos">
+        <div class="s-tip" v-show="isShowing">
           <div class="inner">
             <p>{{tipData.date}}</p>
-            <p v-if="tipData['2019']">2019：{{tipData['2019']}}万元</p>
-            <p v-if="tipData['2020']">2020：{{tipData['2020']}}万元</p>
+            <p v-if="tipData['2019']">2019：{{tipData['2019']}}{{unit}}</p>
+            <p v-if="tipData['2020']">2020：{{tipData['2020']}}{{unit}}</p>
           </div>
         </div>
       </Tooltip>
@@ -41,7 +41,7 @@
 
     <v-divider></v-divider>
 
-    <div class="calendar-view" ref="calWrapper">
+    <div class="calendar-view" ref="calWrapper" @mouseout="isShowing = false">
       <div class="chart-legends text-lg-body-2">
         <span
           :class="type === 1 ? 'active': ''"
@@ -70,7 +70,7 @@
         @tooltip="updateTooltip"
       />
 
-      <Tooltip v-show="isShowing" v-bind="tipPos">
+      <Tooltip v-bind="tipPos" v-show="isShowing">
         <div class="s-tip">
           <div class="inner">
             <p>{{tipData.date}}</p>
@@ -167,6 +167,9 @@ export default {
     // 获得的数据
     dataFetch: Object,
     subTitle: String,
+
+    // tooltip的单位
+    unit: String,
   },
 
   data() {
@@ -221,6 +224,12 @@ export default {
         return;
       }
 
+      if (isShowing === false) {
+        this.isShowing = false;
+        return;
+      }
+      console.log(isShowing, tipPos);
+
       this.isShowing = isShowing;
 
       this.tipPos = {
@@ -235,17 +244,21 @@ export default {
         left: tipPos.left,
       };
 
-      const date = tipData.date.substr(5);
-      const data1 = this.datum['2019'][YEAR_HASH[`2019-${date}`][this.itemSelect]];
-      const data2 = this.datum['2020'][YEAR_HASH[`2020-${date}`][this.itemSelect]];
-      this.tipData = {
-        ...tipData,
-        ...{
-          2019: data1 ? data1.value.toLocaleString() : null,
-          2020: data2 ? data2.value.toLocaleString() : null,
-          date,
-        },
-      };
+      try {
+        const date = tipData.date.substr(5);
+        const data1 = this.datum['2019'][YEAR_HASH[`2019-${date}`][this.itemSelect]];
+        const data2 = this.datum['2020'][YEAR_HASH[`2020-${date}`][this.itemSelect]];
+        this.tipData = {
+          ...tipData,
+          ...{
+            2019: data1 ? data1.value.toLocaleString() : null,
+            2020: data2 ? data2.value.toLocaleString() : null,
+            date,
+          },
+        };
+      } catch (e) {
+        console.log(e);
+      }
     },
 
     updateData(datafetch) {
@@ -305,7 +318,7 @@ export default {
       this.lineDatum = data2;
       this.yscale = this.yscale.domain([0, maxValue * 1.1]).nice();
       this.colorScale = extent.map((e) => d3.scaleLinear()
-        .range(['#73cdbb', '#efefef', '#eb745f'])
+        .range(['#73cdbb', '#fff', '#eb745f'])
         .domain([-e, 0, e]));
     },
   },

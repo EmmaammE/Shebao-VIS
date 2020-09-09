@@ -7,14 +7,16 @@
         :width="scale(data)"
         height="14"
         @mouseout="showTip"
+        class="rect"
       />
 
       <line v-for="(d,index) in datum"
         :key="index"
         :y1="3"
-        :x1="scale(d)"
-        :x2="scale(d)"
+        :x1="scale(d*index)"
+        :x2="scale(d*index)"
         :y2="17"
+        class="line"
       >
       </line>
     </template>
@@ -26,7 +28,7 @@
           :x="index===0?0:scale(datum[index-1])"
           y="3"
           :width="scale(d)"
-          :fill="colorScale(d)"
+          :fill="color[index]"
           height="14"
           @mouseout="showTip"
         />
@@ -50,12 +52,22 @@ export default {
     scale: Function,
     datum: Array,
     data: Number,
-    colorScale: Function,
+    // colorScale: Function,
     type: Number,
+  },
+
+  data() {
+    return {
+      color: ['#5c87ca', '#4470b5', '#2e5ba1', '#16448c'],
+    };
   },
 
   computed: {
     res() {
+      if (this.type === 1) {
+        return [];
+      }
+
       const arr = [0, ...this.datum, this.data];
       const res = [];
       arr.forEach((d, index) => {
@@ -77,7 +89,7 @@ export default {
 </script>
 
 <style scoped>
-  rect {
+  .rect {
     fill: #769edc;
     stroke: #2965c8;
   }

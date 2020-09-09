@@ -34,7 +34,17 @@ export default {
     .custom-active.v-list-item--active ,
   .v-list-group__header.v-list-item--active {
     background: linear-gradient(to right, #eaf1f9, #f5f7fb);
-    border-left: 5px solid #94bfef;
+    border-left: 5px solid #94bfef!important;
+
+    svg {
+      path:nth-child(1) {
+        stroke: #024Ec2;
+      }
+
+      path {
+        fill: #024Ec2;
+      }
+    }
   }
 
   .v-list-item--link:before {
@@ -149,6 +159,12 @@ export default {
 
   }
 
+  .map-charts-container {
+    td {
+      font-size: 0.5rem!important;
+      text-align: center;
+    }
+  }
   .search-container,
   .treatment {
     th, td {
@@ -161,7 +177,7 @@ export default {
     .v-data-table > .v-data-table__wrapper > table > thead > tr > th,
     .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td,
     .v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
-      padding: 0;
+      padding: 0 5px;
     }
 
     .v-icon.v-icon {
@@ -173,7 +189,11 @@ export default {
     }
 
     .s-table .v-data-table__wrapper {
-      overflow: hidden;
+      overflow: auto;
+    }
+
+    .table-wrapper table{
+      width: 139%!important;
     }
   }
 
@@ -182,5 +202,34 @@ export default {
       min-height: 22px!important;
       line-height: 20px;
     }
+  }
+
+  .min-height {
+    .v-input__slot {
+      min-height: 28px!important;
+    }
+
+    .v-label {
+      font-size: 0.7rem;
+      top: 5px!important;
+    }
+  }
+
+  .chart-table {
+     tr {
+      td:nth-child(4) ,
+      td:nth-child(5) ,
+      td:nth-child(6) ,
+      td:nth-child(7) {
+        opacity: 0;
+      }
+    }
+
+    tr:nth-child(1) {
+      td {
+        opacity: 1;
+      }
+    }
+
   }
 </style>

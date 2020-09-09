@@ -1,7 +1,7 @@
 <template>
   <div class="search-container">
     <v-card outlined class="content-card">
-      <p class="sub-title">筛选条件</p>
+      <p class="she-title">筛选条件</p>
       <v-sheet class="date-container">
         <p>时间区间</p>
         <v-menu
@@ -21,6 +21,8 @@
               hide-details="true"
               v-bind="attrs"
               v-on="on"
+              :height="30"
+              class="min-height"
             ></v-text-field>
           </template>
           <v-date-picker v-model="dateBegin" no-title scrollable>
@@ -49,6 +51,8 @@
               hide-details="true"
               v-bind="attrs"
               v-on="on"
+              :height="30"
+              class="min-height"
             ></v-text-field>
           </template>
           <v-date-picker v-model="dateEnd" no-title scrollable>
@@ -65,6 +69,8 @@
           dense
           hide-details="true"
           v-model="id"
+          :height="30"
+          class="min-height"
           label="身份证号、社保卡号或姓名"
         ></v-text-field>
       </v-sheet>
@@ -140,7 +146,7 @@
         </div>
       </v-sheet>
 
-      <p class="sub-title text-margin">数据结果</p>
+      <p class="she-title text-margin">数据结果</p>
 
       <v-data-table
         class="s-table"
@@ -572,6 +578,10 @@ export default {
     grid-template-columns: 50% 50%;
     grid-gap: 2px;
     height: 100%;
+
+    p {
+      margin: 0;
+    }
   }
 
   .content-card {
@@ -598,6 +608,7 @@ export default {
     display: flex;
     border-bottom: 2px solid #ccc;
     border-radius: 0;
+    align-items: center;
 
     p {
       font-size: $sub-title;

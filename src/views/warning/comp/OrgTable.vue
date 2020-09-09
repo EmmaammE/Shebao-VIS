@@ -33,6 +33,7 @@
         :show-expand="tabIndex === 0"
         single-select
         @click:row="rowClick"
+        :class="tabIndex === 4 ? 'chart-table': ''"
       >
         <template v-slot:[`item.jine`]="{ item }">
           <!-- 多地开药次数 -->
@@ -41,22 +42,23 @@
               :scale="scale"
               :datum="[item.five_min, item.ten_min, item.sixty_min]"
               :data="item.day"
+              :type="0"
             />
             <p>{{item.day}}</p>
           </div>
-          <!-- 多地开药次数 -->
+          <!-- 刷小卡次数 -->
           <div class="bar-container" v-else-if="tabIndex === 3">
             <bar
               :scale="scale"
               :datum="item.jine"
-              :data="item.zong_jin_e"
+              :data="+item.zong_jin_e"
               :type="1"
             />
             <p>{{item.zong_jin_e}}</p>
           </div>
         </template>
         <template v-slot:[`item.yao_zhan_bi`]="{ item }">
-          {{item.yao_zhan_bi.toFixed(4) * 100 +'%'}}
+          {{(100 * (+item.yao_zhan_bi)).toFixed(2) + '%'}}
         </template>
         <template v-slot:expanded-item="{ headers, item }"
           v-if="tabIndex===0"
@@ -90,7 +92,7 @@
             <span>{{d.text}}</span>
             <bar-line
               :data="falseData[index]"
-              :standard="standard[index]"
+              :standard="+standard[index]"
               :scale="widthScale[index]"
             />
           </div>
@@ -114,7 +116,6 @@ const RANGE = [0, 100];
 export default {
   props: {
     title: String,
-    type: String,
     id: String,
     data: Object,
   },
@@ -221,19 +222,26 @@ export default {
     tabIndex() {
       this.getData();
     },
+    data: {
+      deep: true,
+      handler() {
+        this.getData();
+      },
+    },
   },
 
   computed: {
     falseData() {
       // 虚假住院的数据
-      return this.falseKeys.map((key) => this.datum[this.activeIndex][key.value]);
+      return this.falseKeys.map((key) => +this.datum[this.activeIndex][key.value]);
     },
     widthScale() {
       const values = Object.values(this.datum);
       // 虚假住院的宽度比例尺
       return Array.from({ length: 6 }, (_, index) => d3.scaleLinear()
         // 求指标和value的最大值
-        .domain([0, d3.max(values, (d) => d[this.falseKeys[index].value])])
+        .domain([0, d3.max(values,
+          (d) => (d[this.falseKeys[index].value] ? d[this.falseKeys[index].value] : 0))])
         .range([0, 100]));
     },
   },
@@ -484,11 +492,13 @@ export default {
 
   .chart {
     position: absolute;
-    bottom: 10px;
     right: 10px;
     width: 280px;
     height: calc(100% - 84px);
     display: flex;
+    top: 84px;
+    bottom: 0;
+    padding: 0;
 
     .container {
       width: 100%;
@@ -501,12 +511,12 @@ export default {
         font-size: 0.75rem;
         text-align: right;
         font-weight: bold;
-        width: 120px;
         display: inline-block;
+        flex: 1 0 50%;
       }
 
       svg {
-        flex-grow: 1;
+        flex: 0 0 50%;
       }
     }
   }

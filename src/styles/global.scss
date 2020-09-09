@@ -53,6 +53,7 @@ tr.v-data-table__selected {
 body {
   ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
   /* Estilos barra (thumb) de scroll */
   ::-webkit-scrollbar-thumb {
@@ -101,6 +102,7 @@ html {
 .radio-group {
   display: flex;
   flex-wrap: wrap;
+  padding: 0 20px;
   $accent-color:#5d77ff;
   $primary-color: #fff;
 
@@ -144,6 +146,27 @@ html {
   }
 }
 
+.s-container {
+  .v-list-group .v-list-group__header .v-list-item__icon.v-list-group__header__append-icon {
+    min-width: 1vw;
+  }
+}
+
+// 数据结果和筛选条件
+.she-title {
+  font-family:PingFangSC, sans-serif;
+  font-size:1rem;
+  color:#262626;
+  letter-spacing:0;
+  font-weight: 800;
+}
+
 .text-margin {
-  margin: 10px 0 0 0!important;
+  margin: 0.8rem 0!important;
+}
+
+
+p.profile-title {
+  font-size: 1.2rem;
+  font-weight: 800;
 }

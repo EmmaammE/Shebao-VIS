@@ -28,8 +28,8 @@
           index*(chartWidth/2+margin.padding)}, ${margin.top})`'
         :key="'rect'+index">
 
-        <g v-for="catagory in yDomain"
-          :key="catagory"
+        <g v-for="(catagory,i) in yDomain"
+          :key="catagory.key+i"
         >
           <template v-if="data[catagory.key]!==undefined">
             <template v-if="data[catagory.key].shi_ji > data[catagory.key].yu_suan">
@@ -59,10 +59,11 @@
             </template>
 
             <line
-              :y1="yScale(catagory.title)+3"
+              :y1="yScale(catagory.title)+4"
               :x1="xScale[index](data[catagory.key].yu_suan)"
               :x2="xScale[index](data[catagory.key].yu_suan)"
-              :y2="yScale(catagory.title)+17"
+              :y2="yScale(catagory.title)+16"
+              class="divider"
             />
           </template>
         </g>
@@ -70,9 +71,10 @@
    </template>
 
    <template v-else>
+     <!-- 年度指标 -->
       <g v-for="catagory in yDomain"
         :transform='`translate(${margin.left}, ${margin.top-5})`'
-        :key="catagory"
+        :key="catagory.key"
       >
         <g v-if="datum[0][catagory.key]!==undefined">
           <rect
@@ -89,6 +91,48 @@
             :x2="xScale[0](datum[0][catagory.key].yu_suan)"
             :y2="yScale(catagory.title)+17"
           />
+        </g>
+
+        <!-- 每个月的情况 -->
+        <g v-for="(value,name) in datum[1]" :key="name+'m'">
+          <g v-if="value[catagory.key]!==undefined">
+            <template v-if="value[catagory.key].shi_ji > value[catagory.key].yu_suan">
+              <!-- 如果超过了预算 -->
+              <rect
+                :x="0.5"
+                :y="yScale(catagory.title)+5"
+                :width="xScale[0](value[catagory.key].yu_suan)"
+                :height="10"
+              />
+              <rect
+                class="warning"
+                :x="xScale[0](value[catagory.key].yu_suan) + 0.5"
+                :y="yScale(catagory.title)+5"
+                :width="xScale[0](value[catagory.key].shi_ji)
+                  - xScale[0](value[catagory.key].yu_suan)"
+                :height="10"
+              />
+
+            </template>
+
+            <template v-else>
+              <rect
+                :x="0.5"
+                :y="yScale(catagory.title)+5"
+                :width="xScale[0](value[catagory.key].shi_ji)"
+                :height="10"
+              />
+
+            </template>
+
+            <line
+                :y1="yScale(catagory.title)+3"
+                :x1="xScale[0](value[catagory.key].shi_ji)"
+                :x2="xScale[0](value[catagory.key].shi_ji)"
+                :y2="yScale(catagory.title)+17"
+                stroke="#fff"
+              />
+          </g>
         </g>
       </g>
    </template>
@@ -218,7 +262,7 @@ export default {
       fill: #b90000
     }
 
-    line {
+    line.divider {
       stroke: #064dc1;
     }
   }

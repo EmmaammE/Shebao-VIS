@@ -1,7 +1,7 @@
 <template>
   <div class="search-map">
     <v-card flat class="filter-card">
-      <p class="sub-title">筛选条件</p>
+      <p class="she-title">筛选条件</p>
       <div class="divider" />
       <p>时间区间</p>
 
@@ -63,7 +63,7 @@
         >总店汇总</span>
 
         <div class="divider" />
-        <p>地域类型</p>
+        <p :style="{marginLeft: '-10px'}">地域类型</p>
         <div class="type-check">
           <span
             v-for="(value, name) in areaType"
@@ -76,7 +76,7 @@
         </div>
 
         <div class="divider" />
-        <p>机构类型</p>
+        <p :style="{marginLeft: '-10px'}">机构类型</p>
         <div class="color">
           <span
             v-for="(value, name) in orgType"
@@ -424,16 +424,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  p.sub-title {
-    font-family:PingFangSC-Semibold;
-    font-size: 18px;
-    color:#262626;
-    letter-spacing:0;
-    text-align:left;
-    font-weight: bold;
-    margin: 0;
-  }
-
   p {
     margin: 0;
   }
@@ -514,6 +504,7 @@ export default {
     .s-legends {
       display: flex;
       flex-direction: column;
+      padding-left: 14px;
 
       $type: #4c7dfe,#44b500,#ff9c29,#ff5345,#543ba4,#2db9cf;
 
@@ -542,9 +533,10 @@ export default {
       }
       span {
         position: relative;
-        text-indent: 15px;
         margin: 5px 10px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
       }
 
       span::before {
@@ -552,21 +544,19 @@ export default {
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        border: 1px solid #c0c0c0;;
+        border: 1px solid #c0c0c0;
         position: absolute;
-        left: -10px;
-        top: 5px;
+        left: -20px;
       }
 
       span::after {
         content: '';
         width: 10px;
         height: 10px;
-        top: 7px;
         border-radius: 50%;
         border: 1px solid #c0c0c0;
         position: absolute;
-        left: -8px;
+        left: -18px;
       }
     }
 }

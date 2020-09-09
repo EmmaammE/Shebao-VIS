@@ -31,7 +31,6 @@
             v-model="itemSelect"
             item-text="title"
             item-value="value"
-            height= "5"
             solo
             dense
             hide-details
@@ -47,6 +46,7 @@
           :itemSelect="itemSelect"
           :dataFetch="data"
           :subTitle="subTitles.length !==0 ? subTitles[index] : ''"
+          :unit="menuSubtitle[tabActive] === '人次人头（次）'?'次':'元'"
         />
       </div>
 
@@ -59,10 +59,8 @@ import Badge from '@/views/monitor/badge.vue';
 import {
   fetchFeeStatistics, fetchFeeTimeSeries, fetchFundDetailStatistics, fetchFundDetailTimeSeries,
 } from '@/util/http';
-import { FUND_TYPE, ROUTE_PARAM } from '@/util/type';
+import { ROUTE_PARAM } from '@/util/type';
 import TimePicker from '@/components/small/TimePicker.vue';
-import * as d3 from 'd3';
-import tooltip from '@/mixins/tooltip';
 import MonitorCharts from './MonitorCharts.vue';
 
 const FEE_TYPE = {
@@ -77,11 +75,11 @@ const FEE_TYPE = {
 const FEE_STRUCTURE = {
   // fee_structure
   药品费用: 'drug_fee',
-  检查费用: 'check_fee',
+  检查检验: 'check_fee',
   手术治疗: 'surgical_fee',
   物理治疗: 'physical_fee',
   中医治疗: 'tcm_fee',
-  口腔治疗: 'oral_fee',
+  口腔诊疗: 'oral_fee',
 };
 
 const LIE_ZHI_TYPE = {
@@ -134,10 +132,10 @@ export default {
 
   data: () => ({
     tabActive: 0,
-    tabTitle: ['总医疗（元）', '医保列支（元）', '基金支出（元）', '门诊均次（元）', '人次人头（次）'],
+    tabTitle: ['总医疗费用（元）', '医保列支费用（元）', '基金支出费用（元）', '门诊均次费用（元）', '住院均次费用（元）', '人次人头（次）'],
     tabNumber: [32678903, 0, 0, 0, 0],
 
-    menuSubtitle: ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '人次人头'],
+    menuSubtitle: ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '住院均次费用', '人次人头'],
 
     dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
     dateEnd: new Date().toISOString().substr(0, 10),
@@ -174,13 +172,12 @@ export default {
   watch: {
     routeType(newValue) {
       this.tabActive = 0;
-      this.getData(newValue);
       this.subTitles = [];
       this.param_type = '';
+      this.getData(newValue);
     },
     tabActive() {
       this.subTitles = [];
-      this.param_type = '';
 
       if (this.$route.params.routeType === 'liezhi'
         || this.$route.params.routeType === 'feiyong') {
@@ -210,6 +207,9 @@ export default {
         this.getFund();
       } else {
         type = 1;
+        this.menuSubtitle = ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '住院均次费用', '人次人头'];
+        this.tabTitle = ['总医疗费用（元）', '医保列支费用（元）', '基金支出费用（元）', '门诊均次费用（元）', '住院均次费用（元）', '人次人头（次）'];
+
         this.getFeeStatistics();
       }
 

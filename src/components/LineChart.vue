@@ -175,7 +175,8 @@ export default {
         });
       }
     }).on('mouseout', () => {
-      this.$emit('tooltip', false, {
+      console.log('?');
+      that.$emit('tooltip', false, {
         left: 0,
         top: 0,
         x: 0,

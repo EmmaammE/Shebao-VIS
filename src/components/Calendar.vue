@@ -1,9 +1,7 @@
 <template>
   <div class="calendar-container">
     <!-- <svg width='100%' height='100%'> -->
-    <svg  height='100%' :viewBox="`0 0 ${width} ${height}`"
-      @mouseout="hideTooltip"
-    >
+    <svg  height='100%' :viewBox="`0 0 ${width} ${height}`">
       <defs>
         <linearGradient id="gradient" x1="0" x2="0" y1="100%" y2="0%">
           <stop offset="0%" stop-color="#73cdbb" />
@@ -54,7 +52,11 @@
             :y="-10"
           >{{j+1}}</text>
         </template>
+
+        <rect width="100%" height="100" @mouseleave="hideTooltip" fill="none" stroke="none"/>
+
       </g>
+
     </svg>
   </div>
 </template>
@@ -233,6 +235,7 @@ export default {
     },
 
     hideTooltip() {
+      console.log('fffffffffffffffffff');
       this.$emit('tooltip', false, {
         left: 0,
         top: 0,

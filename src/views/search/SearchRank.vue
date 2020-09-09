@@ -1,7 +1,7 @@
 <template>
   <v-card class="s-rank-container">
     <div>
-      <p class="text-lg-h6">筛选条件</p>
+      <p class="she-title">筛选条件</p>
       <div class="s-box text-lg-body-2">时间区间
         <time-picker
           :dateEnd="endDay"
@@ -100,7 +100,7 @@
 
     </div>
 
-    <p class="text-lg-h6 text-margin">数据结果</p>
+    <p class="she-title text-margin">数据结果</p>
     <div class="s-chart-container text-lg-body-2" ref="chart">
       <div class="charts">
         <div v-for="(value, name) in datum"
@@ -290,12 +290,12 @@ export default {
 
     margin: 1rem;
     height: 95%;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
 
     .s-box {
       display: flex;
       align-items: center;
-      margin: 2px 0;
+      margin: 5px 0;
 
       .time-container {
         margin: 0 18px;
@@ -311,7 +311,6 @@ export default {
     .type-container {
       display: flex;
       align-items: center;
-      margin: 2px 0;
 
       .v-list {
         padding: 0;
@@ -408,6 +407,7 @@ export default {
         width: 90px;
         text-align: center;
         color: #3365ba;
+        font-size: 0.8rem;
       }
       button:nth-child(2) {
         background: #3365ba;
