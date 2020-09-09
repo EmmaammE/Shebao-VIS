@@ -195,7 +195,7 @@ export default {
       menuIndex: 0,
       submenuIndex: 0,
       menu: [
-        '住院就诊人员', '门诊就诊人员', '规定病种就诊人员', '家庭病床就诊人员',
+        '门诊就诊人员', '住院就诊人员', '规定病种就诊人员', '家庭病床就诊人员',
       ],
       menuValue: [
         'zhu_yuan_jiu_zhen',

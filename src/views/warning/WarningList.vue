@@ -58,7 +58,7 @@
             <tbody v-if="pageData[pageIndex[0].index-1] &&
               Object.keys(pageData[pageIndex[0].index-1][tabsKey[activeIndex]]).length!== 0">
               <tr v-for="(item, value) in pageData[pageIndex[0].index-1][tabsKey[activeIndex]]"
-                :key="item.jiu_zhen_liu_shui">
+                :key="value">
                 <td>{{ value }}</td>
                 <td>{{item.ji_gou_dai_ma}}</td>
                 <td>{{item.ji_gou_ming_cheng}}</td>
@@ -67,7 +67,7 @@
                 <td>{{item.jiu_zhen_liu_shui}}</td>
                 <td>{{item.yi_liao_fei_zong_e}}</td>
                 <td>{{item.bao_xiao_zong_e}}</td>
-                <!-- <td>{{item.yi_shi}}</td> -->
+                <td>{{item.yi_shi}}</td>
               </tr>
             </tbody>
             <tbody v-else>
@@ -254,11 +254,27 @@ export default {
         border-radius: 4px;
         transition: all 300ms ease-in-out;
 
-        &.active {
-          background: $she-c;
+        // &.active {
+        //   background: $she-c;
+        //   color: #fff;
+        // }
+      }
+
+      $blues: #5c87ca, #4470b5, #2e5ba1, #16448c;
+
+      @each $c in $blues {
+        $i: index($blues, $c);
+
+        div:nth-child(#{$i}) {
+          color:$c;
+        }
+
+        div:nth-child(#{$i}).active {
+          background:$c;
           color: #fff;
         }
       }
+
     }
 
     td {

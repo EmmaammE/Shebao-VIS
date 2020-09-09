@@ -10,32 +10,44 @@
             :key="index"
             color="#fff"
           >
+            <div>{{d.text}}</div>
+
             <div>
-              2019:
-              {{Number(datum[HASH[d.text]]['2019']).toFixed(2)}}
+              <div>
+                2019:
+                {{index===0||index===3
+                ? Number(datum[HASH[d.text]]['2019']).toFixed(2)
+                : Number(datum[HASH[d.text]]['2019'])}}
+                {{d.unit}}
+              </div>
+              <div>
+                2020:
+                {{index===0||index===3
+                ? Number(datum[HASH[d.text]]['2020']).toFixed(2)
+                : Number(datum[HASH[d.text]]['2020'])}}
+                {{d.unit}}
+                <!-- <span>{{d.unit}}</span> -->
+              </div>
             </div>
-             <div>
-              2020:
-              {{Number(datum[HASH[d.text]]['2020']).toFixed(2)}}
-              <!-- <span>{{d.unit}}</span> -->
-            </div>
-            <!-- <div>{{d.text}}</div> -->
-            <div>{{d.text}}{{d.unit}}</div>
           </div>
         </div>
         <!-- 个人现金支付 -->
         <div class="num-container" v-else-if="tabs.length === 1">
           <div class="tab a-line">
+            <div>{{tabs[0].text}}</div>
             <div>
-              2019:
-              {{Number(datum.ge_ren_xian_jin_zhi_fu['xian_jin_zhi_fu_zong_e']['2019']).toFixed(2)}}
+              <div>
+                2019:
+                {{Number(datum.ge_ren_xian_jin_zhi_fu.xian_jin_zhi_fu_zong_e['2019']).toFixed(2)}}
+                {{tabs[0].unit}}
+              </div>
+              <div>
+                2020:
+                {{Number(datum.ge_ren_xian_jin_zhi_fu.xian_jin_zhi_fu_zong_e['2020']).toFixed(2)}}
+                {{tabs[0].unit}}
+                <!-- <span>{{d.unit}}</span> -->
+              </div>
             </div>
-             <div>
-              2020:
-              {{Number(datum.ge_ren_xian_jin_zhi_fu['xian_jin_zhi_fu_zong_e']['2020']).toFixed(2)}}
-              <!-- <span>{{d.unit}}</span> -->
-            </div>
-            <div>{{tabs[0].text}}{{tabs[0].unit}}</div>
           </div>
         </div>
 
@@ -147,7 +159,9 @@
                     :fill="colorScale(index)"
                     @mousemove="hoverPie(index)"
                   ></path>
-                  <g class="tip" v-if="d.value > 0 || d.data['2019'] > 0">
+                  <g class="tip" v-if="d.value > 0 || d.data['2019'] > 0"
+                    v-show="d.ratio[0] > 7 || d.ratio[1] > 7 || activePie === index"
+                  >
                     <path
                       marker-end="url(#circle)"
                       :d="textPath(d)"
@@ -258,6 +272,15 @@
                 </g>
               </g>
             </svg>
+
+            <Tooltip v-bind="tipPos">
+              <div class="s-tip" v-show="isShowing">
+                <div class="inner">
+                  <!-- <p v-if="tipData['2019']">2019：{{tipData['2019']}}{{unit}}</p>
+                  <p v-if="tipData['2020']">2020：{{tipData['2020']}}{{unit}}</p> -->
+                </div>
+              </div>
+            </Tooltip>
           </div>
         </div>
       </v-card>

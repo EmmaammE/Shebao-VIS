@@ -329,7 +329,7 @@ export default {
         .v-input {
           border: 2px solid #efefef;
           width: 80px;
-          border-radius: 12px;
+          border-radius: 15px;
           font-size: 12px;
           border: 2px solid #efefef;
           margin: 2px 4px;

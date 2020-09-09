@@ -11,7 +11,6 @@ export default {
 /**为了修改Vuetify中slot的样式，这个组件不设置scoped */
 <style lang="scss">
   @import "@/styles/markercluster.scss";
-
   header .v-input__slot {
     background: $she-bg!important;
   }
@@ -199,8 +198,9 @@ export default {
 
   .m-container .select-area {
     .v-text-field.v-text-field--solo.v-input--dense > .v-input__control {
-      min-height: 22px!important;
+      min-height: 20px!important;
       line-height: 20px;
+      height: 20px;
     }
   }
 

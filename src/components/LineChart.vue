@@ -165,9 +165,11 @@ export default {
       if (mouse[0] >= that.margin.left) {
         const date = that.chartX[1].invert(mouse[0] - that.margin.left);
 
+        console.log(d3.event);
+
         that.$emit('tooltip', true, {
-          left: d3.event.offsetX,
-          top: d3.event.offsetY + 150,
+          left: d3.event.layerX,
+          top: d3.event.layerY + 150,
           x: mouse[0],
         }, {
           date: date.toISOString().substr(0, 10),

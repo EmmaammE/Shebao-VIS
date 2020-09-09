@@ -182,8 +182,8 @@ export default {
           text-align:center;
         }
          a {
-        color: #fff;
-        text-decoration: none;
+          color: #fff;
+          text-decoration: none;
         }
       }
 

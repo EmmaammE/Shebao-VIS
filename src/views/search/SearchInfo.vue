@@ -18,6 +18,7 @@
             <div class="info-box">
               <span v-for="d in info"
                 :key="d.value"
+                :class="title.length === 2?'next':''"
               >{{d.text}}:{{data.ji_ben_qing_kuang[d.value]}}</span>
             </div>
           </div>
@@ -75,7 +76,7 @@
               <!-- 没值的label -->
               <div
                 v-for="(d,index) in Object.values(dataHandle[0])
-                  .filter((d) => d.value === null || d.value === 0)"
+                  .filter((d) => !d.value || d.value === 0)"
                 :key="index+'n'"
                 class="radio"
               >
@@ -186,7 +187,6 @@ const FEI_YONG = {
     jiu_zhu_ji_jin: '救助基金',
     tong_chou_zhi_fu: '统筹支付',
     xian_jin_zhi_fu: '现金支付',
-    xian_jin_zhi_fu_zhan_bi: '现金支付占比',
   },
 
   yi_bao_fen_lei_fu_wu_qing_kuang: {
@@ -228,17 +228,20 @@ export default {
     return {
       menuIndex: 0,
 
-      dateStart: new Date('2020-01-01').toISOString().substr(0, 10),
-      dateEnd: new Date().toISOString().substr(0, 10),
-      menu1: false,
-      menu2: false,
-
       // 被选中的Pie
       activePie: 0,
 
       title: ['累计列支费用', '累计列支次数'],
-
     };
+  },
+
+  watch: {
+    menu: {
+      handler() {
+        this.menuIndex = 0;
+      },
+      immediate: true,
+    },
   },
 
   computed: {
@@ -306,10 +309,15 @@ export default {
                 text: hash[key][inner],
                 value: data[key][inner],
               };
-            } else {
+            } else if (typeof data[key][inner] === 'object') {
               tmp[inner] = {
                 text: hash[key][inner],
                 value: data[key][inner].value,
+              };
+            } else {
+              tmp[inner] = {
+                text: hash[key][inner],
+                value: data[key][inner],
               };
             }
           });
@@ -401,7 +409,7 @@ export default {
 
       .number {
         font-family:Avenir-Heavy;
-        font-size:22px;
+        font-size: 1.2rem;
         color:$she-c;
         letter-spacing:0;
         text-align:left;
@@ -427,7 +435,10 @@ export default {
         margin: 7px 0;
 
         span {
-          flex: 1 0 55%;
+          flex: 1 0 50%;
+        }
+        span.next {
+          flex: 1 0 75%;
         }
       }
     }

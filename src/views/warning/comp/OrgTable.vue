@@ -38,13 +38,13 @@
         <template v-slot:[`item.jine`]="{ item }">
           <!-- 多地开药次数 -->
           <div class="bar-container" v-if="tabIndex === 1">
+            <p>{{item.day}}</p>
             <bar
               :scale="scale"
               :datum="[item.five_min, item.ten_min, item.sixty_min]"
               :data="item.day"
               :type="0"
             />
-            <p>{{item.day}}</p>
           </div>
           <!-- 刷小卡次数 -->
           <div class="bar-container" v-else-if="tabIndex === 3">

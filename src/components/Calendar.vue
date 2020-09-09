@@ -220,12 +220,10 @@ export default {
         return;
       }
 
-      const x = this.cellX(d);
-
       this.$emit('tooltip', true, {
         left: e.offsetX,
         top: e.offsetY - 15 + (+this.year - 2019) * 155,
-        x,
+        x: null,
       }, {
         number: this.datum[valueKey][0],
         number2: this.datum[valueKey][1],

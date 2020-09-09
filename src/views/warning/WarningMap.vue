@@ -28,7 +28,7 @@
         <template v-if="indexArr[index] === true">
           <l-marker v-for="(value, name) in d"
             :key="name" :lat-lng="[value.LAT, value.LNG]"
-            :icon="isShowing===false||id!==name?iconsActive[index]:icons[index]"
+            :icon="id===name||isShowing===false?iconsInit[index]:icons[index]"
             @click="onClick($event,name,index,clickMarker)"
           >
           </l-marker>
@@ -125,8 +125,9 @@ import {
   LMarker, LPopup,
 } from 'vue2-leaflet';
 
-const defaulticon2 = (style, count) => divIcon({
-  html: `<div class="outer hide">
+// opacity:1
+const initicon = (style, count) => divIcon({
+  html: `<div class="outer">
     <div class="inner">
       <span> ${count || ''}</span>
     </div>
@@ -134,9 +135,9 @@ const defaulticon2 = (style, count) => divIcon({
   className: `marker-cluster cluster-${style}`,
   iconSize: new Point(40, 40),
 });
-
+// opacity:0.35
 const defaulticon = (style, count) => divIcon({
-  html: `<div class="outer ${count ? 'hide' : ''}">
+  html: `<div class="outer hide"}">
     <div class="inner">
       <span> ${count || ''}</span>
     </div>
@@ -144,7 +145,6 @@ const defaulticon = (style, count) => divIcon({
   className: `marker-cluster cluster-${style}`,
   iconSize: new Point(40, 40),
 });
-
 // 后端参数名
 const TITLE_P = 'ji_gou_ming_cheng';
 
@@ -168,7 +168,7 @@ export default {
       ],
       datum: [0, 0, 0],
       icons: [defaulticon('red'), defaulticon('yellow'), defaulticon('green')],
-      iconsActive: [defaulticon2('red'), defaulticon2('yellow'), defaulticon2('green')],
+      iconsInit: [initicon('red'), initicon('yellow'), initicon('green')],
 
       // 显示index
       indexArr: [true, true, true],
@@ -177,19 +177,28 @@ export default {
         {
           spiderLegPolylineOptions: { weight: 1.5, color: '#efefef', opacity: 0.5 },
           iconCreateFunction(cluster) {
-            return defaulticon('red', cluster.getChildCount());
+            if (this.isShowing) {
+              return defaulticon('red', cluster.getChildCount());
+            }
+            return initicon('red', cluster.getChildCount());
           },
         },
         {
           spiderLegPolylineOptions: { weight: 1.5, color: '#efefef', opacity: 0.5 },
           iconCreateFunction(cluster) {
-            return defaulticon('yellow', cluster.getChildCount());
+            if (this.isShowing) {
+              return defaulticon('yellow', cluster.getChildCount());
+            }
+            return initicon('yellow', cluster.getChildCount());
           },
         },
         {
           spiderLegPolylineOptions: { weight: 1.5, color: '#efefef', opacity: 0.5 },
           iconCreateFunction(cluster) {
-            return defaulticon('green', cluster.getChildCount());
+            if (this.isShowing) {
+              return defaulticon('green', cluster.getChildCount());
+            }
+            return initicon('green', cluster.getChildCount());
           },
         },
       ],

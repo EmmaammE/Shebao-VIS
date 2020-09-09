@@ -250,22 +250,23 @@ export default {
       {
         align: 'center', text: '性别', value: 'xing_bie',
       }, {
-        align: 'center', text: '序号', value: 'index', width: 100,
-      }, {
-        align: 'center', text: '费用情况', value: 'data-table-expand', width: 100,
+        align: 'center', text: '序号', value: 'index',
       },
       {
         align: 'center', text: '就诊人编码', value: 'jiu_zhen_ren_bian_ma',
       }, {
         align: 'center', text: '就诊人名称', value: 'jiu_zhen_ren_ming_cheng',
       }, {
-        align: 'center', text: '就诊人流水号', value: 'jiu_zhen_ren_liu_shui_hao',
+        align: 'center', text: '就诊人流水号', value: 'jiu_zhen_ren_liu_shui_hao', width: 150,
       }, {
-        align: 'center', text: '单据号', value: 'dan_ju_hao',
+        align: 'center', text: '单据号', value: 'dan_ju_hao', width: 150,
+      },
+      {
+        align: 'center', text: '费用情况', value: 'data-table-expand', width: 100,
       }, {
         align: 'center', text: '疾病名称', value: 'ji_bing_ming_cheng',
       }, {
-        align: 'center', text: '疾病编号', value: 'ji_bing_bian_hao',
+        align: 'center', text: '疾病编号', value: 'ji_bing_bian_hao', width: 100,
       },
       // {
       //   align: 'center', text: '结算流水号', value: 'jiu_zhi_zhuang_tai',
@@ -436,7 +437,7 @@ export default {
         }
       });
 
-      console.log(colorHash);
+      // console.log(colorHash);
       return {
         colorScale: this.colorScale(values.length),
         data: values,

@@ -24,14 +24,16 @@
           v-if="isShowing"
           stroke="#babec7"
           stroke-dasharray="4 2"
-          :x1="lineTipPos.x" :y1="chart1Size.margin.top" :x2="lineTipPos.x"
+          :x1="lineTipPos.x"
+          :y1="chart1Size.margin.top"
+          :x2="lineTipPos.x"
           :y2="chart1Size.height-chart1Size.margin.bottom-chart1Size.margin.top" />
       </line-chart>
 
       <Tooltip v-bind="lineTipPos">
         <div class="s-tip" v-show="isShowing">
           <div class="inner">
-            <p>{{tipData.date}}</p>
+            <p class="s-title">{{tipData.date}}</p>
             <p v-if="tipData['2019']">2019：{{tipData['2019']}}{{unit}}</p>
             <p v-if="tipData['2020']">2020：{{tipData['2020']}}{{unit}}</p>
           </div>
@@ -73,7 +75,7 @@
       <Tooltip v-bind="tipPos" v-show="isShowing">
         <div class="s-tip">
           <div class="inner">
-            <p>{{tipData.date}}</p>
+            <p class="s-title">{{tipData.date}}</p>
             <p>同比：{{tipData.number > 0 ?
                 '↑'+tipData.number.toFixed(2):'↓'+(-tipData.number).toFixed(2)}}</p>
             <p>环比：{{tipData.number2 > 0 ?
@@ -178,7 +180,9 @@ export default {
       setting,
 
       // 折线图
-      xscale: d3.scaleLinear(),
+      xscale: d3.scaleTime()
+        .domain([new Date(Date.UTC(2020, 0, 0)), new Date(Date.UTC(2020, 11, 31))])
+        .range([0, chart1Size - chart1Size.margin.left - chart1Size.margin.right]),
       yscale: d3.scaleLinear(),
       lineDatum: [],
       linebox: {},
@@ -228,7 +232,6 @@ export default {
         this.isShowing = false;
         return;
       }
-      console.log(isShowing, tipPos);
 
       this.isShowing = isShowing;
 
@@ -238,11 +241,6 @@ export default {
       };
 
       const { y, height } = this.linebox;
-      this.lineTipPos = {
-        x: tipPos.x,
-        top: height / 2 - 40,
-        left: tipPos.left,
-      };
 
       try {
         const date = tipData.date.substr(5);
@@ -255,6 +253,14 @@ export default {
             2020: data2 ? data2.value.toLocaleString() : null,
             date,
           },
+        };
+
+        console.log(date, this.xscale(new Date()));
+
+        this.lineTipPos = {
+          x: tipPos.x ? tipPos.x : tipPos.left + setting.marginLeft,
+          top: height / 2 - 40,
+          left: tipPos.left,
         };
       } catch (e) {
         console.log(e);
@@ -424,6 +430,8 @@ export default {
     p {
       margin: 0;
       font-size: 0.5rem;
+    }
+    p.s-title {
       text-align: center;
     }
   }

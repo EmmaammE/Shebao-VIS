@@ -1,4 +1,12 @@
 // 全局css
+@font-face {
+  font-family: 'lcdd';
+  src: url('/assets/fonts/lcdd-webfont.woff2') format('woff2'),
+       url('/assets/fonts/lcdd-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
 
 // 背景色
 $she-bg: #f5f6f9;

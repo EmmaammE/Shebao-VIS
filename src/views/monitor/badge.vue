@@ -36,7 +36,7 @@ export default {
     justify-content: center;
 
     .svg-style {
-      width: 4vw;
+      width: 3.2vw;
       height: auto;
     }
 
@@ -56,7 +56,7 @@ export default {
       }
 
       p.text-number {
-        font-family:LcdD;
+        font-family:'lcdd';
         font-size:1.5rem;
         letter-spacing:0;
         margin-bottom: 0px;
@@ -64,7 +64,7 @@ export default {
 
       p.text-title {
         font-family:STHeitiSC-Medium;
-        font-size: 0.9rem;
+        font-size: 1rem;
         letter-spacing:-0.96px;
       }
 
