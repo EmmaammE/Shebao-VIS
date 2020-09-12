@@ -233,7 +233,6 @@ export default {
     },
 
     hideTooltip() {
-      console.log('fffffffffffffffffff');
       this.$emit('tooltip', false, {
         left: 0,
         top: 0,

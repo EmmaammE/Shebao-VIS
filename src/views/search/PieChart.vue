@@ -47,15 +47,24 @@
                   :d="textPath(cd)"
                   class="line"
                 />
-                <text :font-size="12 * (type + 1)">
+                <text :font-size="12 * (type + 1)"
+                  :class="cd.cx > cd.ox ? 'she-left':'she-right'"
+                >
+                <!-- 名称 -->
                   <tspan
                     :x="cd.x"
                     :y="cd.y+10"
-                  >{{cd.ratio}}%</tspan>
+                  >{{cd.text}}</tspan>
+                <!-- 值 -->
                   <tspan
                     :x="cd.x"
                     :y="cd.y+40"
-                  >{{cd.text}} : {{cd.value.toLocaleString()}}</tspan>
+                  >{{cd.value.toLocaleString()}}</tspan>
+                <!-- 比例 -->
+                  <tspan
+                    :x="cd.x"
+                    :y="cd.y+70"
+                  >{{cd.ratio}}%</tspan>
                 </text>
               </g>
             </template>
@@ -76,6 +85,7 @@
           />
           <text
             :font-size="12 * (type + 1)"
+            :class="d.cx > d.ox ? 'she-left':'she-right'"
           >
            <tspan
               :x="d.x"
@@ -144,9 +154,9 @@ export default {
           // console.log(tmp);
 
           if (tmp.cx > tmp.ox) {
-            tmp.x -= 50;
+            tmp.x -= 30;
           } else {
-            tmp.x += 50;
+            tmp.x += 30;
           }
 
           if (d.data.child) {
@@ -186,9 +196,9 @@ export default {
 
               if (cx > ox) {
                 // 朝向左边
-                x -= 120;
+                x -= 60;
               } else {
-                x += 120;
+                x += 60;
               }
 
               tmp.child.push({
@@ -272,8 +282,16 @@ export default {
     svg {
       flex: 1;
 
-      text {
-        text-anchor: middle;
+      .she-left {
+        tspan {
+          text-anchor: end;
+        }
+      }
+
+      .she-right {
+        tspan {
+          text-anchor: start;
+        }
       }
     }
 

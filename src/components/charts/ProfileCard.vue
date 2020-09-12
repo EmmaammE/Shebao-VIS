@@ -494,7 +494,7 @@ export default {
       .tab {
         flex: 1 0 25%;
         margin: 10px;
-        box-shadow: 0 0 8px 2px rgba(172, 170, 170, 0.1);
+        box-shadow: 0 0 8px 3px rgba(172, 170, 170, 0.3);
         padding: 10px 0;
         display: flex;
         justify-content: center;

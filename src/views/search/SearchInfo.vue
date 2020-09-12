@@ -18,7 +18,7 @@
             <div class="info-box">
               <span v-for="d in info"
                 :key="d.value"
-                :class="title.length === 2?'next':''"
+                :class="info.length === 2?'next':''"
               >{{d.text}}:{{data.ji_ben_qing_kuang[d.value]}}</span>
             </div>
           </div>
@@ -76,7 +76,7 @@
               <!-- 没值的label -->
               <div
                 v-for="(d,index) in Object.values(dataHandle[0])
-                  .filter((d) => !d.value || d.value === 0)"
+                  .filter((d) => !d.value || parseInt(d.value) === 0)"
                 :key="index+'n'"
                 class="radio"
               >

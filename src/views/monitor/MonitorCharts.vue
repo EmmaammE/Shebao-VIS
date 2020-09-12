@@ -72,7 +72,7 @@
         @tooltip="updateTooltip"
       />
 
-      <Tooltip v-bind="tipPos" v-show="isShowing">
+      <Tooltip v-bind="tipPos" v-show="isShowing && tipData.type==1">
         <div class="s-tip">
           <div class="inner">
             <p class="s-title">{{tipData.date}}</p>
@@ -182,7 +182,7 @@ export default {
       // 折线图
       xscale: d3.scaleTime()
         .domain([new Date(Date.UTC(2020, 0, 0)), new Date(Date.UTC(2020, 11, 31))])
-        .range([0, chart1Size - chart1Size.margin.left - chart1Size.margin.right]),
+        .range([0, chart1Size.width - chart1Size.margin.left - chart1Size.margin.right]),
       yscale: d3.scaleLinear(),
       lineDatum: [],
       linebox: {},
@@ -222,8 +222,18 @@ export default {
   },
 
   methods: {
+    // cellX(d) {
+    //   return d3.utcMonday.count(d3.utcYear(d), d)
+    //      * 10 + 6;
+    // },
+
+    // cellY(d) {
+    //   // 0代表星期天
+    //   const index = d.getUTCDay() % 7;
+    //   return ((index + 6) % 7) * 10 + 1 - 5;
+    // },
+
     updateTooltip(isShowing, tipPos, tipData) {
-      // console.log(isShowing, tipPos, tipData);
       if (tipData.date === undefined) {
         return;
       }
@@ -235,33 +245,59 @@ export default {
 
       this.isShowing = isShowing;
 
-      this.tipPos = {
-        left: tipPos.left,
-        top: tipPos.top,
-      };
-
       const { y, height } = this.linebox;
 
       try {
         const date = tipData.date.substr(5);
         const data1 = this.datum['2019'][YEAR_HASH[`2019-${date}`][this.itemSelect]];
         const data2 = this.datum['2020'][YEAR_HASH[`2020-${date}`][this.itemSelect]];
+        // let d;
+
+        // if (tipData.date.substr(0, 4) === '2019') {
+        //   // TODO 如果要从折线图到日历图，还得给日历图再加一个tooltip
+        //   d = this.datum['2019'][YEAR_HASH[`2019-${date}`][this.itemSelect]];
+        // } else {
+        //   d = this.datum['2020'][YEAR_HASH[`2020-${date}`][this.itemSelect]];
+        // }
+
+        // const number1 = d.chain_ratio;
+        // const number2 = d.year_ratio;
         this.tipData = {
           ...tipData,
           ...{
             2019: data1 ? data1.value.toLocaleString() : null,
             2020: data2 ? data2.value.toLocaleString() : null,
             date,
+            // number1,
+            // number2,
           },
         };
+        const month = parseInt(date.substr(0, 2), 10);
+        const day = parseInt(date.substr(3, 2), 10);
 
-        console.log(date, this.xscale(new Date()));
+        // console.log(new Date(2020, month - 1, day - 1));
+        const dateObject = new Date(Date.UTC(
+          2020, month - 1, day,
+        ));
+        if (tipPos.x) {
+        // 从line发起的
+          this.tipPos = {
+            left: tipPos.left,
+            top: tipPos.top,
+          };
+        } else {
+          this.tipPos = {
+            left: tipPos.left,
+            top: tipPos.top,
+          };
+        }
 
+        // console.log(this.calbox, this.linebox);
         this.lineTipPos = {
-          x: tipPos.x ? tipPos.x : tipPos.left + setting.marginLeft,
+          x: this.xscale(dateObject) + chart1Size.margin.left,
           top: height / 2 - 40,
-          left: tipPos.left,
         };
+        this.lineTipPos.left = (this.lineTipPos.x / chart1Size.width) * this.calbox.width;
       } catch (e) {
         console.log(e);
       }

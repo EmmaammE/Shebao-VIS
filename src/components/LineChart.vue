@@ -165,10 +165,8 @@ export default {
       if (mouse[0] >= that.margin.left) {
         const date = that.chartX[1].invert(mouse[0] - that.margin.left);
 
-        console.log(d3.event);
-
         that.$emit('tooltip', true, {
-          left: d3.event.layerX,
+          left: d3.event.layerX + 1,
           top: d3.event.layerY + 150,
           x: mouse[0],
         }, {
@@ -177,7 +175,6 @@ export default {
         });
       }
     }).on('mouseout', () => {
-      console.log('?');
       that.$emit('tooltip', false, {
         left: 0,
         top: 0,
