@@ -46,7 +46,7 @@
         />
       </g>
 
-      <g class="lines" :transform='`translate(${margin.left}, ${margin.top})`'>
+      <g class="lines" :transform='`translate(${margin.left}, ${margin.top})`' ref="paths">
         <path fill="url(#2019)" :d="area(Object.values(data['2019']))" />
         <path fill="url(#2020)" :d="area(Object.values(data['2020']))" />
         <path fill="none" stroke="#3a96fd" :d="line(Object.values(data['2019']))" />
@@ -54,12 +54,27 @@
       </g>
     </svg>
 
+     <Tooltip v-bind="tipPos">
+      <div class="s-tip" v-show="isShowing">
+      <!-- <div class="s-tip"> -->
+        <div class="inner legends">
+          <span v-if="tipData['2019']"><i></i>
+            {{Number(tipData['2019']).toLocaleString()}}
+          </span>
+          <span v-if="tipData['2020']"><i></i>
+            {{Number(tipData['2020']).toLocaleString()}}
+          </span>
+        </div>
+      </div>
+    </Tooltip>
+
   </v-card>
 </template>
 
 <script>
 import * as d3 from 'd3';
 import { axisDirective } from '@/directives/axis';
+import Tooltip from '@/components/Tooltip.vue';
 
 export default {
   props: {
@@ -85,8 +100,51 @@ export default {
       },
       width: 400,
       height: 220,
+
+      // tooltip
+      isShowing: false,
+      tipData: {
+        2019: 0,
+        2020: 0,
+      },
+      tipPos: {
+        left: 0,
+        top: 0,
+      },
     };
   },
+
+  components: {
+    Tooltip,
+  },
+
+  mounted() {
+    const paths = d3.select(this.$refs.paths);
+    const that = this;
+
+    paths.selectAll('path')
+      .on('mousemove', function () {
+        const mouse = d3.mouse(this);
+        const index = Math.round(that.xScale.invert(mouse[0]));
+
+        const data2019 = that.data['2019'][index + 1];
+        const data2020 = that.data['2020'][index + 1];
+
+        that.tipData = {
+          2019: data2019,
+          2020: data2020,
+        };
+        that.isShowing = true;
+        that.tipPos = {
+          left: d3.event.layerX,
+          top: d3.event.layerY - 50,
+        };
+      });
+    paths.on('mouseout', () => {
+      that.isShowing = false;
+    });
+  },
+
   computed: {
     chartWidth() {
       return this.width - this.margin.left - this.margin.right;
@@ -175,6 +233,50 @@ export default {
       .lines {
         path {
           stroke-width: 2;
+          cursor: pointer;
+        }
+      }
+    }
+
+    // tooltip
+    .s-tip {
+      background: #eee;
+      padding: 2px 8px;
+      color:#000;
+
+      &::before {
+        border-top: 6px solid #ededed;
+      }
+    }
+
+    .legends {
+      transition: all 300ms ease-in-out;
+
+      span {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding: 4px 10px;
+        cursor: pointer;
+        font-size: 0.5rem;
+
+        i {
+          width: 1rem;
+          height: 1rem;
+          border-radius: 50%;
+          margin: 0 0.5rem 0 0;
+        }
+      }
+
+      span:nth-child(1) {
+        i {
+          background: #6672fb;
+        }
+      }
+
+      span:nth-child(2) {
+        i {
+          background: #d8adf2;
         }
       }
     }

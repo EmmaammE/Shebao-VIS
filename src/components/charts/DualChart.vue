@@ -183,16 +183,23 @@ export default {
         const pos = d3.mouse(this);
         // eslint-disable-next-line
         that.tipX = pos[0];
-        // const { x, y } = that.bbox;
 
-        const { xBottomScale, xTopScale } = that.scales;
+        const { xBottomScale, xTopScale, yScale } = that.scales;
+
+        const num = xBottomScale.invert(pos[0]).toFixed(2);
+        const money = xTopScale.invert(pos[0]).toFixed(2);
+
+        const eachBand = yScale.step();
+        const index = Math.round(pos[1] / eachBand);
+        const yValue = yScale.domain().reverse()[index];
+        // console.log(yValue, pos, d3.event.layerX);
 
         that.$emit('tooltip', true, {
           left: d3.event.pageX,
           top: d3.event.pageY - 70,
         }, {
-          num: xBottomScale.invert(pos[0]).toFixed(2),
-          money: xTopScale.invert(pos[0]).toFixed(2),
+          num: that.datum[yValue].num,
+          money: that.datum[yValue].money,
         });
       });
       d3.select(this.$refs.chart).on('mouseout', () => {

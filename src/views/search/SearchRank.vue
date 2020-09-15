@@ -123,8 +123,8 @@
           <Tooltip v-show="isShowing" v-bind="tipPos">
             <div class="s-tip">
               <div>
-                <p>金额：{{tipData.money}}万元</p>
-                <p>数量：{{tipData.num}}例</p>
+                <p v-if="tipData.money">金额：{{tipData.money}}万元</p>
+                <p v-if="tipData.num">数量：{{tipData.num}}例</p>
               </div>
             </div>
           </Tooltip>
@@ -422,6 +422,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
+      // background: rgba(#777,0.75);
     }
   }
 </style>

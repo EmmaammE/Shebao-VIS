@@ -36,6 +36,14 @@ export default {
     position: relative;
     margin-left: -50%;
     margin-right: 50%;
+
+    padding: 5px 7px;
+    pointer-events: none;
+
+    p {
+      margin: 0;
+      font-size: 0.7rem;
+    }
   }
 
 // TODO 修改三角形的朝向

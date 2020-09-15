@@ -244,10 +244,13 @@
                 />
               </g>
 
-              <g :transform='`translate(${margin.left}, ${margin.top})`'>
+              <g :transform='`translate(${margin.left}, ${margin.top})`'
+                ref="rects"
+              >
                 <g v-for="(entry,index) in Object.entries(curDatum)"
                   :key="entry[0]"
                 >
+                  <!-- 2019 -->
                   <rect
                     :x="xScaleDomain('2019')+ xScale(entry[0])"
                     :y="yScale(entry[1]['2019'])"
@@ -261,13 +264,17 @@
                     :width="xScaleDomain.bandwidth()"
                     :height="chartHeight - yScale(entry[1]['2019'])"
                     fill="url(#line2)"
+                    :value="entry[1]['2019']"
                   />
+
+                  <!-- 2020 -->
                   <rect
                     :x="xScaleDomain('2020')+ xScale(entry[0])"
                     :y="yScale(entry[1]['2020'])"
                     :width="xScaleDomain.bandwidth()"
                     :height="chartHeight - yScale(entry[1]['2020'])"
                     :fill="colorScale(index)"
+                    :value="entry[1]['2020']"
                   />
                 </g>
               </g>
@@ -275,9 +282,8 @@
 
             <Tooltip v-bind="tipPos">
               <div class="s-tip" v-show="isShowing">
-                <div class="inner">
-                  <!-- <p v-if="tipData['2019']">2019：{{tipData['2019']}}{{unit}}</p>
-                  <p v-if="tipData['2020']">2020：{{tipData['2020']}}{{unit}}</p> -->
+                <div class="inner" v-if="tipData!==null">
+                  <p>{{Number(tipData).toLocaleString()}}</p>
                 </div>
               </div>
             </Tooltip>
@@ -290,6 +296,7 @@
 <script>
 import * as d3 from 'd3';
 import { axisDirective } from '@/directives/axis';
+import Tooltip from '@/components/Tooltip.vue';
 
 const HASH = {
   // 只有数值的几个的映射
@@ -360,7 +367,39 @@ export default {
       },
       width: 600,
       height: 400,
+
+      // tooltip
+      isShowing: false,
+      tipData: null,
+      tipPos: {
+        left: 0,
+        top: 0,
+      },
     };
+  },
+
+  components: {
+    Tooltip,
+  },
+
+  mounted() {
+    // inittooltip
+    const that = this;
+    const g = d3.select(this.$refs.rects);
+    g.selectAll('rect')
+      .on('mousemove', function () {
+        const yValue = d3.select(this).attr('value');
+
+        that.tipData = yValue;
+        that.tipPos = {
+          left: d3.event.layerX,
+          top: d3.event.layerY - 40,
+        };
+        that.isShowing = true;
+      });
+    g.on('mouseout', () => {
+      that.isShowing = false;
+    });
   },
 
   computed: {
@@ -625,6 +664,10 @@ export default {
         path {
           display: none;
         }
+      }
+
+      rect {
+        cursor: pointer;
       }
     }
   }
