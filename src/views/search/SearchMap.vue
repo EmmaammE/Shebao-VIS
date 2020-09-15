@@ -110,8 +110,9 @@
       :zoomcb="zoomUpdated"
       :class="openPopup?'':'hide-popup'"
     >
-      <!-- marker -->
+      <!-- marker 费用明细-->
       <template v-if="$route.meta.type > 0">
+
         <template
           v-for="value in datum"
         >
@@ -126,17 +127,13 @@
             <l-popup
               :options = "options"
             >{{d.ji_ben_qing_kuang.ji_gou_ming_cheng}}</l-popup>
-            <!-- <l-popup
-              ref="popup"
-              :options = "{offset: offset, autoClose: false, closeOnClick: false, autoPan: false}"
-            >{{key}}</l-popup> -->
           </l-marker>
         </template>
       </template>
 
       <!-- 就诊信息 markers -->
       <template v-else>
-        <l-marker
+        <!-- <l-marker
           v-for="(d,key) in datum"
           :key="key"
           :lat-lng="[d.lat, d.lng]"
@@ -146,7 +143,23 @@
           <l-popup
             :options = "options"
           >{{d.ji_gou_ming_cheng}}</l-popup>
-        </l-marker>
+        </l-marker> -->
+
+        <v-marker-cluster
+          :options="clusterOption"
+        >
+          <l-marker
+            v-for="(d,key) in datum"
+            :key="key"
+            :lat-lng="[d.lat, d.lng]"
+            :icon="d.icon"
+            @add="openPopupAction"
+          >
+            <l-popup
+              :options = "{...options, type: d.orgType}"
+            >{{d.ji_gou_ming_cheng}}</l-popup>
+          </l-marker>
+        </v-marker-cluster>
       </template>
     </Map>
 
@@ -169,7 +182,7 @@ import Map from '@/components/charts/Map.vue';
 import {
   fetchOrgPortraitBasic, fetchDetail, fetchOrgInfo,
 } from '@/util/http';
-import { LMarker, LTooltip, LPopup } from 'vue2-leaflet';
+import { LMarker, LPopup } from 'vue2-leaflet';
 import L from 'leaflet';
 import image1 from '@/assets/search/map/1.png';
 import image2 from '@/assets/search/map/2.png';
@@ -177,8 +190,10 @@ import image3 from '@/assets/search/map/3.png';
 import image4 from '@/assets/search/map/4.png';
 import image5 from '@/assets/search/map/5.png';
 import image6 from '@/assets/search/map/6.png';
-
+import Vue2LeafletMarkercluster from 'vue2-leaflet-markercluster';
 import * as d3 from 'd3';
+import Piechart from '@/components/small/Piechart.vue';
+import Vue from 'vue';
 
 const HASH = {
   本地: 'local',
@@ -192,15 +207,16 @@ const HASH = {
   其他门诊部: 'outpatient',
   口腔内门诊部: 'oral',
 };
-// TODO 切换图片
-const iconFactory = (image = image1, num = 0.5) => L.icon({
+
+const iconFactory = (image = image1, type = '', num = 0.5) => L.icon({
   iconUrl: image,
   iconSize: [60 * num, 100 * num],
   iconAnchor: [30 * num, 100 * num],
+  type,
 });
 
 const initSatus = {
-  dateStart: new Date('2020-03-01').toISOString().substr(0, 10),
+  dateStart: new Date('2020-01-01').toISOString().substr(0, 10),
   dateEnd: new Date().toISOString().substr(0, 10),
   active: 1,
   // 地域类型
@@ -217,19 +233,78 @@ const initSatus = {
   },
 };
 
+const getClusterData = (markers) => {
+  const count = [0, 0, 0, 0, 0, 0];
+
+  const hash = {
+    public: 0,
+    private: 1,
+    community: 2,
+    oral: 3,
+    outpatient: 4,
+    drugstore: 5,
+  };
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const marker of markers) {
+    // console.log(marker.options.icon.options.type);
+    const index = hash[marker.options.icon.options.type];
+    if (index) {
+      count[index] += 1;
+    }
+  }
+
+  return count;
+};
+
+const EnhancedPiechart = Vue.extend(Piechart);
+
+// marker cluster icon
+const initicon = (cluster) => {
+  const children = cluster.getAllChildMarkers();
+  const data = getClusterData(children);
+
+  const myPiechart = new EnhancedPiechart({
+    propsData: {
+      data,
+    },
+  }).$mount().$el;
+
+  // console.log(myPiechart);
+
+  const radius = 30 * Math.log(children.length);
+
+  return L.divIcon({
+    html: myPiechart.outerHTML,
+    className: 'pie-chart-cluster',
+    iconSize: new L.Point(radius, radius),
+    iconAnchor: new L.Point(radius / 2, radius / 2),
+  });
+};
+
+// const initicon = (style, count) => L.divIcon({
+//   html: `<div class="outer">
+//     <div class="inner">
+//       <span> ${count || ''}</span>
+//     </div>
+//   </div>`,
+//   className: `marker-cluster cluster-${style}`,
+//   iconSize: new L.Point(40, 40),
+// });
 export default {
   name: 'SearchMap',
   components: {
     Map,
     LMarker,
     LPopup,
+    'v-marker-cluster': Vue2LeafletMarkercluster,
   },
   props: {
     routeType: String,
   },
   data() {
     return {
-      dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
+      dateStart: new Date('2020-02-01').toISOString().substr(0, 10),
       dateEnd: new Date().toISOString().substr(0, 10),
       menu1: false,
       menu2: false,
@@ -277,6 +352,16 @@ export default {
       latLng: null,
       tip: {},
       tipId: null,
+
+      // cluster设置
+      clusterOption: {
+        spiderLegPolylineOptions: { weight: 1.5, color: '#efefef', opacity: 0.5 },
+        iconCreateFunction(cluster) {
+          return initicon(cluster);
+        },
+        // disableClusteringAtZoom: 14,
+      },
+      // icon: initicon('red'),
     };
   },
 
@@ -357,7 +442,26 @@ export default {
       const scale = d3.scaleLinear().domain([minValue, maxValue]).range([0.1, 0.8]);
 
       Object.keys(d).forEach((key) => {
-        d[key].icon = iconFactory(image2, scale(+d[key].zong_fei_yong_zhi_chu));
+        switch (d[key].orgType) {
+          case 'private':
+            d[key].icon = iconFactory(image1, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
+            break;
+          case 'community':
+            d[key].icon = iconFactory(image3, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
+            break;
+          case 'oral':
+            d[key].icon = iconFactory(image4, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
+            break;
+          case 'outpatient':
+            d[key].icon = iconFactory(image5, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
+            break;
+          case 'drugstore':
+            d[key].icon = iconFactory(image6, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
+            break;
+          default:
+            d[key].icon = iconFactory(image2, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
+            break;
+        }
       });
 
       this.datum = d;
@@ -424,6 +528,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  @import "~leaflet.markercluster/dist/MarkerCluster.css";
+
   p {
     margin: 0;
   }

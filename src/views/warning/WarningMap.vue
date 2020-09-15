@@ -22,7 +22,7 @@
         v-for="(d,index) in datum"
         :key="index"
         :options="clusterOptions[index]"
-        @clusterclick="click()"
+        @clusterclick="click"
         @ready="ready"
       >
         <template v-if="indexArr[index] === true">
@@ -289,7 +289,7 @@ export default {
       this.datum = [data.red, data.yellow, data.green];
     },
 
-    click: (e) => console.log('clusterclick', e),
+    click: (e) => console.log('clusterclick', e.layer.getAllChildMarkers()),
     ready: (e) => console.log('ready', e),
 
     // 点击marker
