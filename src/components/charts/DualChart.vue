@@ -1,5 +1,5 @@
 <template>
-  <svg :viewBox="`0 0 ${width} ${height}`" class="dualchart">
+  <svg :viewBox="`0 0 ${width} ${wrapperHeight}`" class="dualchart">
     <defs>
       <clipPath id="clip">
         <rect x="0" :y="-yScalePadding" :width="chartWidth" :height="chartHeight" />
@@ -29,7 +29,7 @@
       />
       <text :transform='`translate(${chartWidth+20}, -10)`'>金额（万元）</text>
       <text :transform='`translate(${chartWidth+20}, ${chartHeight+14})`'>数量（例）</text>
-      <path class="grid" d="M0.5,240H620.5"></path>
+      <path class="grid" :d="`M0.5,${chartHeight}H620.5`"></path>
       <path class="grid" d="M0.5,0H620.5"></path>
     </g>
 
@@ -115,12 +115,21 @@ export default {
   },
 
   computed: {
+
     chartWidth() {
       return this.width - this.margin.left - this.margin.right;
     },
+
     chartHeight() {
-      return this.height - this.margin.top - this.margin.bottom;
+      // 将高度改为和数量相关
+      const size = Object.keys(this.datum).length;
+      return size * 25;
     },
+
+    wrapperHeight() {
+      return this.chartHeight + this.margin.top + this.margin.bottom;
+    },
+
     scales() {
       // 金额
       const xTopDomain = [Number.MAX_VALUE, Number.MIN_VALUE];

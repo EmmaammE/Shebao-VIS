@@ -87,7 +87,13 @@
           hide-details
           v-model="lookup"
           label="可输入药品或服务名"
-        ></v-text-field>
+          :rules="selected!=='drug'?['Required']:null"
+        >
+          <template #label v-if="selected!=='drug'">
+            可输入药品或服务名
+            <span class="red--text"><strong>* </strong></span>
+          </template>
+        </v-text-field>
         </div>
 
         <div class="btn-container">
@@ -193,7 +199,7 @@ export default {
       menu2: false,
 
       // 排序类型
-      selected: { value: '按机构排序', key: 'organization' },
+      selected: 'organization',
 
       datum: {},
       chart1Size,
@@ -235,11 +241,12 @@ export default {
 
   methods: {
     async getRankData() {
+      console.log(this.selected);
       const data = await fetchRank({
         startDay: this.startDay,
         endDay: this.endDay,
         orgType: this.model.map((d) => FUND_TYPE[d]),
-        searchType: this.selected.key,
+        searchType: this.selected,
         drugItem: this.lookup,
         displayNum: this.number || 15,
       });
@@ -268,6 +275,7 @@ export default {
       ];
       this.number = null;
       this.lookup = null;
+      this.selected = 'organization';
     },
 
     updateTooltip(isShowing, tipPos, tipData) {
