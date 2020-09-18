@@ -2,21 +2,25 @@
   <div class="w-container">
     <v-card>
       <v-data-table
-        class="s-table"
+        class="s-table max-height"
         :headers="headers"
+        :items="pageData"
+        item-key="index"
         :items-per-page="10"
         :options.sync="options"
-        :server-items-length="10"
-        :items="pageData"
+        :server-items-length="total"
         @click:row="rowClick"
         v-model="pageIndex"
-        item-key="index"
-        disable-sort
         single-select
+        :loading="loading"
       >
 
         <template v-slot:[`item.key`]="{ item }">
           <div class="s-col">{{item.key}}</div>
+        </template>
+
+        <template v-slot:[`item.yi_chang_fei_yong`]="{ item }">
+          <div class="s-col">{{Number(item.yi_chang_fei_yong).toFixed(2)}}</div>
         </template>
 
         <template v-slot:[`item.type`]="{ item }">
@@ -28,13 +32,14 @@
                 Object.keys(item.ten_min).length,
                 Object.keys(item.sixty_min).length]"
               :data="item.type"
+              :type="0"
             />
             <p>{{item.type}}</p>
           </div>
         </template>
       </v-data-table>
     </v-card>
-    <v-card>
+    <v-card class="right-panel">
       <v-sheet class="header">
         <div class="avatar"><GirlIcon/></div>
         <v-card class="s-tab">
@@ -67,7 +72,7 @@
                 <td>{{item.jiu_zhen_liu_shui}}</td>
                 <td>{{item.yi_liao_fei_zong_e}}</td>
                 <td>{{item.bao_xiao_zong_e}}</td>
-                <td>{{item.yi_shi}}</td>
+                <!-- <td>{{item.yi_shi}}</td> -->
               </tr>
             </tbody>
             <tbody v-else>
@@ -104,8 +109,9 @@ export default {
         {
           text: '医师编号',
           align: 'center',
-          sortable: false,
           value: 'key',
+          sortable: false,
+          width: 120,
         },
         {
           text: '医师姓名',
@@ -117,17 +123,19 @@ export default {
           text: '异常机构',
           value: 'yi_chang_ji_gou_shu_liang',
           align: 'center',
+          sortable: false,
         },
         {
           text: '异常费用（元）',
           value: 'yi_chang_fei_yong',
           align: 'center',
+          sortable: false,
         },
         {
           text: '多地开药次数（次）',
           value: 'type',
           align: 'center',
-          sortable: false,
+          sortable: true,
         },
       ],
 
@@ -146,6 +154,8 @@ export default {
       pageNum: 1,
       loading: true,
       options: {},
+      // 服务端总数量
+      total: 0,
 
       // 另一半的数据
       pageIndex: [{ index: 1 }],
@@ -159,7 +169,12 @@ export default {
   watch: {
     options: {
       handler() {
-        this.getDoctorViolationInfo();
+        this.getDoctorViolationInfo()
+          .then((data) => {
+            this.pageData = data.items;
+            this.total = data.total;
+            this.scale = this.scale.domain([0, data.maxValue]);
+          });
       },
       deep: true,
     },
@@ -173,13 +188,8 @@ export default {
         pageNum: page,
       });
 
-      // setTimeout(() => {
-      //   this.loading = false;
-      // }, 0);
-      // console.log(data);
-
       let maxValue = Number.MIN_VALUE;
-      this.pageData = Object.keys(data.doctor_page)
+      const items = Object.keys(data.doctor_page)
         .map((key, index) => {
           const size = Object.keys(data.doctor_page[key].day).length;
           maxValue = Math.max(maxValue, size);
@@ -188,7 +198,18 @@ export default {
           };
         });
 
-      this.scale = this.scale.domain([0, maxValue]);
+      // this.scale = this.scale.domain([0, maxValue]);
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          this.loading = false;
+          resolve({
+            total: data.total_num,
+            items,
+            maxValue,
+          });
+        }, 0);
+      });
     },
 
     changeTab(e) {
@@ -208,7 +229,7 @@ export default {
 <style scoped lang="scss">
   .w-container {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 45% auto;
     grid-gap: 10px;
     margin: 10px;
     height: calc(90vh - 20px);
@@ -220,7 +241,11 @@ export default {
     }
 
     .s-col {
-      max-width: 100px;
+      max-width: 120px;
+    }
+
+    .bar-container {
+      user-select: none;
     }
 
     th {
@@ -260,7 +285,7 @@ export default {
         // }
       }
 
-      $blues: #5c87ca, #4470b5, #2e5ba1, #16448c;
+      $blues: #6690ff, #4d6bda, #3348b6, #0f2693;
 
       @each $c in $blues {
         $i: index($blues, $c);
@@ -278,8 +303,13 @@ export default {
     }
 
     td {
-      font-size: 14px!important;
       text-align: center;
+    }
+
+    .wrapper {
+      overflow: auto;
+      max-height: 70vh;
+      min-height: 0;
     }
   }
 </style>

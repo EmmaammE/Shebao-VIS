@@ -57,7 +57,7 @@
                   </v-list-item-content>
 
                   <div class="info-box">
-                    <div>违规劣质费用
+                    <div>违规列支费用
                     <div>{{$store.state.menudata[0].toLocaleString()}} 元</div>
                     </div>
                     <div>违规人数

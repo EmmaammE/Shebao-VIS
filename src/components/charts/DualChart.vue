@@ -123,7 +123,7 @@ export default {
     chartHeight() {
       // 将高度改为和数量相关
       const size = Object.keys(this.datum).length;
-      return size * 25;
+      return size * 20;
     },
 
     wrapperHeight() {

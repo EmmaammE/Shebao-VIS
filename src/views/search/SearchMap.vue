@@ -89,6 +89,20 @@
         </div>
       </div>
 
+      <div v-else class="s-legends">
+
+        <p :style="{marginLeft: '-10px'}">机构类型</p>
+        <div class="color">
+          <span
+            v-for="(value, name) in orgType"
+            :key="name"
+            class="checked"
+          >
+            {{name}}
+          </span>
+        </div>
+      </div>
+
       <div class="divider" />
 
       <!-- footer -->

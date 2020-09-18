@@ -77,9 +77,9 @@
       </v-data-table>
       <v-sheet v-if="tabIndex === 4 && datum.length > 0" class="chart">
         <div class="legends">
-          <!-- TODO 插入图例 -->
-          <!-- <span><i />实际数据</span>
-          <span> <i />标准指标</span> -->
+          <div class="img-wrapper">
+            <img src="@/assets/warning/图例.png"/>
+          </div>
         </div>
 
         <!-- 六个折线图 -->
@@ -499,6 +499,16 @@ export default {
     top: 84px;
     bottom: 0;
     padding: 0;
+    flex-direction: column;
+
+    .img-wrapper {
+
+      img {
+        object-fit: contain;
+        width: 170px;
+        float: right;
+      }
+    }
 
     .container {
       width: 100%;

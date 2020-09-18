@@ -28,6 +28,7 @@ export default {
     color: #fff;
     z-index: 100;
     position: absolute;
+    transition: all ease-in-out 300ms;
   }
 
   .s-tip {

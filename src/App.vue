@@ -84,6 +84,21 @@ export default {
     }
   }
 
+  // .w-container .s-table {
+  //   th {
+  //     font-size: 0.875rem;
+  //   }
+  //   td {
+  //     font-size: 0.7rem!important;
+  //   }
+  // }
+
+  // .w-container .right-panel {
+  //   td {
+  //     font-size: 12px;
+  //   }
+  // }
+
   .s-lists {
     .v-list-item__content {
       // 修改layout左侧侧边
@@ -165,6 +180,7 @@ export default {
     }
   }
   .search-container,
+  .w-container,
   .treatment {
     th, td {
       font-size: 0.5rem!important;
@@ -193,6 +209,11 @@ export default {
 
     .table-wrapper table{
       width: 139%!important;
+    }
+
+    // 添加max-height拉高表格
+    .max-height .v-data-table__wrapper > table {
+      height: 100%;
     }
   }
 

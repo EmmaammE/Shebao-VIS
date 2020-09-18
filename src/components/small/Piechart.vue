@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     dataReady() {
-      console.log(this.data);
+      // console.log(this.data);
       // 处理后的piechart数据
       return d3.pie()
         .padAngle(0.005)
