@@ -75,7 +75,7 @@
           dense
           solo
           flat
-          v-model="number"
+          v-model.trim="number"
           label="排名显示数量"
           hide-details
         ></v-text-field>
@@ -85,9 +85,9 @@
           solo
           flat
           hide-details
-          v-model="lookup"
+          v-model.trim="lookup"
           label="可输入药品或服务名"
-          :rules="selected!=='drug'?['Required']:null"
+          :rules="selected!=='drug'?['Required']:[]"
         >
           <template #label v-if="selected!=='drug'">
             可输入药品或服务名
@@ -108,7 +108,24 @@
 
     <p class="she-title text-margin">数据结果</p>
     <div class="s-chart-container text-lg-body-2" ref="chart">
-      <div class="charts">
+      <div class="charts" v-if="singleChart && datum!==null">
+        <dura-chart
+          v-bind="chart1Size"
+          :datum="datum"
+          @tooltip="updateTooltip"
+        />
+
+        <Tooltip v-show="isShowing" v-bind="tipPos">
+          <div class="s-tip">
+            <div>
+              <p v-if="tipData.money">金额：{{tipData.money}}万元</p>
+              <p v-if="tipData.num">数量：{{tipData.num}}例</p>
+            </div>
+          </div>
+        </Tooltip>
+      </div>
+
+      <div class="charts" v-else>
         <div v-for="(value, name) in datum"
           :key="name"
           class="wrapper"
@@ -119,7 +136,6 @@
           </div>
 
           <!-- 折线图 -->
-
           <dura-chart
             :datum="value"
             v-bind="chart1Size"
@@ -189,8 +205,8 @@ export default {
         { value: '按医师排序', key: 'doctor' },
       ],
 
-      number: null,
-      lookup: null,
+      number: '',
+      lookup: '',
 
       // 查询时间
       startDay: new Date('2020-01-01').toISOString().substr(0, 10),
@@ -201,7 +217,7 @@ export default {
       // 排序类型
       selected: 'organization',
 
-      datum: {},
+      datum: null,
       chart1Size,
 
       TITLE: {
@@ -239,25 +255,53 @@ export default {
     this.bbox = this.$refs.chart.getBoundingClientRect();
   },
 
+  computed: {
+    // 如果是按药品排序，且输入了一个药品/服务名，则只显示一个图表
+    singleChart() {
+      if (this.selected === 'drug' && this.lookup.length !== 0) {
+        return true;
+      }
+      return false;
+    },
+  },
+
+  watch: {
+    singleChart() {
+      this.datum = null;
+    },
+  },
+
   methods: {
     async getRankData() {
-      console.log(this.selected);
+      // console.log(this.selected);
+      const lookup = this.lookup.length === 0 ? null : this.lookup;
+      const number = this.number.length === 0 ? null : (+this.number);
       const data = await fetchRank({
         startDay: this.startDay,
         endDay: this.endDay,
         orgType: this.model.map((d) => FUND_TYPE[d]),
         searchType: this.selected,
-        drugItem: this.lookup,
-        displayNum: this.number || 15,
+        drugItem: lookup,
+        displayNum: number || 15,
       });
 
       const d = {};
-      // 类型
-      Object.keys(data).forEach((key) => {
-        if (Object.keys(data[key]).length !== 0) {
-          d[key] = data[key];
-        }
-      });
+
+      if (this.singleChart) {
+        Object.keys(data).forEach((key) => {
+          if (Object.keys(data[key]).length !== 0) {
+            // eslint-disable-next-line prefer-destructuring
+            d[this.TITLE[key]] = Object.values(data[key])[0];
+          }
+        });
+      } else {
+        Object.keys(data).forEach((key) => {
+          if (Object.keys(data[key]).length !== 0) {
+            d[key] = data[key];
+          }
+        });
+      }
+
       this.datum = d;
     },
 
@@ -273,8 +317,8 @@ export default {
         '社区卫生服务中心',
         '零售药店',
       ];
-      this.number = null;
-      this.lookup = null;
+      this.number = '';
+      this.lookup = '';
       this.selected = 'organization';
     },
 

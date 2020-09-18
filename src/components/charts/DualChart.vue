@@ -195,13 +195,12 @@ export default {
 
         const { xBottomScale, xTopScale, yScale } = that.scales;
 
-        const num = xBottomScale.invert(pos[0]).toFixed(2);
-        const money = xTopScale.invert(pos[0]).toFixed(2);
+        // const num = xBottomScale.invert(pos[0]).toFixed(2);
+        // const money = xTopScale.invert(pos[0]).toFixed(2);
 
         const eachBand = yScale.step();
         const index = Math.round(pos[1] / eachBand);
         const yValue = yScale.domain().reverse()[index];
-        // console.log(yValue, pos, d3.event.layerX);
 
         that.$emit('tooltip', true, {
           left: d3.event.pageX,
