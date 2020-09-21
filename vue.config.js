@@ -50,6 +50,15 @@ module.exports = {
           '^/api': '',
         },
       },
+      // 睿医
+      '/real': {
+        target: 'http://s.ccnt.xyz:10000/backend/',
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/real': '',
+        },
+      },
     },
   },
 };

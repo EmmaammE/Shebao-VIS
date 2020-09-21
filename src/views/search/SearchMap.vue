@@ -296,15 +296,6 @@ const initicon = (cluster) => {
   });
 };
 
-// const initicon = (style, count) => L.divIcon({
-//   html: `<div class="outer">
-//     <div class="inner">
-//       <span> ${count || ''}</span>
-//     </div>
-//   </div>`,
-//   className: `marker-cluster cluster-${style}`,
-//   iconSize: new L.Point(40, 40),
-// });
 export default {
   name: 'SearchMap',
   components: {
@@ -388,6 +379,11 @@ export default {
     // 组件创建完后获取数据，
     this.getData();
   },
+
+  // mounted() {
+  // ["", "search", "jigou"]
+  //   console.log(this.$route.fullPath.split('/'));
+  // },
 
   watch: {
     $route: 'getData',
