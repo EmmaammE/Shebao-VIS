@@ -27,6 +27,16 @@ const routes = [
           linkIndex: 0,
         },
       },
+
+      {
+        path: 'table/:tableType',
+        component: () => import('../views/Table.vue'),
+        meta: {
+          linkIndex: 1,
+          type: 1,
+        },
+      },
+
       {
         path: 'search/rank',
         component: () => import('../views/search/SearchRank'),

@@ -13,8 +13,8 @@
         v-model="pageIndex"
         single-select
         :loading="loading"
+        disable-sort
       >
-
         <template v-slot:[`item.key`]="{ item }">
           <div class="s-col">{{item.key}}</div>
         </template>
@@ -61,7 +61,8 @@
               </tr>
             </thead>
             <tbody v-if="pageData[pageIndex[0].index-1] &&
-              Object.keys(pageData[pageIndex[0].index-1][tabsKey[activeIndex]]).length!== 0">
+              Object.keys(pageData[pageIndex[0].index-1][tabsKey[activeIndex]]).length!== 0"
+            >
               <tr v-for="(item, value) in pageData[pageIndex[0].index-1][tabsKey[activeIndex]]"
                 :key="value">
                 <td>{{ value }}</td>
@@ -190,13 +191,14 @@ export default {
 
       let maxValue = Number.MIN_VALUE;
       const items = Object.keys(data.doctor_page)
-        .map((key, index) => {
+        .map((key) => {
           const size = Object.keys(data.doctor_page[key].day).length;
           maxValue = Math.max(maxValue, size);
           return {
-            ...data.doctor_page[key], key, index: index + 1, type: size,
+            ...data.doctor_page[key], key, type: size,
           };
-        });
+        }).sort((a, b) => b.type - a.type)
+        .map((d, index) => ({ ...d, index: index + 1 }));
 
       // this.scale = this.scale.domain([0, maxValue]);
 
@@ -234,9 +236,8 @@ export default {
     margin: 10px;
     height: calc(90vh - 20px);
 
-    .s-table,
-    .v-data-table__wrapper {
-      height: calc(90vh - 20px);
+    .s-table {
+      // height: calc(90vh - 20px);
       overflow: auto;
     }
 

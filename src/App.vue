@@ -50,7 +50,7 @@ export default {
     background: #fff!important;
   }
 
-  .w-container {
+  .w-container .max-height {
     .v-data-table__wrapper {
       height: calc(90vh - 80px);
     }
@@ -68,7 +68,6 @@ export default {
 
   .s-table {
     .v-data-table__wrapper {
-      overflow: auto;
 
       td {
         font-size: 0.5rem;
@@ -204,7 +203,8 @@ export default {
     }
 
     .s-table .v-data-table__wrapper {
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .table-wrapper table{
