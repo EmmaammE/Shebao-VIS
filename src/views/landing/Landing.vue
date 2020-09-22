@@ -79,6 +79,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  @import url(//db.onlinewebfonts.com/c/396385b48ad7cb2df0fea7b96a899414?family=YouSheBiaoTiHei);
 
   .v-image__image--cover {
     position: relative;
@@ -149,6 +150,7 @@ export default {
         letter-spacing:3.7px;
         text-align:center;
         font-size: 3rem;
+        font-weight: normal;
       }
     }
 
