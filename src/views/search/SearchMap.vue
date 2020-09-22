@@ -414,10 +414,28 @@ export default {
         searchItem: this.condition,
         pageNum: null,
       }))).then((values) => {
-        this.datum = values.map((d, index) => ({
-          type: org[index],
-          value: d.org_page,
-        }));
+        const table = {
+          page: {},
+          total: 0,
+        };
+
+        const datum = values.map((d, index) => {
+          table.page = { ...d.org_page };
+          table.total += d.total_org_num;
+
+          return {
+            type: org[index],
+            value: d.org_page,
+          };
+        });
+
+        this.datum = datum;
+
+        // 将数据存成表格数据
+        this.$store.commit({
+          type: 'updateTableData',
+          data: table,
+        });
       });
     },
 

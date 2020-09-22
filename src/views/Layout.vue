@@ -130,7 +130,9 @@
           </template>
         </v-text-field>
         <div class="icons">
-          <div class="tool-btn"><img src="@/assets/bingtu.png"/></div>
+          <div class="tool-btn"
+            @click="toTable"
+          ><img src="@/assets/bingtu.png"/></div>
           <div class="tool-btn"><BackIcon/></div>
           <div class="tool-btn"><NextIcon/></div>
         </div>
@@ -187,6 +189,19 @@ export default {
   }),
 
   methods: {
+    toTable() {
+      // console.log(this.$route);
+      const { path } = this.$route;
+      if (path.indexOf('/table') !== -1) {
+        this.$router.push({
+          path: path.replace('/table', ''),
+        });
+      } else {
+        this.$router.push({
+          path: `${path}/table`,
+        });
+      }
+    },
   },
 
   computed: {
@@ -444,6 +459,7 @@ export default {
           .tool-btn img {
             margin: 10px;
             height: 30px;
+            cursor:pointer;
           }
         }
      }

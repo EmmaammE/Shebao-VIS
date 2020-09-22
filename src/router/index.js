@@ -27,16 +27,6 @@ const routes = [
           linkIndex: 0,
         },
       },
-
-      {
-        path: 'table/:tableType',
-        component: () => import('../views/Table.vue'),
-        meta: {
-          linkIndex: 1,
-          type: 1,
-        },
-      },
-
       {
         path: 'search/rank',
         component: () => import('../views/search/SearchRank'),
@@ -62,6 +52,16 @@ const routes = [
           linkIndex: 1,
         },
       },
+
+      {
+        path: 'search/jigou/table',
+        component: () => import('../views/Table.vue'),
+        meta: {
+          linkIndex: 1,
+          type: 1,
+        },
+      },
+
       {
         path: 'search/jigou',
         component: () => import('../views/search/SearchMap'),

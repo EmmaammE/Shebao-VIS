@@ -11,7 +11,10 @@ export default new Vuex.Store({
     menudata: [0, 0, 0],
 
     // 表格的数据
-    tableData: {},
+    tableData: {
+      page: {},
+      total: 0,
+    },
   },
   mutations: {
     updatemenu(state, payload) {
@@ -19,7 +22,8 @@ export default new Vuex.Store({
     },
 
     updateTableData(state, payload) {
-      state.tableData = payload.data.slice();
+      console.log(payload);
+      state.tableData = { ...state.tableData, ...payload.data };
     },
   },
   actions: {

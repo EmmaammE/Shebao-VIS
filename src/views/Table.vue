@@ -8,12 +8,14 @@
       disable-sort
       single-select
       :options.sync="options"
-      :server-items-length="totalItems"
       :loading="loading"
       dense
+      hide-default-header
+      :items-per-page="10"
+      calculate-widths
     >
-      <template v-slot:header="{props:headers}">
-        <thead :key="headers">
+      <template v-slot:header="{}">
+        <thead>
             <tr
               v-for="(header, row) in tableHeader.trees"
               :key="row"
@@ -24,7 +26,9 @@
                 :colspan="node.colspan"
                 :rowspan="node.rowspan"
               >
-                {{node.text}}
+                <div class="cell-span">
+                  {{node.text}}
+                </div>
               </th>
             </tr>
         </thead>
@@ -34,60 +38,51 @@
 </template>
 
 <script>
-import { getSpan, searchRankHeader } from '@/util/tableHeader';
+import getSpan from '@/util/tableHeader';
+import { searchRankHeader, leaves, handleData } from '@/util/table/rank';
+import { mapState } from 'vuex';
 
 const tableHeader = getSpan(searchRankHeader);
 
 export default {
   data() {
     return {
-      tableData: [],
-      options: {},
-      totalItems: 100,
-      loading: false,
-      headers: [
-        {
-          align: 'center', text: '性别', value: 'xing_bie', width: 45,
-        }, {
-          align: 'center', text: '序号', value: 'index',
-        }, {
-          align: 'center', text: '姓名', value: 'name',
-        }, {
-          align: 'center', text: '社保编号', value: 'she_bao_bian_hao',
-        }, {
-          align: 'center', text: '身份证号', value: 'shen_fen_zheng_hao',
-        }, {
-          align: 'center', text: '参保类别', value: 'can_bao_lei_xing',
-        }, {
-          align: 'center', text: '就诊状态', value: 'jiu_zhi_zhuang_tai',
-        },
-      ],
+      // tableData: [],
+      // totalItems: 100,
 
+      options: {},
+      loading: false,
+      headers: leaves,
       tableHeader,
     };
   },
 
-  computed: {
-
-    // headersMenuWithSpan() {
-    //   const depth = 4;
-    //   return this.headersMenu.map((header) => {
-    //     header.colspan.
-    //   });
+  computed: mapState({
+    // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+    // countPlusLocalState(state) {
+    //   return state.count + this.localCount;
     // },
-  },
+    totalItems(state) {
+      return state.tableData.total;
+    },
+
+    tableData(state) {
+      return handleData(state.tableData.page);
+    },
+
+  }),
 
   mounted() {
-    console.log(tableHeader.trees);
+    // console.log(tableHeader.trees);
   },
 };
 </script>
 
 <style lang="scss">
   .expand-table {
-    .v-data-table__wrapper > table {
+    .v-data-table__wrapper {
       height: calc(100vh - 150px);
-      width: 400%;
+      overflow: auto;
     }
 
     th {
@@ -101,15 +96,28 @@ export default {
     .v-data-table__wrapper > table > tfoot > tr > td,
     .v-data-table__wrapper > table > tfoot > tr > th {
       padding: 0 5px;
-      height: 10px;
+      height: 40px;
+      min-width: 100px;
       text-align: center!important;
     }
 
+    .v-data-table__wrapper > table > tfoot > tr > td:nth-child(2) {
+      min-width: 300px;
+    }
   }
 
   .table-container {
     overflow: auto;
     padding: 10px;
     width: 81vw;
+
+    div.cell-span {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 </style>

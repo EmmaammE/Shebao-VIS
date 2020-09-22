@@ -49,7 +49,7 @@
       <div class="content" @scroll="onScroll">
         <div
           v-for="(d,i) in datum"
-          :key = "d.tableData[1]"
+          :key = "i"
           :class="activeIndex===i?'s-row active':'s-row'"
           @click="onClick(i)"
         >
