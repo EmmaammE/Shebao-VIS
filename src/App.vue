@@ -253,4 +253,10 @@ export default {
     }
 
   }
+
+  .warning-people {
+    .leaflet-popup-content {
+      min-width: 160px;
+    }
+  }
 </style>

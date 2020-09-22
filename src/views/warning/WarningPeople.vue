@@ -1,5 +1,5 @@
 <template>
-  <div class="map-container">
+  <div class="map-container warning-people">
     <Map
       :class="openPopup?'':'hide-popup'"
     >
@@ -18,18 +18,23 @@
               <p>({{orgData.sum}})次</p>
               <p>{{orgData.name}}</p>
               <hr />
-              <div v-for="(d,index) in warning"
-                :key="index"
-              >
-              <div v-if="wData[index][orgData.key]"
-                class="bar"
-              >
-                {{d.value}}
-                <bar :scale="widthScale" :data="wData[index][orgData.key]"
-                  :color="d.color"
-                />
-              </div>
-              </div>
+              <!-- {{orgData.key}} -->
+              <template v-if="openPopup">
+                <div v-for="(d,index) in warning"
+                  :key="index"
+                >
+                  <div v-if="wData[index][orgData.key]"
+                    class="bar"
+                  >
+                    <span>{{d.value}}</span>
+                    <bar
+                      :scale="widthScale"
+                      :data="wData[index][orgData.key]"
+                      :color="d.color"
+                    />
+                  </div>
+                </div>
+              </template>
             </div>
           </l-popup>
         </l-marker>
@@ -96,7 +101,7 @@ export default {
       radius: 200,
       rScale: d3.scaleLinear().range([200, 350]),
       options: {
-        offset: new L.Point(1, 70),
+        offset: new L.Point(1, 100),
         autoClose: false,
         closeOnClick: false,
         autoPan: false,
@@ -116,7 +121,7 @@ export default {
         // {id(机构代码): 次数}
         {}, {}, {}, {},
       ],
-      widthScale: d3.scaleLinear().range([0, 80]),
+      widthScale: d3.scaleLinear().range([0, 70]),
 
       // 是否显示Popup
       openPopup: false,
@@ -169,23 +174,27 @@ export default {
         this.$store.commit({
           type: 'updatemenu',
           data: [
-            data.wei_gui_ji_gou_shu,
-            data.wei_gui_ren_shu,
-            data.wei_gui_lie_zhi_fei_yong,
+            res[0].wei_gui_ji_gou_shu + res[1].wei_gui_ji_gou_shu,
+            res[0].wei_gui_ren_shu + res[1].wei_gui_ren_shu,
+            res[0].wei_gui_lie_zhi_fei_yong + res[1].wei_gui_lie_zhi_fei_yong,
           ],
         });
 
         const result = this.datum.slice();
         let index = this.datum.length;
 
-        Object.keys(data.patient_page).forEach((key) => {
-          const chart = Object.values(data.patient_page[key].yi_chang_ji_gou).map((orgData) => {
-            const a = orgData.qun_ti_jiu_yi.all;
-            const b = orgData.shua_kong_ka.all;
-            const c = orgData.shua_xiao_ka.all;
-            const d = orgData.xu_jia_zhu_yuan.all;
+        // console.log(data.patient_page);
 
-            return { ...orgData, ...{ sum: a + b + c + d, key } };
+        Object.keys(data.patient_page).forEach((key) => {
+          const chart = Object.keys(data.patient_page[key].yi_chang_ji_gou).map((orgKey) => {
+            const orgData = data.patient_page[key].yi_chang_ji_gou[orgKey];
+
+            const a = orgData.qun_ti_jiu_yi.patient;
+            const b = orgData.shua_kong_ka.patient;
+            const c = orgData.shua_xiao_ka.patient;
+            const d = orgData.xu_jia_zhu_yuan.patient;
+
+            return { ...orgData, ...{ sum: a + b + c + d, key: orgKey } };
           });
 
           result.push(
@@ -218,8 +227,7 @@ export default {
 
     async getPatientDetail(id) {
       const param = {
-        // 有很多没有值
-        patientId: id,
+        patientId: id.trim(),
       };
       // 请求详细信息
       const data = await Promise.all([
@@ -261,7 +269,10 @@ export default {
 
     onClick(index) {
       this.activeIndex = index;
-      this.getAllDetail();
+      this.wData = [
+        // {id(机构代码): 次数}
+        {}, {}, {}, {},
+      ];
     },
 
     openPopupAction(event) {
@@ -376,6 +387,13 @@ export default {
 
     div.bar {
       display: flex;
+
+      span {
+        display:inline-block;
+        width:40%;
+        word-wrap:break-word;
+        white-space:normal;
+      }
 
       svg {
         flex-grow: 1;
