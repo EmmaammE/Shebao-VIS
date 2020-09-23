@@ -29,7 +29,6 @@
       <g
         v-for="(d,index) in dataReady"
         :key="index"
-        :class="d.cx < d.ox?'':'svg-end'"
       >
         <g v-if="d.child">
           <g v-for="(cd,j) in d.child" :key="j+'c'">
@@ -41,6 +40,27 @@
                 :class="dataReady.length+j === activePie?'active':''"
                 @mousemove="hoverPie(dataReady.length+j)"
               ></path>
+            </template>
+          </g>
+        </g>
+
+        <path
+          :d="arc(d)"
+          :fill="colorScale(index)"
+          :class="index === activePie && type === 1?'active':''"
+          @mousemove="hoverPie(index)"
+        ></path>
+      </g>
+
+      <!-- 绘制tooltip -->
+      <g
+        v-for="(d,index) in dataReady"
+        :key="index+'t'"
+        :class="d.cx < d.ox?'':'svg-end'"
+      >
+        <g v-if="d.child">
+          <g v-for="(cd,j) in d.child" :key="j+'c'">
+            <template v-if="cd.ratio > 1 || dataReady.length + j === activePie">
               <g class="tip">
                 <path
                   marker-end="url(#circle)"
@@ -71,13 +91,7 @@
           </g>
         </g>
 
-        <path
-          :d="arc(d)"
-          :fill="colorScale(index)"
-          :class="index === activePie && type === 1?'active':''"
-          @mousemove="hoverPie(index)"
-        ></path>
-        <g class="tip">
+        <g class="tip" v-if="d.ratio>1 || index === activePie">
           <path
             marker-end="url(#circle)"
             :d="textPath(d)"
@@ -98,6 +112,7 @@
           </text>
         </g>
       </g>
+
     </svg>
   </div>
 </template>

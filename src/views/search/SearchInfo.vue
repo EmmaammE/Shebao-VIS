@@ -405,6 +405,7 @@ export default {
 
       .left-box {
         margin: 0 30px;
+        width: 100%;
       }
 
       .number {

@@ -1,6 +1,6 @@
 <template>
- <v-card flat >
-  <v-overlay v-if="loading" :value="loading" color="#fff" >
+ <v-card flat class="v-card-container">
+  <v-overlay v-if="loading" :value="loading" color="#fff" absolute>
     <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
   </v-overlay>
 
@@ -245,6 +245,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .v-card-container {
+    min-height: 90vh;
+  }
   .profile-container {
     display: flex;
     flex-direction: column;

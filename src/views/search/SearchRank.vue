@@ -107,38 +107,18 @@
     </div>
 
     <p class="she-title text-margin">数据结果</p>
+
     <div class="s-chart-container text-lg-body-2" ref="chart">
-      <div class="charts" v-if="singleChart && datum!==null">
-        <dura-chart
-          v-bind="chart1Size"
-          :datum="datum"
-          @tooltip="updateTooltip"
-        />
 
-        <Tooltip v-show="isShowing" v-bind="tipPos">
-          <div class="s-tip">
-            <div>
-              <p v-if="tipData.money">金额：{{tipData.money}}万元</p>
-              <p v-if="tipData.num">数量：{{tipData.num}}例</p>
-            </div>
-          </div>
-        </Tooltip>
-      </div>
+      <v-overlay v-if="loading" :value="loading" color="#fff" absolute >
+        <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
+      </v-overlay>
 
-      <div class="charts" v-else>
-        <div v-for="(value, name) in datum"
-          :key="name"
-          class="wrapper"
-        >
-          <div class="header">
-            <HosIcon />
-            <p>{{TITLE[name]}} </p>
-          </div>
-
-          <!-- 折线图 -->
+      <template v-else>
+        <div class="charts" v-if="singleChart && datum!==null">
           <dura-chart
-            :datum="value"
             v-bind="chart1Size"
+            :datum="datum"
             @tooltip="updateTooltip"
           />
 
@@ -152,7 +132,35 @@
           </Tooltip>
         </div>
 
-      </div>
+        <div class="charts" v-else>
+          <div v-for="(value, name) in datum"
+            :key="name"
+            class="wrapper"
+          >
+            <div class="header">
+              <HosIcon />
+              <p>{{TITLE[name]}} </p>
+            </div>
+
+            <!-- 折线图 -->
+            <dura-chart
+              :datum="value"
+              v-bind="chart1Size"
+              @tooltip="updateTooltip"
+            />
+
+            <Tooltip v-show="isShowing" v-bind="tipPos">
+              <div class="s-tip">
+                <div>
+                  <p v-if="tipData.money">金额：{{tipData.money}}万元</p>
+                  <p v-if="tipData.num">数量：{{tipData.num}}例</p>
+                </div>
+              </div>
+            </Tooltip>
+          </div>
+
+        </div>
+      </template>
       <!-- legends -->
       <div class="legends">
         <span>金额 <MIcon /></span>
@@ -239,6 +247,8 @@ export default {
         top: 0,
       },
       bbox: {},
+
+      loading: false,
     };
   },
 
@@ -303,9 +313,11 @@ export default {
       }
 
       this.datum = d;
+      this.loading = false;
     },
 
     getData() {
+      this.loading = true;
       this.getRankData();
     },
 

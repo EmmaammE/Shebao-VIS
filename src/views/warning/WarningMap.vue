@@ -1,5 +1,9 @@
 <template>
   <div class="map-container">
+    <v-overlay v-if="loading" :value="loading" color="#fff" absolute z-index="500">
+      <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
+    </v-overlay>
+
     <div class="cards-container">
       <v-card v-for="(d,index) in info" :key="index"
         outlined
@@ -71,6 +75,7 @@
               <span>均次费用（元）</span>
             </div>
             <barchart
+              v-if="tipData[0]"
               :type="1"
               :width="250"
               :height="120"
@@ -161,6 +166,7 @@ export default {
 
   data() {
     return {
+      loading: true,
       info: [
         { icon: Icon1, title: '异常机构数量' },
         { icon: Icon2, title: '高危机构数量' },
@@ -261,6 +267,8 @@ export default {
 
   methods: {
     getData() {
+      this.loading = true;
+
       if (this.compType === 0) {
         this.getFundInfo();
         // console.log('fund');
@@ -281,12 +289,14 @@ export default {
       this.datum = [data.red ? data.red : {},
         data.yellow ? data.yellow : {},
         data.green ? data.green : {}];
+      this.loading = false;
     },
 
     async getOrganizationInfo() {
       const data = await fetchOrgViolationInfo();
 
       this.datum = [data.red, data.yellow, data.green];
+      this.loading = false;
     },
 
     click: (e) => console.log('clusterclick', e.layer.getAllChildMarkers()),

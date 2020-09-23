@@ -1,5 +1,9 @@
 <template>
   <div class="search-map">
+    <v-overlay v-if="loading" :value="loading" color="#fff" absolute z-index="600">
+      <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
+    </v-overlay>
+
     <v-card flat class="filter-card">
       <p class="she-title">筛选条件</p>
       <div class="divider" />
@@ -309,6 +313,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       dateStart: new Date('2020-02-01').toISOString().substr(0, 10),
       dateEnd: new Date().toISOString().substr(0, 10),
       menu1: false,
@@ -431,6 +436,8 @@ export default {
 
         this.datum = datum;
 
+        this.loading = false;
+
         // 将数据存成表格数据
         this.$store.commit({
           type: 'updateTableData',
@@ -493,9 +500,11 @@ export default {
       });
 
       this.datum = d;
+      this.loading = false;
     },
 
     getData() {
+      this.loading = true;
       switch (this.$route.meta.type) {
         // 机构画像
         case 2:
@@ -572,7 +581,7 @@ export default {
     position: absolute;
     top: 3vh;
     left: 2vw;
-    z-index: 1100;
+    z-index: 500;
     padding: 15px;
     box-shadow: 1px 2px 5px rgba($color: #000, $alpha: 0.1)!important;
 
