@@ -178,6 +178,16 @@ export default {
       text-align: center;
     }
   }
+  // .map-charts-container {
+  //   .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
+  //   .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
+  //   .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
+  //   .v-data-table > .v-data-table__wrapper > table > thead > tr > th,
+  //   .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td,
+  //   .v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
+  //     padding: 0 10px;
+  //   }
+  // }
   .search-container,
   .w-container,
   .treatment {
@@ -258,5 +268,9 @@ export default {
     .leaflet-popup-content {
       min-width: 160px;
     }
+  }
+
+  .layout-insert .v-list-item__content {
+    margin-left: -10px;
   }
 </style>

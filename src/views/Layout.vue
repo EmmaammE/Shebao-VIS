@@ -57,29 +57,47 @@
                   </v-list-item-content>
 
                   <div class="info-box">
-                    <div>违规列支费用
-                    <div>{{$store.state.menudata[0].toLocaleString()}} 元</div>
+                    <div class="info-title">
+                      <Icon1 />
+                      <span>违规列支费用</span>
                     </div>
-                    <div>违规人数
-                    <div>{{$store.state.menudata[1].toLocaleString()}}</div>
+                    <div class="info-number">
+                      {{Number($store.state.menudata[0]).toLocaleString()}}元
                     </div>
-                    <div>违规机构数
-                     <div>{{$store.state.menudata[2].toLocaleString()}}</div>
+
+                    <div class="info-title">
+                      <Icon2 />
+                      <span>违规人数</span>
+                    </div>
+                    <div class="info-number">
+                      {{Number($store.state.menudata[1]).toLocaleString()}}
+                    </div>
+
+                    <div class="info-title">
+                      <Icon3 />
+                      <span>违规机构数</span>
+                    </div>
+                    <div class="info-number">
+                      {{$store.state.menudata[2].toLocaleString()}}
                     </div>
                   </div>
                    <ul>
                       <li>
                         <span></span>
-                        群体就医</li>
+                        <p>群体就医</p>
+                      </li>
                       <li>
                         <span></span>
-                        虚假住院</li>
+                        <p>虚假住院</p>
+                      </li>
                       <li>
                         <span></span>
-                        刷空卡</li>
+                        <p>刷空卡</p>
+                      </li>
                       <li>
                         <span></span>
-                        刷小卡</li>
+                        <p>刷小卡</p>
+                      </li>
                     </ul>
               </v-list-item-group>
 
@@ -161,6 +179,9 @@ import WarningIcon from '@/assets/common/warning.svg';
 import icon5 from '@/assets/common/icon_5.svg';
 import icon6 from '@/assets/common/icon_6.svg';
 import icon7 from '@/assets/common/icon_7.svg';
+import Icon1 from '@/assets/warning/1.svg';
+import Icon2 from '@/assets/warning/2.svg';
+import Icon3 from '@/assets/warning/3.svg';
 
 import { ROUTE_PARAM, FUND_TYPE } from '@/util/type';
 
@@ -173,6 +194,9 @@ export default {
     SearchIcon,
     WarningIcon,
     MonitorIcon,
+    Icon1,
+    Icon2,
+    Icon3,
   },
   data: () => ({
     drawer: true,
@@ -490,17 +514,38 @@ export default {
       display: flex;
       flex-direction: column;
       color: #1976d2;
-      line-height: 25px;
-      font-size: $sub-title;
       border-bottom: 2px solid $she-border;
       border-top: 2px solid $she-border;
+      font-size: 0.875rem;
+      text-indent: 0px;
 
       .info-box {
-        margin: -5px 0 0 20px;
+        margin: 0 10px 0 25px;
         border-bottom: 2px solid $she-border;
 
         div {
-          margin: 10px 0;
+          line-height: 20px;
+        }
+
+        .info-title {
+          display: flex;
+          align-items: center;
+
+          svg {
+            transform: scale(0.9);
+          }
+          // margin-left: 30px;
+
+          span {
+            text-indent: 5px;
+          }
+        }
+
+        .info-number {
+          font-family: LcdD;
+          font-size: 1rem;
+          font-weight: 100;
+          margin: 0 0 15px 24px;
         }
       }
       .v-list-item {
@@ -510,7 +555,7 @@ export default {
       ul {
         list-style: none;
         padding: 0;
-        margin: 10px 0 10px 20px;
+        margin: 10px 0;
 
         li {
           position: relative;
@@ -518,6 +563,11 @@ export default {
           display: flex;
           align-items: center;
           margin: 5px 0;
+
+          p {
+            margin: 0;
+            text-indent: 10px;
+          }
 
           span {
             display: flex;
