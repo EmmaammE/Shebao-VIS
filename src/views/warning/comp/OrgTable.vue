@@ -15,8 +15,8 @@
             :class="tabIndex===index?'active':''"
           >
             <span>{{d.title}}</span>
-            <span>{{data[d.key].num}}</span>
-            <span>{{data[d.key].money}}</span>
+            <span v-if="data[d.key].num">{{data[d.key].num}}</span>
+            <span v-if="data[d.key].money">{{data[d.key].money}}</span>
           </li>
         </ul>
       </div>
@@ -48,13 +48,13 @@
           </div>
           <!-- 刷小卡次数 -->
           <div class="bar-container" v-else-if="tabIndex === 3">
+            <p>{{item.zong_jin_e}}</p>
             <bar
               :scale="scale"
               :datum="item.jine"
               :data="+item.zong_jin_e"
               :type="1"
             />
-            <p>{{item.zong_jin_e}}</p>
           </div>
         </template>
         <template v-slot:[`item.yao_zhan_bi`]="{ item }">
@@ -112,7 +112,7 @@ import Bar from '@/components/small/Bar.vue';
 import * as d3 from 'd3';
 import BarLine from './BarLine.vue';
 
-const RANGE = [0, 100];
+const RANGE = [0, 190];
 export default {
   props: {
     title: String,
@@ -159,7 +159,7 @@ export default {
           { align: 'center', value: 'yi_chang_ji_gou', text: '异常机构' },
           { align: 'center', value: 'yi_chang_fei_yong', text: '异常费用' },
           {
-            align: 'center', value: 'jine', text: '多地开药次数', width: 150,
+            align: 'center', value: 'jine', text: '多地开药次数', width: 200,
           },
 
         ],
@@ -173,7 +173,7 @@ export default {
           { align: 'center', value: 'can_bao_ren_xing_ming', text: '参保人姓名' },
           { align: 'center', value: 'zong_ju_li', text: '总距离' },
           {
-            align: 'center', value: 'jine', text: '刷卡总金额', width: 150,
+            align: 'center', value: 'jine', text: '刷卡总金额', width: 200,
           },
         ],
         // NOTE虚假住院
@@ -477,7 +477,7 @@ export default {
       overflow-x: hidden;
     }
     th, td {
-      padding: 0!important;
+      padding: 0 5px!important;
     }
 
     .expand-content {
@@ -493,13 +493,14 @@ export default {
   .chart {
     position: absolute;
     right: 10px;
-    width: 280px;
+    width: 57%;
     height: calc(100% - 84px);
     display: flex;
     top: 84px;
     bottom: 0;
     padding: 0;
     flex-direction: column;
+    background-color: transparent!important;
 
     .img-wrapper {
 

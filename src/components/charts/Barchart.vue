@@ -90,6 +90,7 @@
             :x1="xScale[0](datum[0][catagory.key].yu_suan)"
             :x2="xScale[0](datum[0][catagory.key].yu_suan)"
             :y2="yScale(catagory.title)+17"
+            class="divider"
           />
         </g>
 

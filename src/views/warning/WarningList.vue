@@ -26,6 +26,8 @@
         <template v-slot:[`item.type`]="{ item }">
           <!-- 多地开药次数 -->
           <div class="bar-container">
+            <p>{{item.type}}</p>
+
             <bar
               :scale="scale"
               :datum="[Object.keys(item.five_min).length,
@@ -34,7 +36,6 @@
               :data="item.type"
               :type="0"
             />
-            <p>{{item.type}}</p>
           </div>
         </template>
       </v-data-table>

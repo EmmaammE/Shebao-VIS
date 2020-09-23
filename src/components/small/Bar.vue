@@ -1,6 +1,6 @@
 <template>
   <div class="bar-wrapper">
-    <svg :viewBox="`0 0 100 20`" ref="svg">
+    <svg :viewBox="`0 0 ${type*50+150} 20`" ref="svg">
       <template v-if="type===1">
         <!-- 刷小卡 -->
         <rect
@@ -154,6 +154,12 @@ export default {
 
   .bar-wrapper {
     position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  svg {
+    flex:1;
   }
 
   .inner {
