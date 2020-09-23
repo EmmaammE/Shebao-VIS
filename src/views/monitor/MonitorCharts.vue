@@ -103,7 +103,7 @@ const chart1Size = {
 
 const setting = {
   width: 850,
-  height: 100,
+  height: 125,
   cellSize: 14,
   marginLeft: 40,
   marginTop: 20,

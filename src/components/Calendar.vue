@@ -48,7 +48,7 @@
           />
           <text
             :key="year+j+'t'"
-            :x="cellX(data[15])"
+            :x="cellX(data[14])"
             :y="-10"
           >{{j+1}}</text>
         </template>
