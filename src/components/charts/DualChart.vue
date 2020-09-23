@@ -199,7 +199,7 @@ export default {
         // const money = xTopScale.invert(pos[0]).toFixed(2);
 
         const eachBand = yScale.step();
-        const index = Math.round(pos[1] / eachBand);
+        const index = Math.round((pos[1] - eachBand / 2) / eachBand);
         const yValue = yScale.domain().reverse()[index];
 
         that.$emit('tooltip', true, {
