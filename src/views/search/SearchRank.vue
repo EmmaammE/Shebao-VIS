@@ -1,13 +1,21 @@
 <template>
   <v-card class="s-rank-container">
+    <v-overlay v-if="loading" :value="loading" color="#fff" absolute>
+      <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
+    </v-overlay>
+
     <div>
       <p class="she-title">筛选条件</p>
       <div class="s-box text-lg-body-2">时间区间
         <time-picker
-          :dateEnd="endDay"
-          :dateStart="startDay"
+          :dateEnd="dateEnd"
+          :dateStart="dateStart"
           :menu1="menu1"
           :menu2="menu2"
+          @updateMenu1="updateMenu1"
+          @updateMenu2="updateMenu2"
+          @updateDateStart="updateDateStart"
+          @updateDateEnd="updateDateEnd"
           :type="true"
         />
       </div>
@@ -110,15 +118,37 @@
 
     <div class="s-chart-container text-lg-body-2" ref="chart">
 
-      <v-overlay v-if="loading" :value="loading" color="#fff" absolute >
-        <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
-      </v-overlay>
+      <div class="charts" v-if="singleChart && datum!==null">
+        <dura-chart
+          v-bind="chart1Size"
+          :datum="datum"
+          @tooltip="updateTooltip"
+        />
 
-      <template v-else>
-        <div class="charts" v-if="singleChart && datum!==null">
+        <Tooltip v-show="isShowing" v-bind="tipPos">
+          <div class="s-tip">
+            <div>
+              <p v-if="tipData.money">金额：{{tipData.money}}万元</p>
+              <p v-if="tipData.num">数量：{{tipData.num}}例</p>
+            </div>
+          </div>
+        </Tooltip>
+      </div>
+
+      <div class="charts" v-else>
+        <div v-for="(value, name) in datum"
+          :key="name"
+          class="wrapper"
+        >
+          <div class="header">
+            <HosIcon />
+            <p>{{TITLE[name]}} </p>
+          </div>
+
+          <!-- 折线图 -->
           <dura-chart
+            :datum="value"
             v-bind="chart1Size"
-            :datum="datum"
             @tooltip="updateTooltip"
           />
 
@@ -132,35 +162,7 @@
           </Tooltip>
         </div>
 
-        <div class="charts" v-else>
-          <div v-for="(value, name) in datum"
-            :key="name"
-            class="wrapper"
-          >
-            <div class="header">
-              <HosIcon />
-              <p>{{TITLE[name]}} </p>
-            </div>
-
-            <!-- 折线图 -->
-            <dura-chart
-              :datum="value"
-              v-bind="chart1Size"
-              @tooltip="updateTooltip"
-            />
-
-            <Tooltip v-show="isShowing" v-bind="tipPos">
-              <div class="s-tip">
-                <div>
-                  <p v-if="tipData.money">金额：{{tipData.money}}万元</p>
-                  <p v-if="tipData.num">数量：{{tipData.num}}例</p>
-                </div>
-              </div>
-            </Tooltip>
-          </div>
-
-        </div>
-      </template>
+      </div>
       <!-- legends -->
       <div class="legends">
         <span>金额 <MIcon /></span>
@@ -179,6 +181,7 @@ import { FUND_TYPE } from '@/util/type';
 import DuraChart from '@/components/charts/DualChart.vue';
 import TimePicker from '@/components/small/TimePicker.vue';
 import Tooltip from '@/components/Tooltip.vue';
+import timePicker from '@/mixins/date';
 
 const chart1Size = {
   width: 900,
@@ -215,12 +218,6 @@ export default {
 
       number: '',
       lookup: '',
-
-      // 查询时间
-      startDay: new Date('2020-01-01').toISOString().substr(0, 10),
-      endDay: new Date().toISOString().substr(0, 10),
-      menu1: false,
-      menu2: false,
 
       // 排序类型
       selected: 'organization',
@@ -261,6 +258,10 @@ export default {
     Tooltip,
   },
 
+  mixins: [
+    timePicker,
+  ],
+
   mounted() {
     this.bbox = this.$refs.chart.getBoundingClientRect();
   },
@@ -287,8 +288,8 @@ export default {
       const lookup = this.lookup.length === 0 ? null : this.lookup;
       const number = this.number.length === 0 ? null : (+this.number);
       const data = await fetchRank({
-        startDay: this.startDay,
-        endDay: this.endDay,
+        startDay: this.dateStart,
+        endDay: this.dateEnd,
         orgType: this.model.map((d) => FUND_TYPE[d]),
         searchType: this.selected,
         drugItem: lookup,

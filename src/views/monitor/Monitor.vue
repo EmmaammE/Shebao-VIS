@@ -23,6 +23,10 @@
             :dateStart="dateStart"
             :menu1="menu1"
             :menu2="menu2"
+            @updateMenu1="updateMenu1"
+            @updateMenu2="updateMenu2"
+            @updateDateStart="updateDateStart"
+            @updateDateEnd="updateDateEndAction"
           />
           <!-- 时间选择 end-->
 
@@ -40,6 +44,10 @@
       </div>
 
       <div class="charts-container">
+        <v-overlay v-if="loading" :value="loading" color="#fff" absolute z-index="600">
+          <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
+        </v-overlay>
+
         <monitor-charts
           v-for="(data, index) in datafetch"
           :key="index"
@@ -61,6 +69,7 @@ import {
 } from '@/util/http';
 import { ROUTE_PARAM } from '@/util/type';
 import TimePicker from '@/components/small/TimePicker.vue';
+import timePicker from '@/mixins/date';
 import MonitorCharts from './MonitorCharts.vue';
 
 const FEE_TYPE = {
@@ -131,16 +140,13 @@ export default {
   },
 
   data: () => ({
+    loading: true,
+
     tabActive: 0,
     tabTitle: ['总医疗费用（元）', '医保列支费用（元）', '基金支出费用（元）', '门诊均次费用（元）', '住院均次费用（元）', '人次人头（次）'],
     tabNumber: [32678903, 0, 0, 0, 0],
 
     menuSubtitle: ['总医疗费用', '医保列支费用', '基金支出费用', '门诊均次费用', '住院均次费用', '人次人头'],
-
-    dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
-    dateEnd: new Date().toISOString().substr(0, 10),
-    menu1: false,
-    menu2: false,
 
     items: [
       { value: 0, title: '月', key: 'month' },
@@ -157,6 +163,10 @@ export default {
     datafetch: [],
     subTitles: [],
   }),
+
+  mixins: [
+    timePicker,
+  ],
 
   mounted() {
     // fetch 总医疗的四个值
@@ -198,6 +208,8 @@ export default {
 
   methods: {
     getData(value) {
+      this.loading = true;
+
       let type = 0;
       if (value === 'liezhi') {
         this.param_type = 'liezhi';
@@ -214,6 +226,13 @@ export default {
       }
 
       this.getFeeTimeSeries(type);
+    },
+
+    updateDateEndAction(value) {
+      this.updateDateEnd(value);
+      this.$nextTick(() => {
+        this.getData(this.routeType);
+      });
     },
 
     changeTab(index) {
@@ -235,6 +254,8 @@ export default {
         data.inpatient_average,
         data.person_time_head_count,
       ];
+
+      this.loading = false;
     },
 
     async getFund() {
@@ -292,6 +313,7 @@ export default {
       }
 
       this.datafetch = datafetch;
+      this.loading = false;
     },
   },
 

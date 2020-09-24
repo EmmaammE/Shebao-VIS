@@ -1,49 +1,49 @@
 <template>
-<!-- 时间选择 -->
+  <!-- 时间选择 -->
   <div :class="type?'time-container type-2':'time-container'">
     <v-menu
       ref="menu1"
-      v-model="menu1"
+      v-model="localMenu1"
       :close-on-content-click="false"
-      :return-value.sync="dateStart"
+      :return-value.sync="localDateStart"
       transition="scale-transition"
       offset-y
     >
       <template v-slot:activator="{ on, attrs }">
         <input
-          v-model="dateStart"
+          v-model="localDateStart"
           v-bind="attrs"
           v-on="on"
           class="date-input"
         />
       </template>
-      <v-date-picker v-model="dateStart" no-title scrollable>
+      <v-date-picker v-model="localDateStart" no-title scrollable>
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="menu1 = false">取消</v-btn>
-        <v-btn text color="primary" @click="$refs.menu1.save(dateStart)">保存</v-btn>
+        <v-btn text color="primary" @click="localMenu1 = false">取消</v-btn>
+        <v-btn text color="primary" @click="$refs.menu1.save(localDateStart)">保存</v-btn>
       </v-date-picker>
     </v-menu>
     <div>—</div>
     <v-menu
       ref="menu2"
-      v-model="menu2"
+      v-model="localMenu2"
       :close-on-content-click="false"
-      :return-value.sync="dateEnd"
+      :return-value.sync="localDateEnd"
       transition="scale-transition"
       offset-y
     >
       <template v-slot:activator="{ on, attrs }">
       <input
-          v-model="dateEnd"
+          v-model="localDateEnd"
           v-bind="attrs"
           v-on="on"
           class="date-input"
         />
       </template>
-      <v-date-picker v-model="dateEnd" no-title scrollable>
+      <v-date-picker v-model="localDateEnd" no-title scrollable>
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="menu2 = false">取消</v-btn>
-        <v-btn text color="primary" @click="$refs.menu2.save(dateEnd)">保存</v-btn>
+        <v-btn text color="primary" @click="localMenu2 = false">取消</v-btn>
+        <v-btn text color="primary" @click="$refs.menu2.save(localDateEnd)">保存</v-btn>
       </v-date-picker>
     </v-menu>
   </div>
@@ -60,6 +60,57 @@ export default {
     type: {
       type: Boolean,
       default: false,
+    },
+  },
+
+  computed: {
+    localValue: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit('input', value);
+      },
+    },
+
+    localMenu1: {
+      get() {
+        return this.menu1;
+      },
+      set(value) {
+        this.$emit('updateMenu1', value);
+      },
+    },
+
+    localMenu2: {
+      get() {
+        return this.menu2;
+      },
+      set(value) {
+        this.$emit('updateMenu2', value);
+      },
+    },
+
+    localDateStart: {
+      get() {
+        return this.dateStart;
+      },
+      set(value) {
+        if (this.type !== true) {
+          this.$emit('updateDateEnd', null);
+        }
+        this.$emit('updateDateStart', value);
+      },
+    },
+
+    localDateEnd: {
+      get() {
+        return this.dateEnd;
+      },
+
+      set(value) {
+        this.$emit('updateDateEnd', value);
+      },
     },
   },
 };
