@@ -1,6 +1,7 @@
 <template>
   <div class="search-container treatment">
     <v-card outlined class="content-card">
+
       <div class="card-condition">
         <p class="she-title">筛选条件</p>
         <v-sheet class="date-container">
@@ -111,11 +112,11 @@
             <v-text-field
               dense
               outlined
-              v-model="infoid"
+              v-model.trim="infoid"
               label="就诊人编码"
               hide-details
               :height="30"
-          class="min-height"
+              class="min-height"
             ></v-text-field>
 
             <v-text-field
@@ -123,7 +124,7 @@
               outlined
               flat
               hide-details
-              v-model="yishi"
+              v-model.trim="yishi"
               label="处方医师"
               :height="30"
               class="min-height"
@@ -133,11 +134,16 @@
               dense
               outlined
               hide-details
-              v-model="orgName"
+              v-model.trim="orgName"
               label="机构名称"
               :height="30"
               class="min-height"
             ></v-text-field>
+
+            <div class="s-btn-container">
+              <button @click="reset">重置</button>
+              <button @click="toGetData">查询</button>
+            </div>
           </div>
         </v-sheet>
 
@@ -161,6 +167,8 @@
           :footer-props="{'disable-items-per-page':true}"
           show-expand
           dense
+          fixed-header
+          height="45vh"
         >
           <template v-slot:[`item.xing_bie`]="{ item }">
             <div class="custom-avatar">
@@ -173,7 +181,7 @@
           </template>
 
           <template v-slot:expanded-item="{ item }">
-            <td :colspan="13" class="expand-content">
+            <td :colspan="10" class="expand-content">
               <div class="expand-content">
                 <div class="outer">
                   <div v-for="(d,i) in expandHeader"
@@ -268,9 +276,9 @@ export default {
       }, {
         align: 'center', text: '疾病编号', value: 'ji_bing_bian_hao', width: 100,
       },
-      // {
-      //   align: 'center', text: '结算流水号', value: 'jiu_zhi_zhuang_tai',
-      // },
+      {
+        align: 'center', text: '结算流水号', value: 'key',
+      },
       {
         align: 'center', text: '科室名称', value: 'ke_shi_ming_cheng',
       }, {
@@ -312,9 +320,11 @@ export default {
     yishi: null,
     orgName: null,
     infoItems: [
-      ['公立医院',
+      [
+        '公立医院',
         '民营医院',
-        '零售药店'],
+        '零售药店',
+      ],
       [
         '门诊',
         '住院',
@@ -407,6 +417,36 @@ export default {
   methods: {
     avatar(d) {
       return d === '女' ? GirlIcon : BoyIcon;
+    },
+
+    toGetData() {
+      this.getData().then((data) => {
+        this.tableData = data.items;
+        this.totalItems = data.total;
+
+        // 更新选中行
+        this.activeIndex = [{ index: 1 }];
+      });
+    },
+
+    reset() {
+      this.dateBegin = new Date('2019-01-01').toISOString().substr(0, 10);
+      this.dateEnd = new Date().toISOString().substr(0, 10);
+      // 就诊人编码 处方医师 机构名称
+      this.infoid = null;
+      this.yishi = null;
+      this.orgName = null;
+      this.infoModel = [
+        ['公立医院',
+          '民营医院',
+          '零售药店'],
+        [
+          '门诊',
+          '住院',
+          '规定病种',
+          '家庭病床',
+        ],
+      ];
     },
 
     getData() {
@@ -558,10 +598,14 @@ export default {
 
   .custom-input {
     border-bottom: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .custom-avatar {
     display: flex;
+    justify-content: center;
   }
 
   // 就诊信息查询的条件
@@ -590,8 +634,9 @@ export default {
 
   .treatment {
     .table-wrapper {
-      height: 50vh;
-      overflow: auto;
+      width: 80vw;
+      // height: 50vh;
+      // overflow: auto;
     }
     .expand-content {
       height: 45vh;

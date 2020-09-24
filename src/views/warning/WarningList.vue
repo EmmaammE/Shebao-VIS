@@ -51,7 +51,10 @@
         </v-card>
       </v-sheet>
       <div class="wrapper">
-        <v-simple-table dense>
+        <v-simple-table dense
+          height="70vh"
+          fixed-header
+        >
           <template v-slot:default>
             <thead>
               <tr>
@@ -237,11 +240,6 @@ export default {
     margin: 10px;
     height: calc(90vh - 20px);
 
-    .s-table {
-      // height: calc(90vh - 20px);
-      overflow: auto;
-    }
-
     .s-col {
       max-width: 120px;
     }
@@ -280,11 +278,6 @@ export default {
         color:  $she-c;
         border-radius: 4px;
         transition: all 300ms ease-in-out;
-
-        // &.active {
-        //   background: $she-c;
-        //   color: #fff;
-        // }
       }
 
       $blues: #6690ff, #4d6bda, #3348b6, #0f2693;
@@ -308,10 +301,5 @@ export default {
       text-align: center;
     }
 
-    .wrapper {
-      overflow: auto;
-      max-height: 70vh;
-      min-height: 0;
-    }
   }
 </style>

@@ -104,7 +104,7 @@
         </v-text-field>
         </div>
 
-        <div class="btn-container">
+        <div class="s-btn-container">
           <button @click="reset">重置</button>
           <button @click="getData">查询</button>
         </div>
@@ -455,28 +455,6 @@ export default {
           height: 35px;
           background: #fff;
         }
-      }
-    }
-
-    .btn-container {
-      margin: 0 20px;
-      display: flex;
-
-      button {
-        padding: 3px 20px;
-        border: 1px solid #3365ba;
-        letter-spacing: 4px;
-        margin: 5px;
-        outline:none;
-        height: 30px;
-        width: 90px;
-        text-align: center;
-        color: #3365ba;
-        font-size: 0.8rem;
-      }
-      button:nth-child(2) {
-        background: #3365ba;
-        color: #fff;
       }
     }
 

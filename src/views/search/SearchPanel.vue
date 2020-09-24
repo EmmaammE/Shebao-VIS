@@ -68,11 +68,16 @@
           outlined
           dense
           hide-details="true"
-          v-model="id"
+          v-model.trim="id"
           :height="30"
           class="min-height"
           label="身份证号、社保卡号或姓名"
         ></v-text-field>
+
+        <div class="s-btn-container">
+          <button @click="toReset">重置</button>
+          <button @click="toGetData">查询</button>
+        </div>
       </v-sheet>
 
       <v-sheet v-else class="info-inputs">
@@ -161,7 +166,8 @@
         :server-items-length="totalItems"
         :loading="loading"
         :footer-props="{'disable-items-per-page':true}"
-        calculate-widths
+        height="70vh"
+        fixed-header
       >
         <template v-slot:[`item.xing_bie`]="{ item }">
           <div class="custom-avatar">
@@ -399,6 +405,22 @@ export default {
       return d === '女' ? GirlIcon : BoyIcon;
     },
 
+    toReset() {
+      this.dateBegin = new Date('2019-01-01').toISOString().substr(0, 10);
+      this.dateEnd = new Date().toISOString().substr(0, 10);
+      this.id = null;
+    },
+
+    toGetData() {
+      this.getData().then((data) => {
+        this.tableData = data.items;
+        this.totalItems = data.total;
+
+        // 更新选中行
+        this.activeIndex = [{ index: 1 }];
+      });
+    },
+
     getData() {
       this.activeKey = '';
       this.loading = true;
@@ -415,7 +437,9 @@ export default {
     },
 
     initData() {
+      this.toReset();
       this.tableData = [];
+
       this.getData().then((data) => {
         this.tableData = data.items;
         this.totalItems = data.total;
@@ -623,6 +647,8 @@ export default {
 
   .custom-input {
     border-bottom: 2px solid #ccc;
+    display: flex;
+    align-items: center;
   }
 
   .custom-avatar {

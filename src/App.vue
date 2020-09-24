@@ -178,16 +178,7 @@ export default {
       text-align: center;
     }
   }
-  // .map-charts-container {
-  //   .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,
-  //   .v-data-table > .v-data-table__wrapper > table > tbody > tr > th,
-  //   .v-data-table > .v-data-table__wrapper > table > thead > tr > td,
-  //   .v-data-table > .v-data-table__wrapper > table > thead > tr > th,
-  //   .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td,
-  //   .v-data-table > .v-data-table__wrapper > table > tfoot > tr > th {
-  //     padding: 0 10px;
-  //   }
-  // }
+
   .search-container,
   .w-container,
   .treatment {
@@ -218,7 +209,12 @@ export default {
     }
 
     .table-wrapper table{
-      width: 139%!important;
+      width: 200%!important;
+
+    }
+
+    .table-wrapper .v-data-table__wrapper {
+      overflow-x: auto;
     }
 
     // 添加max-height拉高表格

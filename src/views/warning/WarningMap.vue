@@ -26,8 +26,6 @@
         v-for="(d,index) in datum"
         :key="index"
         :options="clusterOptions[index]"
-        @clusterclick="click"
-        @ready="ready"
       >
         <template v-if="indexArr[index] === true">
           <l-marker v-for="(value, name) in d"
@@ -299,8 +297,8 @@ export default {
       this.loading = false;
     },
 
-    click: (e) => console.log('clusterclick', e.layer.getAllChildMarkers()),
-    ready: (e) => console.log('ready', e),
+    // click: (e) => console.log('clusterclick', e.layer.getAllChildMarkers()),
+    // ready: (e) => console.log('ready', e),
 
     // 点击marker
     onClick(e, name, index, cb) {

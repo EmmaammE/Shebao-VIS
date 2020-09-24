@@ -15,8 +15,8 @@
             :class="tabIndex===index?'active':''"
           >
             <span>{{d.title}}</span>
-            <span v-if="data[d.key].num">{{data[d.key].num}}</span>
-            <span v-if="data[d.key].money">{{data[d.key].money}}</span>
+            <span>{{data[d.key].num || 0}}</span>
+            <span>{{data[d.key].money || 0}}</span>
           </li>
         </ul>
       </div>
@@ -34,6 +34,8 @@
         single-select
         @click:row="rowClick"
         :class="tabIndex === 4 ? 'chart-table': ''"
+        height="31vh"
+        fixed-header
       >
         <template v-slot:[`item.jine`]="{ item }">
           <!-- 多地开药次数 -->
@@ -276,7 +278,7 @@ export default {
           this.getOrgFalseHosipital();
           break;
         default:
-          console.log('.');
+          console.log('tabIndex: ', this.tabIndex);
       }
     },
 
