@@ -33,7 +33,7 @@
         :show-expand="tabIndex === 0"
         single-select
         @click:row="rowClick"
-        :class="tabIndex === 4 ? 'chart-table': ''"
+        :class="tabClass[tabIndex]"
         height="31vh"
         fixed-header
       >
@@ -130,6 +130,7 @@ export default {
 
   data() {
     return {
+      tabClass: ['', '', '', 'hide-cursor', 'chart-table'],
       tableHeader: [
         { key: 'qun_ti_jiu_yi', title: '群体就医' },
         { key: 'duo_di_kai_yao', title: '多地开药' },
@@ -159,7 +160,7 @@ export default {
           { align: 'center', value: 'key', text: '医师编号' },
           { align: 'center', value: 'yi_shi_xing_ming', text: '医师姓名' },
           { align: 'center', value: 'yi_chang_ji_gou', text: '异常机构' },
-          { align: 'center', value: 'yi_chang_fei_yong', text: '异常费用' },
+          { align: 'center', value: 'yi_chang_fei_yong', text: '异常费用（元）' },
           {
             align: 'center', value: 'jine', text: '多地开药次数', width: 200,
           },
@@ -175,7 +176,7 @@ export default {
           { align: 'center', value: 'can_bao_ren_xing_ming', text: '参保人姓名' },
           { align: 'center', value: 'zong_ju_li', text: '总距离' },
           {
-            align: 'center', value: 'jine', text: '刷卡总金额', width: 200,
+            align: 'center', value: 'jine', text: '刷卡总金额（元）', width: 200,
           },
         ],
         // NOTE虚假住院
@@ -185,7 +186,7 @@ export default {
           { align: 'center', value: 'patient_name', text: '姓名' },
           { align: 'center', value: 'hospital_interval', text: '住院间隔' },
           {
-            align: 'center', value: 'zhu_yuan_zong_fei_yong', text: '住院总费用', width: 100,
+            align: 'center', value: 'zhu_yuan_zong_fei_yong', text: '住院总费用（元）', zongjwidth: 100,
           },
           // 额外处理
           {
@@ -494,7 +495,7 @@ export default {
 
   .chart {
     position: absolute;
-    right: 10px;
+    right: 16px;
     width: 57%;
     height: calc(100% - 84px);
     display: flex;
@@ -505,11 +506,11 @@ export default {
     background-color: transparent!important;
 
     .img-wrapper {
-
       img {
         object-fit: contain;
         width: 170px;
         float: right;
+        margin: 10px 40px 0 0;
       }
     }
 
@@ -536,5 +537,9 @@ export default {
 
   tr {
     cursor: pointer;
+  }
+
+  .hide-cursor tr{
+    user-select: none;
   }
 </style>

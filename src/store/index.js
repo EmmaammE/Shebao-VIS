@@ -5,9 +5,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    // wei_gui_ji_gou_shu: 0,
-    // wei_gui_ren_shu: 0,
     // wei_gui_lie_zhi_fei_yong
+    // wei_gui_ren_shu: 0,
+    // wei_gui_ji_gou_shu: 0,
     menudata: [0, 0, 0],
 
     // 表格的数据

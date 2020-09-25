@@ -166,52 +166,50 @@ export default {
       }), fetchPatientViolationInfo({
         pageNum: pageNum + 1,
       })]).then((res) => {
-        // console.log(res);
-        const data = { ...res[0] };
-        data.patient_page = { ...res[0].patient_page, ...res[1].patient_page };
         this.pageNum = pageNum + 2;
 
+        // NOTE 后端传过来的是数组
         this.$store.commit({
           type: 'updatemenu',
           data: [
-            res[0].wei_gui_ji_gou_shu + res[1].wei_gui_ji_gou_shu,
-            res[0].wei_gui_ren_shu + res[1].wei_gui_ren_shu,
-            res[0].wei_gui_lie_zhi_fei_yong + res[1].wei_gui_lie_zhi_fei_yong,
+            res[0].wei_gui_lie_zhi_fei_yong[0] + res[1].wei_gui_lie_zhi_fei_yong[0],
+            res[0].wei_gui_ren_shu[0] + res[1].wei_gui_ren_shu[0],
+            res[0].wei_gui_ji_gou_shu[0] + res[1].wei_gui_ji_gou_shu[0],
           ],
         });
 
         const result = this.datum.slice();
         let index = this.datum.length;
 
-        // console.log(data.patient_page);
+        res.forEach((d) => {
+          Object.keys(d.patient_page).forEach((key) => {
+            const chart = Object.keys(d.patient_page[key].yi_chang_ji_gou).map((orgKey) => {
+              const orgData = d.patient_page[key].yi_chang_ji_gou[orgKey];
 
-        Object.keys(data.patient_page).forEach((key) => {
-          const chart = Object.keys(data.patient_page[key].yi_chang_ji_gou).map((orgKey) => {
-            const orgData = data.patient_page[key].yi_chang_ji_gou[orgKey];
+              const a = orgData.qun_ti_jiu_yi.patient;
+              const b = orgData.shua_kong_ka.patient;
+              const c = orgData.shua_xiao_ka.patient;
+              const e = orgData.xu_jia_zhu_yuan.patient;
 
-            const a = orgData.qun_ti_jiu_yi.patient;
-            const b = orgData.shua_kong_ka.patient;
-            const c = orgData.shua_xiao_ka.patient;
-            const d = orgData.xu_jia_zhu_yuan.patient;
+              return { ...orgData, ...{ sum: a + b + c + e, key: orgKey } };
+            });
 
-            return { ...orgData, ...{ sum: a + b + c + d, key: orgKey } };
+            result.push(
+              {
+                tableData: [index + 1,
+                  key,
+                  d.patient_page[key].name,
+                  Object.keys(d.patient_page[key].yi_chang_ji_gou).length,
+                  d.patient_page[key].qun_ti_jiu_yi,
+                  d.patient_page[key].shua_kong_ka,
+                  d.patient_page[key].shua_xiao_ka,
+                  d.patient_page[key].xu_jia_zhu_yuan],
+                chart,
+              },
+            );
+
+            index += 1;
           });
-
-          result.push(
-            {
-              tableData: [index + 1,
-                key,
-                data.patient_page[key].name,
-                Object.keys(data.patient_page[key].yi_chang_ji_gou).length,
-                data.patient_page[key].qun_ti_jiu_yi,
-                data.patient_page[key].shua_kong_ka,
-                data.patient_page[key].shua_xiao_ka,
-                data.patient_page[key].xu_jia_zhu_yuan],
-              chart,
-            },
-          );
-
-          index += 1;
         });
 
         this.datum = result;

@@ -260,6 +260,7 @@ export default {
 
       .avatar {
         height: 60px;
+        width: 60px;
         display: flex;
         align-items: center;
       }

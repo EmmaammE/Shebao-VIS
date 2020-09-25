@@ -14,8 +14,8 @@
         <line v-for="(d,index) in datum"
           :key="index"
           :y1="3"
-          :x1="scale(d*index)"
-          :x2="scale(d*index)"
+          :x1="scale(d*index+d)"
+          :x2="scale(d*index+d)"
           :y2="17"
           class="line"
         >
@@ -50,7 +50,9 @@
     <Tooltip v-bind="tipPos">
       <div class="s-tip" v-show="isShowing">
         <div class="inner" v-if="tipData!==null">
-          <p>{{tipData.unit}}: {{Number(tipData.data).toLocaleString()}}</p>
+          <p>
+            <span v-if="tipData.unit">{{tipData.unit}}: </span>
+            {{Number(tipData.data).toLocaleString()}}</p>
         </div>
       </div>
     </Tooltip>
@@ -90,11 +92,11 @@ export default {
   },
 
   mounted() {
+    const that = this;
+    const svg = d3.select(this.$refs.svg);
+
     if (this.type === 0) {
       // 如果是多地开药
-      const that = this;
-      const svg = d3.select(this.$refs.svg);
-
       svg.selectAll('g').selectAll('rect')
         .on('mousemove', function act() {
           const index = +d3.select(this).attr('index');
@@ -116,10 +118,27 @@ export default {
           };
           that.isShowing = true;
         });
-      svg.on('mouseout', () => {
-        this.isShowing = false;
-      });
+    } else {
+      // 刷小卡
+      svg.select('rect')
+      // eslint-disable-next-line
+        .on('mousemove', function act() {
+          that.tipData = {
+            unit: null,
+            data: that.datum[0],
+          };
+
+          that.tipPos = {
+            left: d3.event.layerX,
+            top: -35,
+          };
+          that.isShowing = true;
+        });
     }
+
+    // svg.on('mouseout', () => {
+    //   this.isShowing = false;
+    // });
   },
 
   computed: {
