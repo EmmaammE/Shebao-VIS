@@ -130,29 +130,29 @@ const leaves = [
   { text: '人均列支费用（元）', value: 'ren_jun_lie_zhi_fei_yong' },
   { text: '次均列支费用(元)', value: 'ci_jun_lie_zhi_fei_yong' },
 
-  { text: '列支费用', value: 'lie_zhi_fei_yong' },
-  { text: '人头数', value: 'ren_tou_shu' },
-  { text: '人次数', value: 'ren_ci_shu' },
-  { text: '人均费用', value: 'ren_jun_fei_yong' },
-  { text: '均次费用', value: 'jun_ci_fei_yong' },
+  { text: '列支费用', value: 'lie_zhi_fei_yong', prefix: 'zhu_yuan' },
+  { text: '人头数', value: 'ren_tou_shu', prefix: 'zhu_yuan' },
+  { text: '人次数', value: 'ren_ci_shu', prefix: 'zhu_yuan' },
+  { text: '人均费用', value: 'ren_jun_fei_yong', prefix: 'zhu_yuan' },
+  { text: '均次费用', value: 'jun_ci_fei_yong', prefix: 'zhu_yuan' },
 
-  { text: '列支费用', value: 'lie_zhi_fei_yong' },
-  { text: '人头数', value: 'ren_tou_shu' },
-  { text: '人次数', value: 'ren_ci_shu' },
-  { text: '人均费用', value: 'ren_jun_fei_yong' },
-  { text: '均次费用', value: 'jun_ci_fei_yong' },
+  { text: '列支费用', value: 'lie_zhi_fei_yong', prefix: 'men_zhen' },
+  { text: '人头数', value: 'ren_tou_shu', prefix: 'men_zhen' },
+  { text: '人次数', value: 'ren_ci_shu', prefix: 'men_zhen' },
+  { text: '人均费用', value: 'ren_jun_fei_yong', prefix: 'men_zhen' },
+  { text: '均次费用', value: 'jun_ci_fei_yong', prefix: 'men_zhen' },
 
-  { text: '列支费用', value: 'lie_zhi_fei_yong' },
-  { text: '人头数', value: 'ren_tou_shu' },
-  { text: '人次数', value: 'ren_ci_shu' },
-  { text: '人均费用', value: 'ren_jun_fei_yong' },
-  { text: '均次费用', value: 'jun_ci_fei_yong' },
+  { text: '列支费用', value: 'lie_zhi_fei_yong', prefix: 'gui_ding_bing_zhong' },
+  { text: '人头数', value: 'ren_tou_shu', prefix: 'gui_ding_bing_zhong' },
+  { text: '人次数', value: 'ren_ci_shu', prefix: 'gui_ding_bing_zhong' },
+  { text: '人均费用', value: 'ren_jun_fei_yong', prefix: 'gui_ding_bing_zhong' },
+  { text: '均次费用', value: 'jun_ci_fei_yong', prefix: 'gui_ding_bing_zhong' },
 
-  { text: '列支费用', value: 'lie_zhi_fei_yong' },
-  { text: '人头数', value: 'ren_tou_shu' },
-  { text: '人次数', value: 'ren_ci_shu' },
-  { text: '人均费用', value: 'ren_jun_fei_yong' },
-  { text: '均次费用', value: 'jun_ci_fei_yong' },
+  { text: '列支费用', value: 'lie_zhi_fei_yong', prefix: 'jia_ting_bing_chuang' },
+  { text: '人头数', value: 'ren_tou_shu', prefix: 'jia_ting_bing_chuang' },
+  { text: '人次数', value: 'ren_ci_shu', prefix: 'jia_ting_bing_chuang_ting_bing_chuang' },
+  { text: '人均费用', value: 'ren_jun_fei_yong', prefix: 'jia_ting_bing_chuang' },
+  { text: '均次费用', value: 'jun_ci_fei_yong', prefix: 'jia_ting_bing_chuang' },
 
   { text: '化验费及占比', value: 'hua_yan_fei' },
   { text: '检查费及占比', value: 'jian_cha_fei' },
@@ -232,7 +232,8 @@ const handleData = (data) => {
         case 19:
         case 20:
           // 门诊情况
-          res[leave.value] = d.yi_liao_fei_yong.men_zhen_qing_kuang[leave.value];
+          res[leave.value + leave.prefix] = d.yi_liao_fei_yong.men_zhen_qing_kuang[leave.value];
+          leave.value += leave.prefix;
           break;
 
         case 21:
@@ -241,7 +242,9 @@ const handleData = (data) => {
         case 24:
         case 25:
           // 规定病种情况
-          res[leave.value] = d.yi_liao_fei_yong.gui_ding_bing_zhong_qing_kuang[leave.value];
+          res[leave.value + leave.prefix] = d.yi_liao_fei_yong
+            .gui_ding_bing_zhong_qing_kuang[leave.value];
+          leave.value += leave.prefix;
           break;
 
         case 26:
@@ -250,7 +253,9 @@ const handleData = (data) => {
         case 29:
         case 30:
           // 家庭病床情况
-          res[leave.value] = d.yi_liao_fei_yong.jia_ting_bing_chuang_qing_kuang[leave.value];
+          res[leave.value + leave.prefix] = d.yi_liao_fei_yong
+            .jia_ting_bing_chuang_qing_kuang[leave.value];
+          leave.value += leave.prefix;
           break;
 
         case 31:
