@@ -237,6 +237,8 @@ export default {
 
       const counts = [{}, {}, {}, {}];
       let maxV = 0;
+
+      let table = {};
       data.forEach((d, i) => {
         const count = {};
         // 对每一类异常
@@ -249,12 +251,22 @@ export default {
 
         maxV = Math.max(maxV, ...Object.values(count));
         counts[i] = count;
+        table = { ...d };
       });
 
       this.wData = counts;
       this.widthScale = this.widthScale.domain([0, maxV]);
       // 显示popup
       this.openPopup = true;
+
+      // 将数据存成表格数据
+      this.$store.commit({
+        type: 'updateTableData',
+        data: {
+          page: table,
+          total: 0,
+        },
+      });
     },
 
     getAllDetail(activeIndex) {

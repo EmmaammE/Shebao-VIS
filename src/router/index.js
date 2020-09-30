@@ -79,6 +79,17 @@ const routes = [
         meta: {
           linkIndex: 1,
           type: 0,
+          // 是否能切换表格
+          table: true,
+        },
+      },
+      {
+        path: 'search/mingxi/table',
+        component: () => import('../views/Table.vue'),
+        name: '智能搜索引擎-费用明细-表格',
+        meta: {
+          linkIndex: 1,
+          type: 0,
         },
       },
       {
@@ -101,6 +112,16 @@ const routes = [
         path: 'warning/action/people',
         name: '智能预警-参保人',
         component: () => import('@/views/warning/WarningPeople.vue'),
+        meta: {
+          linkIndex: 2,
+          activeIndex: 1,
+          table: true,
+        },
+      },
+      {
+        path: 'warning/action/people/table',
+        name: '智能预警-参保人-表格',
+        component: () => import('../views/Table.vue'),
         meta: {
           linkIndex: 2,
           activeIndex: 1,

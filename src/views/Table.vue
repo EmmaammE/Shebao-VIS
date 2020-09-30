@@ -76,6 +76,12 @@ export default {
         case '/search/jigou/table':
           module = await import('@/util/table/rank');
           break;
+        case '/search/mingxi/table':
+          module = await import('@/util/table/detail');
+          break;
+        case '/warning/action/people/table':
+          module = await import('@/util/table/people');
+          break;
         default:
           module = await import('@/util/table/org');
           break;
