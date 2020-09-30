@@ -345,7 +345,12 @@ export default {
       });
 
       this.scales = this.scales.map((scale, index) => scale.domain([0, maxArr[index]]));
-      this.standard = this.falseKeys.map((key) => data.standard[key.value]);
+      this.standard = this.falseKeys.map((key) => {
+        if (data.standard) {
+          return data.standard[key.value];
+        }
+        return 0;
+      });
 
       setTimeout(() => {
         document.querySelector('tbody tr')
