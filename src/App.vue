@@ -268,6 +268,6 @@ export default {
   }
 
   .layout-insert .v-list-item__content {
-    margin-left: -10px;
+    margin-left: 26px;
   }
 </style>

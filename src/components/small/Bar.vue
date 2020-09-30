@@ -136,9 +136,9 @@ export default {
         });
     }
 
-    // svg.on('mouseout', () => {
-    //   this.isShowing = false;
-    // });
+    svg.on('mouseout', () => {
+      this.isShowing = false;
+    });
   },
 
   computed: {

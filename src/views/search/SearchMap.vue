@@ -387,7 +387,7 @@ export default {
           align: 'center', value: 'fu_wu_yi_bao_ren_ci', text: '服务医保人次', width: 90,
         },
         {
-          align: 'center', value: 'lie_zhi_fei_yong', text: '劣质费用', width: 70,
+          align: 'center', value: 'lie_zhi_fei_yong', text: '列支费用', width: 70,
         },
         {
           align: 'center', value: 'yao_pin_fu_wu_xiang_mu', text: '药品服务项目', width: 100,
@@ -536,6 +536,15 @@ export default {
 
       this.datum = result;
       this.loading = false;
+
+      // 将数据存成表格数据
+      this.$store.commit({
+        type: 'updateTableData',
+        data: {
+          page: data.fee_detail_page,
+          total: 0,
+        },
+      });
     },
 
     getData() {

@@ -44,7 +44,7 @@
             <bar
               :scale="scale"
               :datum="[item.five_min, item.ten_min, item.sixty_min]"
-              :data="item.day"
+              :data="+item.day"
               :type="0"
             />
           </div>
@@ -299,7 +299,12 @@ export default {
       let maxValue = Number.MIN_VALUE;
       this.datum = Object.keys(data).map((key, index) => {
         maxValue = Math.max(maxValue, data[key].day);
-        return { ...data[key], ...{ index: index + 1, key, jine: '' } };
+        return {
+          ...data[key],
+          ...{
+            index: index + 1, key, jine: '', yi_chang_fei_yong: Number(data[key].yi_chang_fei_yong).toFixed(2),
+          },
+        };
       });
       this.scale.range(RANGE).domain([0, maxValue]);
     },
