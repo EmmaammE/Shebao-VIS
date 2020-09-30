@@ -128,9 +128,8 @@
       :zoomcb="zoomUpdated"
       :class="openPopup?'':'hide-popup'"
     >
-      <!-- marker 费用明细-->
+      <!-- marker 机构汇总-->
       <template v-if="$route.meta.type > 0">
-
         <template
           v-for="value in datum"
         >
@@ -149,20 +148,8 @@
         </template>
       </template>
 
-      <!-- 就诊信息 markers -->
+      <!-- 费用明细 markers -->
       <template v-else>
-        <!-- <l-marker
-          v-for="(d,key) in datum"
-          :key="key"
-          :lat-lng="[d.lat, d.lng]"
-          :icon="d.icon"
-          @add="openPopupAction"
-        >
-          <l-popup
-            :options = "options"
-          >{{d.ji_gou_ming_cheng}}</l-popup>
-        </l-marker> -->
-
         <v-marker-cluster
           :options="clusterOption"
         >
@@ -172,6 +159,7 @@
             :lat-lng="[d.lat, d.lng]"
             :icon="d.icon"
             @add="openPopupAction"
+            @click="onClickFeiyongMarker($event, key)"
           >
             <l-popup
               :options = "{...options, type: d.orgType}"
@@ -184,12 +172,27 @@
     <div class="map-tip" v-if="latLng"
       :style="{left: latLng.x+'px', top: latLng.y+'px'}"
     >
-      <div class='inner'>
+      <div class='inner' v-if="$route.meta.type > 0">
         <h2><router-link :to="'/search/profile/'+tipId">{{tip.name}}</router-link></h2>
         <p>机构编码：{{tip.ji_gou_dai_ma}}</p>
         <p>法定代表人：{{tip.fa_ding_dai_biao_ren}}</p>
         <p>地址：{{tip.di_zhi}}</p>
         <p>盈利类型：{{tip.ying_li_lei_xing}}</p>
+      </div>
+
+      <div class="inner" v-else>
+        <v-data-table
+          dense
+          :headers="tableHeaders"
+          :items="tableItems"
+          :hide-default-footer="true"
+          item-key="index"
+          height="20vh"
+          disable-sort
+          fixed-header
+          class="s-table"
+        >
+        </v-data-table>
       </div>
     </div>
   </div>
@@ -209,7 +212,7 @@ import image4 from '@/assets/search/map/4.png';
 import image5 from '@/assets/search/map/5.png';
 import image6 from '@/assets/search/map/6.png';
 import Vue2LeafletMarkercluster from 'vue2-leaflet-markercluster';
-import * as d3 from 'd3';
+// import * as d3 from 'd3';
 import Piechart from '@/components/small/Piechart.vue';
 import Vue from 'vue';
 
@@ -234,7 +237,7 @@ const iconFactory = (image = image1, type = '', num = 0.5) => L.icon({
 });
 
 const initSatus = {
-  dateStart: new Date('2020-01-01').toISOString().substr(0, 10),
+  dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
   dateEnd: new Date().toISOString().substr(0, 10),
   active: 1,
   // 地域类型
@@ -314,7 +317,7 @@ export default {
   data() {
     return {
       loading: true,
-      dateStart: new Date('2020-02-01').toISOString().substr(0, 10),
+      dateStart: new Date('2019-01-01').toISOString().substr(0, 10),
       dateEnd: new Date().toISOString().substr(0, 10),
       menu1: false,
       menu2: false,
@@ -372,23 +375,40 @@ export default {
         // disableClusteringAtZoom: 14,
       },
       // icon: initicon('red'),
+
+      tableHeaders: [
+        {
+          align: 'center', value: 'dan_jia', text: '单价', width: 50,
+        },
+        {
+          align: 'center', value: 'fei_yong_zhan_bi', text: '费用占比', width: 70,
+        },
+        {
+          align: 'center', value: 'fu_wu_yi_bao_ren_ci', text: '服务医保人次', width: 90,
+        },
+        {
+          align: 'center', value: 'lie_zhi_fei_yong', text: '劣质费用', width: 70,
+        },
+        {
+          align: 'center', value: 'yao_pin_fu_wu_xiang_mu', text: '药品服务项目', width: 100,
+        },
+        {
+          align: 'center', value: 'zong_fei_yong_zhi_chi', text: '总费用支出', width: 70,
+        },
+      ],
+      tableItems: [],
     };
   },
 
   computed: {
     label() {
-      return ['医疗机构编码或名称', '药品/服务项目', '医疗机构编码或名称'][this.$route.meta.type];
+      return ['药品/服务项目', '药品/服务项目', '医疗机构编码或名称'][this.$route.meta.type];
     },
   },
   created() {
     // 组件创建完后获取数据，
     this.getData();
   },
-
-  // mounted() {
-  // ["", "search", "jigou"]
-  //   console.log(this.$route.fullPath.split('/'));
-  // },
 
   watch: {
     $route: 'getData',
@@ -466,40 +486,55 @@ export default {
         pageNum: null,
       });
 
-      let minValue = Number.MAX_VALUE;
-      let maxValue = Number.MIN_VALUE;
-      const d = data.fee_detail_page;
-      Object.keys(d).forEach((key) => {
-        minValue = Math.min(+d[key].zong_fei_yong_zhi_chu);
-        maxValue = Math.max(+d[key].zong_fei_yong_zhi_chu);
-      });
+      // 按照机构名称分组数据
+      const result = {};
 
-      const scale = d3.scaleLinear().domain([minValue, maxValue]).range([0.1, 0.8]);
+      Object.keys(data.fee_detail_page).forEach((key) => {
+        const item = data.fee_detail_page[key];
+        const org = item.ji_gou_ming_cheng;
+        if (result[org] === undefined) {
+          result[org] = {
+            ji_gou_ming_cheng: org,
+            lng: item.lng,
+            lat: item.lat,
+            orgType: item.orgType,
+            children: [],
+          };
 
-      Object.keys(d).forEach((key) => {
-        switch (d[key].orgType) {
-          case 'private':
-            d[key].icon = iconFactory(image1, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
-            break;
-          case 'community':
-            d[key].icon = iconFactory(image3, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
-            break;
-          case 'oral':
-            d[key].icon = iconFactory(image4, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
-            break;
-          case 'outpatient':
-            d[key].icon = iconFactory(image5, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
-            break;
-          case 'drugstore':
-            d[key].icon = iconFactory(image6, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
-            break;
-          default:
-            d[key].icon = iconFactory(image2, d[key].orgType, scale(+d[key].zong_fei_yong_zhi_chu));
-            break;
+          switch (result[org].orgType) {
+            case 'private':
+              result[org].icon = iconFactory(image1, result[org].orgType);
+              break;
+            case 'community':
+              result[org].icon = iconFactory(image3, result[org].orgType);
+              break;
+            case 'oral':
+              result[org].icon = iconFactory(image4, result[org].orgType);
+              break;
+            case 'outpatient':
+              result[org].icon = iconFactory(image5, result[org].orgType);
+              break;
+            case 'drugstore':
+              result[org].icon = iconFactory(image6, result[org].orgType);
+              break;
+            default:
+              result[org].icon = iconFactory(image2, result[org].orgType);
+              break;
+          }
         }
+
+        result[org].children.push({
+          yao_pin_fu_wu_xiang_mu: item.yao_pin_fu_wu_xiang_mu,
+          zong_fei_yong_zhi_chu: item.zong_fei_yong_zhi_chu,
+          lie_zhi_fei_yong: item.lie_zhi_fei_yong,
+          fei_yong_zhan_bi: item.fei_yong_zhan_bi,
+          dan_jia: item.dan_jia,
+          fu_wu_yi_bao_ren_shu: item.fu_wu_yi_bao_ren_shu,
+          fu_wu_yi_bao_ren_ci: item.fu_wu_yi_bao_ren_ci,
+        });
       });
 
-      this.datum = d;
+      this.datum = result;
       this.loading = false;
     },
 
@@ -558,6 +593,11 @@ export default {
         this.tip = data;
         this.tipId = id;
       }
+    },
+
+    onClickFeiyongMarker(e, id) {
+      this.latLng = e.containerPoint;
+      this.tableItems = this.datum[id].children;
     },
   },
 

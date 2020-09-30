@@ -174,16 +174,17 @@ export default {
 
   .map-charts-container {
     td {
-      font-size: 0.5rem!important;
+      font-size:12px!important;
       text-align: center;
     }
   }
 
   .search-container,
   .w-container,
+  .inner,
   .treatment {
     th, td {
-      font-size: 0.5rem!important;
+      font-size: 12px!important;
     }
 
     .v-data-table > .v-data-table__wrapper > table > tbody > tr > td,

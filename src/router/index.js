@@ -69,6 +69,7 @@ const routes = [
         meta: {
           linkIndex: 1,
           type: 1,
+          table: true,
         },
       },
       {
@@ -123,6 +124,16 @@ const routes = [
           activeIndex: 1,
         },
       },
+
+      // 机构预算预警
+      {
+        path: 'warning/budget/:routeType/table',
+        component: () => import('../views/Table.vue'),
+        meta: {
+          linkIndex: 2,
+          activeIndex: 0,
+        },
+      },
       {
         path: 'warning/budget/:routeType',
         name: '智能预警',
@@ -130,6 +141,7 @@ const routes = [
         meta: {
           linkIndex: 2,
           activeIndex: 0,
+          table: true,
         },
       },
     ],

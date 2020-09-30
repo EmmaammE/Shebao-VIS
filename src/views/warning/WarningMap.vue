@@ -284,10 +284,25 @@ export default {
         orgType: this.$route.params.routeType,
       });
 
+      const table = {
+        page: {
+          ...(data.red ? data.red : {}),
+          ...(data.green ? data.green : {}),
+          ...(data.red ? data.red : {}),
+        },
+        total: 0,
+      };
+
       this.datum = [data.red ? data.red : {},
         data.yellow ? data.yellow : {},
         data.green ? data.green : {}];
       this.loading = false;
+
+      // 将数据存成表格数据
+      this.$store.commit({
+        type: 'updateTableData',
+        data: table,
+      });
     },
 
     async getOrganizationInfo() {

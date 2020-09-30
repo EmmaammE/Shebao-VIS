@@ -1,5 +1,5 @@
 // 表格的表头
-const searchRankHeader = [
+const header = [
   { text: '序号' },
   {
     text: '机构基本情况',
@@ -311,7 +311,7 @@ const handleData = (data) => {
 };
 
 export {
-  searchRankHeader,
+  header,
   leaves,
   handleData,
 };

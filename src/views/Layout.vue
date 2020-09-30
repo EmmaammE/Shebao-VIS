@@ -215,12 +215,13 @@ export default {
   methods: {
     toTable() {
       // console.log(this.$route);
-      const { path } = this.$route;
+      const { path, meta } = this.$route;
+
       if (path.indexOf('/table') !== -1) {
         this.$router.push({
           path: path.replace('/table', ''),
         });
-      } else {
+      } else if (meta.table) {
         this.$router.push({
           path: `${path}/table`,
         });

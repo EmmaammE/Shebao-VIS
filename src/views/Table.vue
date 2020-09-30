@@ -1,8 +1,9 @@
 <template>
  <v-card class="table-container">
     <v-data-table
+      v-if="tableUtil"
       class="s-table expand-table"
-      :headers="headers"
+      :headers="tableUtil.headers"
       :items="tableData"
       item-key="index"
       disable-sort
@@ -12,12 +13,11 @@
       dense
       hide-default-header
       :items-per-page="10"
-      calculate-widths
     >
       <template v-slot:header="{}">
         <thead>
             <tr
-              v-for="(header, row) in tableHeader.trees"
+              v-for="(header, row) in tableUtil.tableHeader.trees"
               :key="row"
             >
               <th
@@ -39,10 +39,7 @@
 
 <script>
 import getSpan from '@/util/tableHeader';
-import { searchRankHeader, leaves, handleData } from '@/util/table/rank';
 import { mapState } from 'vuex';
-
-const tableHeader = getSpan(searchRankHeader);
 
 export default {
   data() {
@@ -52,28 +49,44 @@ export default {
 
       options: {},
       loading: false,
-      headers: leaves,
-      tableHeader,
+      tableUtil: null,
     };
   },
 
+  mounted() {
+    this.getModule();
+  },
+
   computed: mapState({
-    // 为了能够使用 `this` 获取局部状态，必须使用常规函数
-    // countPlusLocalState(state) {
-    //   return state.count + this.localCount;
-    // },
     totalItems(state) {
       return state.tableData.total;
     },
 
     tableData(state) {
-      return handleData(state.tableData.page);
+      return this.tableUtil.handleData(state.tableData.page);
     },
-
   }),
 
-  mounted() {
-    // console.log(tableHeader.trees);
+  methods: {
+    async getModule() {
+      const { path } = this.$route;
+      let module;
+
+      switch (path) {
+        case '/search/jigou/table':
+          module = await import('@/util/table/rank');
+          break;
+        default:
+          module = await import('@/util/table/org');
+          break;
+      }
+
+      this.tableUtil = {
+        headers: module.leaves,
+        tableHeader: getSpan(module.header),
+        handleData: module.handleData,
+      };
+    },
   },
 };
 </script>
