@@ -48,6 +48,8 @@
           <v-progress-circular indeterminate size="64" color="#98cbfa"></v-progress-circular>
         </v-overlay>
 
+        <react-chart />
+
         <monitor-charts
           v-for="(data, index) in datafetch"
           :key="index"
@@ -70,6 +72,7 @@ import {
 import { ROUTE_PARAM } from '@/util/type';
 import TimePicker from '@/components/small/TimePicker.vue';
 import timePicker from '@/mixins/date';
+import ReactChart from '@/react-components/chart';
 import MonitorCharts from './MonitorCharts.vue';
 
 const FEE_TYPE = {
@@ -133,6 +136,7 @@ export default {
     Badge,
     TimePicker,
     MonitorCharts,
+    ReactChart,
   },
 
   props: {
