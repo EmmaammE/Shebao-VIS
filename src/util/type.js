@@ -42,6 +42,6 @@ export const ROUTE_PARAM = {
   yaoshi: '药师违规预警',
 };
 
-export const token = 'pk.eyJ1IjoiendzdGFydCIsImEiOiJjazRjaDB0MDAwb2Q0M3Vud2NhYjNuZWN5In0.NbjC9BqTGfVEcJuxU7JcjA';
+export const token = 'pk.eyJ1IjoienJjY2NyeiIsImEiOiJjank2bjgzMzcwZmJqM2RsYjBtbjh2Z3F6In0.Bi-7OaOTBaJ43pJM-hAT-g';
 
-export const style = 'zwstart/ckcwya9si0cjk1jqhg70dj5cb';
+export const style = 'zrcccrz/ckd1wz21j2epc1ipmikmfqrsi';
